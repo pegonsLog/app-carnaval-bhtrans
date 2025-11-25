@@ -1,0 +1,48 @@
+<div class="home-container">
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Sistema de Gestão de Blocos
+                <span class="highlight">Carnaval BHTrans</span>
+            </h1>
+            <p class="hero-description">
+                Gerencie de forma eficiente todos os blocos de carnaval com nossa plataforma integrada ao Firebase.
+                Importe, atualize e consulte informações em tempo real.
+            </p>
+            <div class="hero-actions">
+                <a routerLink="/importar" class="btn btn-primary">
+                    📁 Importar Dados
+                </a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="decoration-circle circle-1"></div>
+            <div class="decoration-circle circle-2"></div>
+            <div class="decoration-circle circle-3"></div>
+            <span class="hero-emoji">🎉</span>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2 class="section-title">Funcionalidades</h2>
+        <div class="features-grid">
+            <div class="feature-card" *ngFor="let feature of features">
+                <div class="feature-icon">{{ feature.icon }}</div>
+                <h3 class="feature-title">{{ feature.title }}</h3>
+                <p class="feature-description">{{ feature.description }}</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="cta-content">
+            <h2 class="cta-title">Pronto para começar?</h2>
+            <p class="cta-description">
+                Importe seu primeiro arquivo Excel e veja como é fácil gerenciar seus blocos de carnaval.
+            </p>
+            <a routerLink="/importar" class="btn btn-secondary">
+                Começar Agora
+            </a>
+        </div>
+    </section>
+</div>

@@ -1,0 +1,25 @@
+<header class="header">
+    <div class="container">
+        <div class="logo">
+            <a routerLink="/">
+                <span class="logo-icon">🎭</span>
+                <span class="logo-text">Carnaval BHTrans</span>
+            </a>
+        </div>
+
+        <nav class="nav" [class.active]="isMenuOpen">
+            <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                <span class="nav-icon">🏠</span>
+                <span>Início</span>
+            </a>
+            <a routerLink="/importar" routerLinkActive="active">
+                <span class="nav-icon">📤</span>
+                <span>Importar Excel</span>
+            </a>
+        </nav>
+
+        <button class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle menu">
+            <span class="menu-icon">{{ isMenuOpen ? '✕' : '☰' }}</span>
+        </button>
+    </div>
+</header>

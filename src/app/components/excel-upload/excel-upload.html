@@ -1,0 +1,60 @@
+<div class="excel-upload-container">
+    <div class="upload-section">
+        <h2>Importar Arquivo Excel</h2>
+
+        <div class="file-input-wrapper">
+            <input type="file" id="fileInput" accept=".xlsx, .xls" (change)="onFileChange($event)" #fileInput />
+            <label for="fileInput" class="file-label">
+                <span class="icon">📁</span>
+                <span>{{ fileName || 'Selecione um arquivo Excel' }}</span>
+            </label>
+        </div>
+
+        <div class="action-buttons" *ngIf="excelData.length > 0">
+            <button class="save-btn" (click)="salvarNoFirestore()" [disabled]="isSaving">
+                <span *ngIf="!isSaving">💾 Salvar no Firestore</span>
+                <span *ngIf="isSaving">⏳ Salvando...</span>
+            </button>
+
+            <button class="clear-btn" (click)="clearData(); fileInput.value = ''" [disabled]="isSaving">
+                🗑️ Limpar Dados
+            </button>
+        </div>
+
+        <div class="message-box" *ngIf="saveMessage" [class.success]="saveMessageType === 'success'"
+            [class.error]="saveMessageType === 'error'">
+            {{ saveMessage }}
+        </div>
+    </div>
+
+    <div class="data-section" *ngIf="excelData.length > 0">
+        <h3>Dados Carregados ({{ excelData.length }} registros)</h3>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th *ngFor="let header of headers">{{ header }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let row of excelData; let i = index">
+                        <td class="row-number">{{ i + 1 }}</td>
+                        <td *ngFor="let header of headers">
+                            {{ row[header] || '-' }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="empty-state" *ngIf="excelData.length === 0">
+        <div class="empty-icon">
+            📊
+        </div>
+        <p>Nenhum arquivo carregado</p>
+        <p class="empty-subtitle">Selecione um arquivo Excel (.xlsx ou .xls) para visualizar os dados</p>
+    </div>
+</div>

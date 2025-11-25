@@ -1,0 +1,127 @@
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: 'Montserrat', sans-serif;
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+
+            &:hover {
+                transform: scale(1.05);
+            }
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+    }
+
+    .nav {
+        display: flex;
+        gap: 2rem;
+
+        a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            svg-icon {
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+
+                svg-icon {
+                    color: white;
+                }
+            }
+
+            &.active {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                font-weight: 600;
+
+                svg-icon {
+                    color: white;
+                }
+            }
+        }
+    }
+
+    .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .menu-toggle {
+            display: flex;
+        }
+
+        .nav {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex-direction: column;
+            gap: 0;
+            padding: 1rem 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+
+            &.active {
+                max-height: 300px;
+            }
+
+            a {
+                padding: 1rem 2rem;
+                border-radius: 0;
+
+                &:hover,
+                &.active {
+                    background: rgba(255, 255, 255, 0.15);
+                }
+            }
+        }
+    }
+}

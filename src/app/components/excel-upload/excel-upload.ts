@@ -24,6 +24,54 @@ export class ExcelUploadComponent {
 
   constructor(private blocosService: BlocosService) { }
 
+  // Função auxiliar para parsear datas do Excel
+  private parseExcelDate(dateValue: any): Date {
+    if (!dateValue) {
+      return new Date();
+    }
+
+    // Se já for um objeto Date válido
+    if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
+      return dateValue;
+    }
+
+    // Se for um número (serial do Excel)
+    if (typeof dateValue === 'number') {
+      // Excel usa 1/1/1900 como base (com bug do ano bissexto)
+      const excelEpoch = new Date(1899, 11, 30);
+      return new Date(excelEpoch.getTime() + dateValue * 86400000);
+    }
+
+    // Se for string, tenta diferentes formatos
+    if (typeof dateValue === 'string') {
+      const trimmed = dateValue.trim();
+
+      // Formato dd/mm/yyyy ou dd-mm-yyyy
+      const brMatch = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      if (brMatch) {
+        const [, day, month, year] = brMatch;
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      }
+
+      // Formato yyyy-mm-dd ou yyyy/mm/dd
+      const isoMatch = trimmed.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+      if (isoMatch) {
+        const [, year, month, day] = isoMatch;
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      }
+
+      // Tenta o parse padrão do JavaScript
+      const parsed = new Date(trimmed);
+      if (!isNaN(parsed.getTime())) {
+        return parsed;
+      }
+    }
+
+    // Se nada funcionar, retorna a data atual
+    console.warn('Não foi possível parsear a data:', dateValue);
+    return new Date();
+  }
+
   onFileChange(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -64,7 +112,7 @@ export class ExcelUploadComponent {
       nomeDoBloco: excelRow['Nome Do Bloco'] || '',
       categoriaDoBloco: excelRow['Categoria Do Bloco'] || '',
       autorizaDivulgacao: excelRow['Autoriza Divulgação']?.toLowerCase() === 'sim',
-      dataCadastroModificacao: excelRow['Data de Cadastro ou Modificação'] ? new Date(excelRow['Data de Cadastro ou Modificação']) : new Date(),
+      dataCadastroModificacao: this.parseExcelDate(excelRow['Data de Cadastro ou Modificação']),
       primeiroCadastro: excelRow['Primeiro Cadastro?']?.toLowerCase() === 'sim',
 
       publicoDeclarado: parseInt(excelRow['Público Declarado']) || 0,
@@ -73,7 +121,7 @@ export class ExcelUploadComponent {
       estiloDeMusica: excelRow['Estilo de Música'] || '',
       descricaoDoBloco: excelRow['Descrição Do Bloco'] || '',
 
-      dataDoDesfile: excelRow['Data Do Desfile'] ? new Date(excelRow['Data Do Desfile']) : new Date(),
+      dataDoDesfile: this.parseExcelDate(excelRow['Data Do Desfile']),
       horarioDeconcentracao: excelRow['Horário Deconcentração'] || '',
       inicioDoDesfile: excelRow['Início Do Desfile'] || '',
       horarioEncerramento: excelRow['Horário Encerramento'] || '',

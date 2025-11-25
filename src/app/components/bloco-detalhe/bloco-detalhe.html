@@ -1,0 +1,35 @@
+<div class="overlay" (click)="onFechar()"></div>
+<div class="detalhe-modal">
+    <div class="modal-header">
+        <h2>{{ bloco?.nomeDoBloco || 'Detalhes do Bloco' }}</h2>
+        <button class="close-btn" (click)="onFechar()">
+            <ng-icon name="heroXMark"></ng-icon>
+        </button>
+    </div>
+
+    <div class="modal-content">
+        <div class="grupo" *ngFor="let grupo of grupos">
+            <h3>{{ grupo.titulo }}</h3>
+            <div class="campos-grid">
+                <div class="campo" *ngFor="let campo of grupo.campos">
+                    <label>{{ campo.label }}</label>
+                    <div class="valor-wrapper">
+                        <span class="valor">{{ getTruncatedText(formatValue(bloco?.[campo.key], campo.key)) }}</span>
+                        <button 
+                            *ngIf="isTextLong(formatValue(bloco?.[campo.key], campo.key))"
+                            class="tooltip-trigger"
+                            (click)="showTooltip(campo.key, bloco?.[campo.key])">
+                            <ng-icon name="heroEllipsisHorizontal"></ng-icon>
+                        </button>
+                        <div class="tooltip-balloon" *ngIf="activeTooltip === campo.key">
+                            <button class="tooltip-close" (click)="hideTooltip()">
+                                <ng-icon name="heroXMark"></ng-icon>
+                            </button>
+                            <p>{{ tooltipContent }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

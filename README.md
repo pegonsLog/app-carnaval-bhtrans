@@ -1,59 +1,87 @@
-# AppCarnavalBhtrans
+# App Carnaval BHTrans 🎭
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.0.
+Sistema de gestão de blocos de carnaval desenvolvido em Angular 21 com integração ao Firebase Firestore.
 
-## Development server
+## 🚀 Funcionalidades
 
-To start a local development server, run:
+- **Importação de Excel**: Carregue arquivos `.xlsx` ou `.xls` com informações dos blocos
+- **Visualização de Dados**: Exiba os dados importados em uma tabela responsiva
+- **Firebase Integration**: Salve e sincronize dados no Firestore
+- **Upsert Logic**: Atualiza blocos existentes ou cria novos automaticamente
+- **Interface Moderna**: Design responsivo com gradientes e animações
 
+## 📋 Pré-requisitos
+
+- Node.js (v18 ou superior)
+- Angular CLI 21
+- Conta do Firebase
+
+## 🔧 Instalação
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/pegonsLog/app-carnaval-bhtrans.git
+cd app-carnaval-bhtrans
+```
+
+2. Instale as dependências:
+```bash
+npm install --legacy-peer-deps
+```
+
+3. Configure o Firebase:
+   - Copie suas credenciais do Firebase Console
+   - Edite `src/environments/environment.ts`
+   - Substitua os valores placeholder pelas suas credenciais
+
+4. Inicie o servidor de desenvolvimento:
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+5. Acesse `http://localhost:4200`
 
-## Code scaffolding
+## 📁 Estrutura do Projeto
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+src/app/
+├── components/
+│   ├── header/          # Cabeçalho com navegação
+│   └── excel-upload/    # Componente de upload e importação
+├── pages/
+│   └── home/            # Página inicial
+├── services/
+│   └── blocos.ts        # Serviço Firebase para blocos
+└── interfaces/
+    └── blocos.interface.ts  # Interface TypeScript dos blocos
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## 🎨 Tecnologias Utilizadas
 
-```bash
-ng generate --help
-```
+- **Angular 21**: Framework frontend
+- **Firebase Firestore**: Banco de dados NoSQL
+- **XLSX**: Biblioteca para leitura de arquivos Excel
+- **SCSS**: Pré-processador CSS
+- **TypeScript**: Linguagem de programação
+- **Montserrat**: Fonte tipográfica
 
-## Building
+## 📝 Configuração do Firebase
 
-To build the project run:
+Veja o arquivo [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) para instruções detalhadas de configuração.
 
-```bash
-ng build
-```
+## 🤝 Contribuindo
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Pull requests são bem-vindos! Para mudanças importantes, abra uma issue primeiro para discutir o que você gostaria de mudar.
 
-## Running unit tests
+## 📄 Licença
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+MIT
 
-```bash
-ng test
-```
+## 👤 Autor
 
-## Running end-to-end tests
+**PegonsLog**
+- GitHub: [@pegonsLog](https://github.com/pegonsLog)
 
-For end-to-end (e2e) testing, run:
+---
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Desenvolvido com ❤️ usando Angular e Firebase

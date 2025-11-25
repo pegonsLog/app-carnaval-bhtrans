@@ -57,15 +57,15 @@
             align-items: center;
             gap: 0.5rem;
 
-            svg-icon {
-                color: rgba(255, 255, 255, 0.9);
+            ng-icon {
+                color: white;
             }
 
             &:hover {
                 background: rgba(255, 255, 255, 0.1);
                 color: white;
 
-                svg-icon {
+                ng-icon {
                     color: white;
                 }
             }
@@ -75,7 +75,7 @@
                 color: white;
                 font-weight: 600;
 
-                svg-icon {
+                ng-icon {
                     color: white;
                 }
             }

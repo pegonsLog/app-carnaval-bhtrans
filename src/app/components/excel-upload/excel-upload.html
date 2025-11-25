@@ -5,19 +5,19 @@
         <div class="file-input-wrapper">
             <input type="file" id="fileInput" accept=".xlsx, .xls" (change)="onFileChange($event)" #fileInput />
             <label for="fileInput" class="file-label">
-                <span class="icon">📁</span>
+                <ng-icon name="heroFolder" class="icon"></ng-icon>
                 <span>{{ fileName || 'Selecione um arquivo Excel' }}</span>
             </label>
         </div>
 
         <div class="action-buttons" *ngIf="excelData.length > 0">
             <button class="save-btn" (click)="salvarNoFirestore()" [disabled]="isSaving">
-                <span *ngIf="!isSaving">💾 Salvar no Firestore</span>
-                <span *ngIf="isSaving">⏳ Salvando...</span>
+                <span *ngIf="!isSaving"><ng-icon name="heroCloudArrowUp"></ng-icon> Salvar no Firestore</span>
+                <span *ngIf="isSaving"><ng-icon name="heroClock"></ng-icon> Salvando...</span>
             </button>
 
             <button class="clear-btn" (click)="clearData(); fileInput.value = ''" [disabled]="isSaving">
-                🗑️ Limpar Dados
+                <ng-icon name="heroTrash"></ng-icon> Limpar Dados
             </button>
         </div>
 
@@ -51,9 +51,7 @@
     </div>
 
     <div class="empty-state" *ngIf="excelData.length === 0">
-        <div class="empty-icon">
-            📊
-        </div>
+        <ng-icon name="heroChartBar" class="empty-icon-svg"></ng-icon>
         <p>Nenhum arquivo carregado</p>
         <p class="empty-subtitle">Selecione um arquivo Excel (.xlsx ou .xls) para visualizar os dados</p>
     </div>

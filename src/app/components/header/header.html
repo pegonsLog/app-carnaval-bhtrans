@@ -2,24 +2,24 @@
     <div class="container">
         <div class="logo">
             <a routerLink="/">
-                <span class="logo-icon">🎭</span>
+                <ng-icon name="heroTicket" class="logo-icon"></ng-icon>
                 <span class="logo-text">Carnaval BHTrans</span>
             </a>
         </div>
 
         <nav class="nav" [class.active]="isMenuOpen">
             <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                <span class="nav-icon">🏠</span>
+                <ng-icon name="heroHome" class="nav-icon"></ng-icon>
                 <span>Início</span>
             </a>
             <a routerLink="/importar" routerLinkActive="active">
-                <span class="nav-icon">📤</span>
+                <ng-icon name="heroArrowUpTray" class="nav-icon"></ng-icon>
                 <span>Importar Excel</span>
             </a>
         </nav>
 
         <button class="menu-toggle" (click)="toggleMenu()" aria-label="Toggle menu">
-            <span class="menu-icon">{{ isMenuOpen ? '✕' : '☰' }}</span>
+            <ng-icon [name]="isMenuOpen ? 'heroXMark' : 'heroBars3'" class="menu-icon"></ng-icon>
         </button>
     </div>
 </header>

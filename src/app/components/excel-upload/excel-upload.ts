@@ -3,20 +3,23 @@ import { CommonModule } from '@angular/common';
 import * as XLSX from 'xlsx';
 import { BlocosService } from '../../services/blocos';
 import { Blocos } from '../../interfaces/blocos.interface';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar } from '@ng-icons/heroicons/outline';
 
 
 @Component({
   selector: 'app-excel-upload',
-  imports: [CommonModule],
+  imports: [CommonModule, NgIcon],
+  viewProviders: [provideIcons({ heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar })],
   templateUrl: './excel-upload.html',
   styleUrl: './excel-upload.scss'
 })
 export class ExcelUploadComponent {
   excelData: any[] = [];
-  fileName: string = '';
+  fileName = '';
   headers: string[] = [];
-  isSaving: boolean = false;
-  saveMessage: string = '';
+  isSaving = false;
+  saveMessage = '';
   saveMessageType: 'success' | 'error' | '' = '';
 
   constructor(private blocosService: BlocosService) { }
@@ -53,11 +56,10 @@ export class ExcelUploadComponent {
 
   // Mapeia os dados do Excel para a interface Blocos
   mapExcelDataToBlocos(excelRow: any): Blocos {
-    return {
+    const bloco: any = {
       periodo: excelRow['Periodo'] || '',
       possuiDesfiles: excelRow['Possui Desfiles?']?.toLowerCase() === 'sim',
       statusDoDesfile: excelRow['Status do Desfile'] || '',
-      justificativaStatus: excelRow['Justificativa Status'],
       numeroInscricao: excelRow['Nº de Inscrição'] || '',
       nomeDoBloco: excelRow['Nome Do Bloco'] || '',
       categoriaDoBloco: excelRow['Categoria Do Bloco'] || '',
@@ -65,9 +67,7 @@ export class ExcelUploadComponent {
       dataCadastroModificacao: excelRow['Data de Cadastro ou Modificação'] ? new Date(excelRow['Data de Cadastro ou Modificação']) : new Date(),
       primeiroCadastro: excelRow['Primeiro Cadastro?']?.toLowerCase() === 'sim',
 
-      publicoAnterior: excelRow['Público Anterior'] ? parseInt(excelRow['Público Anterior']) : undefined,
       publicoDeclarado: parseInt(excelRow['Público Declarado']) || 0,
-      observacoesAnoAnterior: excelRow['Observações Ano Anterior'],
 
       perfil: excelRow['Perfil'] || '',
       estiloDeMusica: excelRow['Estilo de Música'] || '',
@@ -85,7 +85,6 @@ export class ExcelUploadComponent {
       comprimentoMetros: parseFloat(excelRow['Comprimento Metros']) || 0,
       alturaMetros: parseFloat(excelRow['Altura Metros']) || 0,
       potenciaWatts: parseFloat(excelRow['Potência Watts']) || 0,
-      dimensaoDeVeiculos: excelRow['Dimensão De Veículos'],
 
       percurso: excelRow['Percurso'] || '',
       regional: excelRow['Regional'] || '',
@@ -98,18 +97,56 @@ export class ExcelUploadComponent {
       areaDoTrajetoM2: parseFloat(excelRow['Área Do Trajeto M²']) || 0,
       capacidadePublicoDoTrajeto: parseInt(excelRow['Capacidade Público Do Trajeto']) || 0,
 
-      informacoesAdicionais: excelRow['Informações Adicionais'],
-
       responsavelLegal: excelRow['Responsável Legal'] || '',
-      cnpj: excelRow['CNPJ'],
-      cpf: excelRow['CPF'],
       email: excelRow['E Mail'] || '',
-      telefone: excelRow['Telefone'],
-      celular: excelRow['Celular'] || '',
-
-      nomeResponsavelSecundario: excelRow['Nome Responsável Secundário'],
-      celularContato2: excelRow['Celular Contato 2']
+      celular: excelRow['Celular'] || ''
     };
+
+    // Adiciona campos opcionais apenas se tiverem valor
+    if (excelRow['Justificativa Status']) {
+      bloco.justificativaStatus = excelRow['Justificativa Status'];
+    }
+
+    if (excelRow['Público Anterior']) {
+      const publicoAnterior = parseInt(excelRow['Público Anterior']);
+      if (!isNaN(publicoAnterior)) {
+        bloco.publicoAnterior = publicoAnterior;
+      }
+    }
+
+    if (excelRow['Observações Ano Anterior']) {
+      bloco.observacoesAnoAnterior = excelRow['Observações Ano Anterior'];
+    }
+
+    if (excelRow['Dimensão De Veículos']) {
+      bloco.dimensaoDeVeiculos = excelRow['Dimensão De Veículos'];
+    }
+
+    if (excelRow['Informações Adicionais']) {
+      bloco.informacoesAdicionais = excelRow['Informações Adicionais'];
+    }
+
+    if (excelRow['CNPJ']) {
+      bloco.cnpj = excelRow['CNPJ'];
+    }
+
+    if (excelRow['CPF']) {
+      bloco.cpf = excelRow['CPF'];
+    }
+
+    if (excelRow['Telefone']) {
+      bloco.telefone = excelRow['Telefone'];
+    }
+
+    if (excelRow['Nome Responsável Secundário']) {
+      bloco.nomeResponsavelSecundario = excelRow['Nome Responsável Secundário'];
+    }
+
+    if (excelRow['Celular Contato 2']) {
+      bloco.celularContato2 = excelRow['Celular Contato 2'];
+    }
+
+    return bloco as Blocos;
   }
 
   async salvarNoFirestore() {

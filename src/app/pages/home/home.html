@@ -11,7 +11,7 @@
             </p>
             <div class="hero-actions">
                 <a routerLink="/importar" class="btn btn-primary">
-                    📁 Importar Dados
+                    <ng-icon name="heroFolder"></ng-icon> Importar Dados
                 </a>
             </div>
         </div>
@@ -19,7 +19,7 @@
             <div class="decoration-circle circle-1"></div>
             <div class="decoration-circle circle-2"></div>
             <div class="decoration-circle circle-3"></div>
-            <span class="hero-emoji">🎉</span>
+            <ng-icon name="heroSparkles" class="hero-emoji-icon"></ng-icon>
         </div>
     </section>
 
@@ -27,7 +27,7 @@
         <h2 class="section-title">Funcionalidades</h2>
         <div class="features-grid">
             <div class="feature-card" *ngFor="let feature of features">
-                <div class="feature-icon">{{ feature.icon }}</div>
+                <div class="feature-icon"><ng-icon [name]="feature.icon"></ng-icon></div>
                 <h3 class="feature-title">{{ feature.title }}</h3>
                 <p class="feature-description">{{ feature.description }}</p>
             </div>

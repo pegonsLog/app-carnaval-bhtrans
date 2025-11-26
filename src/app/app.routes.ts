@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home';
 import { ExcelUploadComponent } from './components/excel-upload/excel-upload';
 import { BlocosListComponent } from './components/blocos-list/blocos-list';
+import { CapasComponent } from './components/capas/capas';
 
 export const routes: Routes = [
     {
@@ -15,6 +16,10 @@ export const routes: Routes = [
     {
         path: 'blocos',
         component: BlocosListComponent
+    },
+    {
+        path: 'capas',
+        component: CapasComponent
     },
     {
         path: '**',

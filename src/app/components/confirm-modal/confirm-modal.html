@@ -1,0 +1,26 @@
+<div class="modal-overlay" (click)="onCancelar()">
+    <div class="modal-content" [class]="tipo" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <div class="icon-wrapper">
+                <ng-icon name="heroExclamationTriangle"></ng-icon>
+            </div>
+            <button class="close-btn" (click)="onCancelar()">
+                <ng-icon name="heroXMark"></ng-icon>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <h3>{{ titulo }}</h3>
+            <p>{{ mensagem }}</p>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="onCancelar()">
+                {{ textoBotaoCancelar }}
+            </button>
+            <button class="btn-confirm" [class]="tipo" (click)="onConfirmar()">
+                {{ textoBotaoConfirmar }}
+            </button>
+        </div>
+    </div>
+</div>

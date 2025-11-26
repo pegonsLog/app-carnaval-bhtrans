@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as XLSX from 'xlsx';
 import { BlocosService } from '../../services/blocos';
@@ -22,7 +22,16 @@ export class ExcelUploadComponent {
   saveMessage = '';
   saveMessageType: 'success' | 'error' | '' = '';
 
-  constructor(private blocosService: BlocosService) { }
+  // Progresso do salvamento
+  progressoAtual = 0;
+  progressoTotal = 0;
+  progressoNovos = 0;
+  progressoAtualizados = 0;
+
+  constructor(
+    private blocosService: BlocosService,
+    private ngZone: NgZone
+  ) { }
 
   // Função auxiliar para parsear datas do Excel
   private parseExcelDate(dateValue: any): Date {
@@ -206,23 +215,43 @@ export class ExcelUploadComponent {
 
     this.isSaving = true;
     this.saveMessage = '';
+    this.progressoAtual = 0;
+    this.progressoTotal = this.excelData.length;
+    this.progressoNovos = 0;
+    this.progressoAtualizados = 0;
 
     try {
       // Mapear os dados do Excel para a interface Blocos
       const blocos: Blocos[] = this.excelData.map(row => this.mapExcelDataToBlocos(row));
 
-      // Salvar no Firestore
-      const resultado = await this.blocosService.salvarBlocos(blocos);
+      // Salvar no Firestore com callback de progresso
+      const resultado = await this.blocosService.salvarBlocos(blocos, (atual, total, novos, atualizados) => {
+        this.ngZone.run(() => {
+          this.progressoAtual = atual;
+          this.progressoTotal = total;
+          this.progressoNovos = novos;
+          this.progressoAtualizados = atualizados;
+        });
+      });
 
-      this.saveMessage = `✓ Sucesso! ${resultado.total} registro(s) processado(s): ${resultado.novos} novo(s), ${resultado.atualizados} atualizado(s).`;
-      this.saveMessageType = 'success';
+      this.ngZone.run(() => {
+        this.saveMessage = `✓ Sucesso! ${resultado.total} registro(s) processado(s): ${resultado.novos} novo(s), ${resultado.atualizados} atualizado(s).`;
+        this.saveMessageType = 'success';
+        this.isSaving = false;
+      });
     } catch (error) {
       console.error('Erro ao salvar no Firestore:', error);
-      this.saveMessage = `✗ Erro ao salvar no Firestore: ${error}`;
-      this.saveMessageType = 'error';
-    } finally {
-      this.isSaving = false;
+      this.ngZone.run(() => {
+        this.saveMessage = `✗ Erro ao salvar no Firestore: ${error}`;
+        this.saveMessageType = 'error';
+        this.isSaving = false;
+      });
     }
+  }
+
+  get progressoPorcentagem(): number {
+    if (this.progressoTotal === 0) return 0;
+    return Math.round((this.progressoAtual / this.progressoTotal) * 100);
   }
 
   clearData() {

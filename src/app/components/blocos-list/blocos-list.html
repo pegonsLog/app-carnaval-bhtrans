@@ -1,106 +1,134 @@
 <div class="blocos-list-container">
-    <div class="header-section">
-        <h2>Blocos Cadastrados</h2>
-        <button class="refresh-btn" (click)="carregarBlocos()" [disabled]="isLoading">
-            <ng-icon name="heroMagnifyingGlass"></ng-icon>
-            {{ isLoading ? 'Carregando...' : 'Atualizar' }}
-        </button>
+  <div class="header-section">
+    <h2>Blocos Cadastrados</h2>
+    <button class="refresh-btn" (click)="carregarBlocos()" [disabled]="isLoading">
+      <ng-icon name="heroMagnifyingGlass"></ng-icon>
+      {{ isLoading ? 'Carregando...' : 'Atualizar' }}
+    </button>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Carregando blocos...</p>
+  </div>
+
+  <div class="filters-section" *ngIf="!isLoading && blocos.length > 0">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Nome do Bloco</label>
+        <input type="text" [(ngModel)]="filtroNome" (ngModelChange)="aplicarFiltros()" placeholder="Buscar por nome...">
+      </div>
+      <div class="filter-group">
+        <label>Regional</label>
+        <select [(ngModel)]="filtroRegional" (ngModelChange)="aplicarFiltros()">
+          <option value="">Escolha a regional</option>
+          <option *ngFor="let regional of regionaisDisponiveis" [value]="regional">{{ regional }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Data do Desfile</label>
+        <select [(ngModel)]="filtroDataDesfile" (ngModelChange)="aplicarFiltros()">
+          <option value="">Escolha a data</option>
+          <option *ngFor="let data of datasDesfileDisponiveis" [value]="data">{{ data }}</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Busca Livre</label>
+        <input type="text" [(ngModel)]="filtroLivre" (ngModelChange)="aplicarFiltros()"
+          placeholder="Buscar em todos os campos...">
+      </div>
     </div>
+    <button class="clear-filters-btn" (click)="limparFiltros()"
+      *ngIf="filtroNome || filtroRegional || filtroDataDesfile || filtroLivre">
+      Limpar Filtros
+    </button>
+  </div>
 
-    <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
+  <div class="table-section" *ngIf="!isLoading && blocos.length > 0">
+    <p class="count-info">{{ blocosFiltrados.length }} de {{ blocos.length }} bloco(s)</p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th class="action-col"></th>
+            <th>#</th>
+            <th *ngFor="let col of displayColumns">{{ col.label }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bloco of blocosFiltrados; let i = index">
+            <td class="action-col">
+              <div class="action-buttons">
+                <button class="view-btn" (click)="abrirDetalhe(bloco)" title="Ver detalhes">
+                  <ng-icon name="heroEye"></ng-icon>
+                </button>
+                <button class="kml-btn" [class.has-kml]="bloco.percursoUrl" (click)="abrirUploadKml(bloco)"
+                  [title]="bloco.percursoUrl ? 'Descritivo enviado - Clique para substituir' : 'Enviar arquivo KML'">
+                  <ng-icon name="heroMapPin"></ng-icon>
+                </button>
+                <button class="percurso-btn" *ngIf="bloco.percursoUrl" (click)="abrirVisualizarPercurso(bloco)"
+                  title="Visualizar descritivo">
+                  <ng-icon name="heroDocumentText"></ng-icon>
+                </button>
+                <button class="remove-btn" *ngIf="bloco.percursoUrl" (click)="abrirModalRemover(bloco)"
+                  title="Remover arquivo descritivo">
+                  <ng-icon name="heroTrash"></ng-icon>
+                </button>
+              </div>
+            </td>
+            <td class="row-number">{{ i + 1 }}</td>
+            <td *ngFor="let col of displayColumns" class="cell-content">
+              <div class="cell-wrapper">
+                <span class="text-truncate">{{ getTruncatedText(formatValue(bloco[col.key], col.key))
+                  }}</span>
+
+                <button *ngIf="isTextLong(formatValue(bloco[col.key], col.key))" class="tooltip-trigger"
+                  (click)="showTooltip(i, col.key, bloco[col.key])">
+                  <ng-icon name="heroEllipsisHorizontal"></ng-icon>
+                </button>
+
+                <div class="tooltip-balloon" *ngIf="isTooltipActive(i, col.key)">
+                  <button class="tooltip-close" (click)="hideTooltip()">
+                    <ng-icon name="heroXMark"></ng-icon>
+                  </button>
+                  <p>{{ tooltipContent }}</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 
-    <div class="loading" *ngIf="isLoading">
-        <div class="spinner"></div>
-        <p>Carregando blocos...</p>
-    </div>
-
-    <div class="filters-section" *ngIf="!isLoading && blocos.length > 0">
-        <div class="filters-grid">
-            <div class="filter-group">
-                <label>Nome do Bloco</label>
-                <input type="text" [(ngModel)]="filtroNome" (ngModelChange)="aplicarFiltros()" placeholder="Buscar por nome...">
-            </div>
-            <div class="filter-group">
-                <label>Regional</label>
-                <select [(ngModel)]="filtroRegional" (ngModelChange)="aplicarFiltros()">
-                    <option value="">Escolha a regional</option>
-                    <option *ngFor="let regional of regionaisDisponiveis" [value]="regional">{{ regional }}</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Data do Desfile</label>
-                <select [(ngModel)]="filtroDataDesfile" (ngModelChange)="aplicarFiltros()">
-                    <option value="">Escolha a data</option>
-                    <option *ngFor="let data of datasDesfileDisponiveis" [value]="data">{{ data }}</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Busca Livre</label>
-                <input type="text" [(ngModel)]="filtroLivre" (ngModelChange)="aplicarFiltros()" placeholder="Buscar em todos os campos...">
-            </div>
-        </div>
-        <button class="clear-filters-btn" (click)="limparFiltros()" *ngIf="filtroNome || filtroRegional || filtroDataDesfile || filtroLivre">
-            Limpar Filtros
-        </button>
-    </div>
-
-    <div class="table-section" *ngIf="!isLoading && blocos.length > 0">
-        <p class="count-info">{{ blocosFiltrados.length }} de {{ blocos.length }} bloco(s)</p>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="action-col"></th>
-                        <th>#</th>
-                        <th *ngFor="let col of displayColumns">{{ col.label }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let bloco of blocosFiltrados; let i = index">
-                        <td class="action-col">
-                            <button class="view-btn" (click)="abrirDetalhe(bloco)" title="Ver detalhes">
-                                <ng-icon name="heroEye"></ng-icon>
-                            </button>
-                        </td>
-                        <td class="row-number">{{ i + 1 }}</td>
-                        <td *ngFor="let col of displayColumns" class="cell-content">
-                            <div class="cell-wrapper">
-                                <span class="text-truncate">{{ getTruncatedText(formatValue(bloco[col.key], col.key)) }}</span>
-                                
-                                <button 
-                                    *ngIf="isTextLong(formatValue(bloco[col.key], col.key))"
-                                    class="tooltip-trigger"
-                                    (click)="showTooltip(i, col.key, bloco[col.key])">
-                                    <ng-icon name="heroEllipsisHorizontal"></ng-icon>
-                                </button>
-
-                                <div class="tooltip-balloon" *ngIf="isTooltipActive(i, col.key)">
-                                    <button class="tooltip-close" (click)="hideTooltip()">
-                                        <ng-icon name="heroXMark"></ng-icon>
-                                    </button>
-                                    <p>{{ tooltipContent }}</p>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="empty-state" *ngIf="!isLoading && blocos.length === 0 && !errorMessage">
-        <ng-icon name="heroMagnifyingGlass" class="empty-icon"></ng-icon>
-        <p>Nenhum bloco cadastrado</p>
-        <p class="empty-subtitle">Importe um arquivo Excel para adicionar blocos</p>
-    </div>
+  <div class="empty-state" *ngIf="!isLoading && blocos.length === 0 && !errorMessage">
+    <ng-icon name="heroMagnifyingGlass" class="empty-icon"></ng-icon>
+    <p>Nenhum bloco cadastrado</p>
+    <p class="empty-subtitle">Importe um arquivo Excel para adicionar blocos</p>
+  </div>
 </div>
 
 <!-- Modal de Detalhe -->
-<app-bloco-detalhe 
-    *ngIf="blocoSelecionado" 
-    [bloco]="blocoSelecionado" 
-    (fechar)="fecharDetalhe()">
+<app-bloco-detalhe *ngIf="blocoSelecionado" [bloco]="blocoSelecionado" (fechar)="fecharDetalhe()">
 </app-bloco-detalhe>
+
+<!-- Modal de Upload KML -->
+<app-kml-upload *ngIf="blocoParaUploadKml" [bloco]="blocoParaUploadKml" (fechar)="fecharUploadKml()"
+  (uploadConcluido)="onKmlUploadConcluido($event)">
+</app-kml-upload>
+
+<!-- Modal de Visualização do Percurso -->
+<app-percurso-viewer *ngIf="blocoParaVisualizarPercurso" [bloco]="blocoParaVisualizarPercurso"
+  (fechar)="fecharVisualizarPercurso()">
+</app-percurso-viewer>
+
+<!-- Modal de Confirmação de Remoção -->
+<app-confirm-modal *ngIf="blocoParaRemover" titulo="Remover Arquivo"
+  [mensagem]="'Deseja remover o arquivo descritivo do bloco ' + blocoParaRemover.nomeDoBloco + '?'" tipo="danger"
+  (confirmar)="confirmarRemocao()" (cancelar)="fecharModalRemover()">
+</app-confirm-modal>

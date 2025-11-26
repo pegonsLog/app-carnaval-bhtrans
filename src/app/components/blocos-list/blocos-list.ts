@@ -1,15 +1,20 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Storage, ref, deleteObject } from '@angular/fire/storage';
+import { Firestore, collection, query, where, getDocs, updateDoc, doc, deleteField } from '@angular/fire/firestore';
 import { BlocosService } from '../../services/blocos';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye } from '@ng-icons/heroicons/outline';
+import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroMapPin, heroDocumentText, heroTrash } from '@ng-icons/heroicons/outline';
 import { BlocoDetalheComponent } from '../bloco-detalhe/bloco-detalhe';
+import { KmlUploadComponent } from '../kml-upload/kml-upload';
+import { PercursoViewerComponent } from '../percurso-viewer/percurso-viewer';
+import { ConfirmModalComponent } from '../confirm-modal/confirm-modal';
 
 @Component({
   selector: 'app-blocos-list',
-  imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent],
-  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye })],
+  imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent],
+  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroMapPin, heroDocumentText, heroTrash })],
   templateUrl: './blocos-list.html',
   styleUrl: './blocos-list.scss'
 })
@@ -33,6 +38,15 @@ export class BlocosListComponent implements OnInit {
 
   // Controle do modal de detalhe
   blocoSelecionado: any = null;
+
+  // Controle do modal de upload KML
+  blocoParaUploadKml: any = null;
+
+  // Controle do modal de visualização do percurso
+  blocoParaVisualizarPercurso: any = null;
+
+  // Controle do modal de confirmação de exclusão
+  blocoParaRemover: any = null;
 
   // Colunas a exibir (todas as colunas)
   displayColumns = [
@@ -93,7 +107,12 @@ export class BlocosListComponent implements OnInit {
     { key: 'celularContato2', label: 'Celular 2' }
   ];
 
-  constructor(private blocosService: BlocosService, private ngZone: NgZone) {}
+  constructor(
+    private blocosService: BlocosService,
+    private ngZone: NgZone,
+    private storage: Storage,
+    private firestore: Firestore
+  ) { }
 
   ngOnInit() {
     this.carregarBlocos();
@@ -105,7 +124,7 @@ export class BlocosListComponent implements OnInit {
 
     try {
       console.log('Iniciando carregamento dos blocos...');
-      
+
       // Adiciona timeout de 15 segundos
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => reject(new Error('Timeout: A conexão com o Firestore demorou muito.')), 15000);
@@ -115,7 +134,7 @@ export class BlocosListComponent implements OnInit {
         this.blocosService.getBlocos(),
         timeoutPromise
       ]);
-      
+
       // Garante que o Angular detecte a mudança
       this.ngZone.run(() => {
         this.blocos = blocos;
@@ -197,10 +216,88 @@ export class BlocosListComponent implements OnInit {
     this.blocoSelecionado = null;
   }
 
+  abrirUploadKml(bloco: any) {
+    this.blocoParaUploadKml = bloco;
+  }
+
+  fecharUploadKml() {
+    this.blocoParaUploadKml = null;
+  }
+
+  onKmlUploadConcluido(url: string) {
+    // Atualiza o bloco na lista local
+    const index = this.blocos.findIndex(b => b.numeroInscricao === this.blocoParaUploadKml?.numeroInscricao);
+    if (index !== -1) {
+      this.blocos[index].percursoUrl = url;
+      this.blocos[index].percursoDataUpload = new Date();
+    }
+  }
+
+  abrirVisualizarPercurso(bloco: any) {
+    this.blocoParaVisualizarPercurso = bloco;
+  }
+
+  fecharVisualizarPercurso() {
+    this.blocoParaVisualizarPercurso = null;
+  }
+
+  abrirModalRemover(bloco: any) {
+    this.blocoParaRemover = bloco;
+  }
+
+  fecharModalRemover() {
+    this.blocoParaRemover = null;
+  }
+
+  async confirmarRemocao() {
+    if (!this.blocoParaRemover?.percursoUrl) return;
+
+    const bloco = this.blocoParaRemover;
+
+    try {
+      // Extrai o path do Storage
+      const match = bloco.percursoUrl.match(/\/o\/([^?]+)/);
+      if (match) {
+        const storagePath = decodeURIComponent(match[1]);
+        const storageRef = ref(this.storage, storagePath);
+        await deleteObject(storageRef);
+      }
+
+      // Remove a referência do Firestore
+      const blocosCollection = collection(this.firestore, 'blocos');
+      const q = query(blocosCollection, where('numeroInscricao', '==', bloco.numeroInscricao));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const docId = querySnapshot.docs[0].id;
+        const docRef = doc(this.firestore, 'blocos', docId);
+        await updateDoc(docRef, {
+          percursoUrl: deleteField(),
+          percursoDataUpload: deleteField()
+        });
+      }
+
+      // Atualiza a lista local
+      this.ngZone.run(() => {
+        const index = this.blocos.findIndex(b => b.numeroInscricao === bloco.numeroInscricao);
+        if (index !== -1) {
+          delete this.blocos[index].percursoUrl;
+          delete this.blocos[index].percursoDataUpload;
+        }
+        this.blocoParaRemover = null;
+      });
+
+    } catch (error: any) {
+      console.error('Erro ao remover arquivo:', error);
+      alert(`Erro ao remover arquivo: ${error.message}`);
+      this.blocoParaRemover = null;
+    }
+  }
+
   extrairRegionais() {
     const regionais = new Set<string>();
     const datas = new Set<string>();
-    
+
     this.blocos.forEach(bloco => {
       if (bloco.regional && bloco.regional.trim()) {
         regionais.add(bloco.regional.trim());
@@ -212,7 +309,7 @@ export class BlocosListComponent implements OnInit {
         }
       }
     });
-    
+
     this.regionaisDisponiveis = Array.from(regionais).sort();
     this.datasDesfileDisponiveis = Array.from(datas).sort((a, b) => {
       // Ordena por data (converte dd/mm/yyyy para comparação)
@@ -238,7 +335,7 @@ export class BlocosListComponent implements OnInit {
   private buscaEmTodosCampos(bloco: any, termo: string): boolean {
     if (!termo) return true;
     const termoLower = termo.toLowerCase();
-    
+
     return Object.values(bloco).some(valor => {
       if (valor === null || valor === undefined) return false;
       if (Array.isArray(valor)) {
@@ -250,15 +347,15 @@ export class BlocosListComponent implements OnInit {
 
   aplicarFiltros() {
     this.blocosFiltrados = this.blocos.filter(bloco => {
-      const nomeMatch = !this.filtroNome || 
+      const nomeMatch = !this.filtroNome ||
         (bloco.nomeDoBloco || '').toLowerCase().includes(this.filtroNome.toLowerCase());
-      
-      const regionalMatch = !this.filtroRegional || 
+
+      const regionalMatch = !this.filtroRegional ||
         bloco.regional === this.filtroRegional;
-      
-      const dataMatch = !this.filtroDataDesfile || 
+
+      const dataMatch = !this.filtroDataDesfile ||
         this.formatarDataParaFiltro(bloco.dataDoDesfile) === this.filtroDataDesfile;
-      
+
       const livreMatch = this.buscaEmTodosCampos(bloco, this.filtroLivre);
 
       return nomeMatch && regionalMatch && dataMatch && livreMatch;

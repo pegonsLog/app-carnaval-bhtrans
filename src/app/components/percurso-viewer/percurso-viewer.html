@@ -1,0 +1,30 @@
+<div class="overlay" (click)="onFechar()"></div>
+<div class="viewer-modal">
+  <div class="modal-header">
+    <div class="header-info">
+      <ng-icon name="heroDocumentText"></ng-icon>
+      <h2>Descritivo do My Maps - {{ bloco?.nomeDoBloco || 'Bloco' }}</h2>
+    </div>
+    <div class="header-actions">
+      <button class="action-btn" (click)="abrirEmNovaAba()" title="Abrir em nova aba" *ngIf="bloco?.percursoUrl">
+        <ng-icon name="heroArrowTopRightOnSquare"></ng-icon>
+      </button>
+      <button class="close-btn" (click)="onFechar()">
+        <ng-icon name="heroXMark"></ng-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="modal-content">
+    <div class="loading" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Carregando descritivo...</p>
+    </div>
+
+    <div class="error" *ngIf="errorMessage && !isLoading">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <div class="markdown-container" *ngIf="!isLoading && !errorMessage" [innerHTML]="htmlContent"></div>
+  </div>
+</div>

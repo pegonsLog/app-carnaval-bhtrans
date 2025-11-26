@@ -21,6 +21,20 @@
             </button>
         </div>
 
+        <div class="progress-section" *ngIf="isSaving">
+            <div class="progress-info">
+                <span class="progress-text">Salvando registro {{ progressoAtual }} de {{ progressoTotal }}</span>
+                <span class="progress-percent">{{ progressoPorcentagem }}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="progressoPorcentagem"></div>
+            </div>
+            <div class="progress-stats">
+                <span class="stat novo">{{ progressoNovos }} novo(s)</span>
+                <span class="stat atualizado">{{ progressoAtualizados }} atualizado(s)</span>
+            </div>
+        </div>
+
         <div class="message-box" *ngIf="saveMessage" [class.success]="saveMessageType === 'success'"
             [class.error]="saveMessageType === 'error'">
             {{ saveMessage }}

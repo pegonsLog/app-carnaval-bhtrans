@@ -29,12 +29,17 @@ export class BlocosService {
     }
   }
 
-  // Salva múltiplos blocos
-  async salvarBlocos(blocos: Blocos[]): Promise<{ total: number, novos: number, atualizados: number }> {
+  // Salva múltiplos blocos com callback de progresso
+  async salvarBlocos(
+    blocos: Blocos[],
+    onProgress?: (atual: number, total: number, novos: number, atualizados: number) => void
+  ): Promise<{ total: number, novos: number, atualizados: number }> {
     let novos = 0;
     let atualizados = 0;
+    const total = blocos.length;
 
-    for (const bloco of blocos) {
+    for (let i = 0; i < blocos.length; i++) {
+      const bloco = blocos[i];
       const blocosCollection = collection(this.firestore, this.collectionName);
       const q = query(blocosCollection, where('nomeDoBloco', '==', bloco.nomeDoBloco));
       const querySnapshot = await getDocs(q);
@@ -50,9 +55,14 @@ export class BlocosService {
         await addDoc(blocosCollection, { ...bloco } as any);
         novos++;
       }
+
+      // Chama callback de progresso
+      if (onProgress) {
+        onProgress(i + 1, total, novos, atualizados);
+      }
     }
 
-    return { total: blocos.length, novos, atualizados };
+    return { total, novos, atualizados };
   }
 
   // Busca todos os blocos

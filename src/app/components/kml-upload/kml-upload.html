@@ -1,0 +1,76 @@
+<div class="modal-overlay" (click)="fecharModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Upload de Arquivo KML</h3>
+            <button class="close-btn" (click)="fecharModal()">
+                <ng-icon name="heroXMark"></ng-icon>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="bloco-info">
+                <span class="label">Bloco:</span>
+                <span class="value">{{ bloco?.nomeDoBloco }}</span>
+            </div>
+            <div class="bloco-info">
+                <span class="label">Nº Inscrição:</span>
+                <span class="value">{{ bloco?.numeroInscricao }}</span>
+            </div>
+
+            <div class="url-input-group">
+                <label for="myMapsUrl">URL do Google My Maps (opcional)</label>
+                <input type="url" id="myMapsUrl" [(ngModel)]="myMapsUrl" placeholder="https://www.google.com/maps/d/..."
+                    [class.invalid]="myMapsUrl && !validarUrlMyMaps()">
+                <span class="url-hint" *ngIf="myMapsUrl && !validarUrlMyMaps()">
+                    URL inválida. Use o link do Google Maps.
+                </span>
+            </div>
+
+            <div class="upload-area" *ngIf="!arquivoSelecionado">
+                <input type="file" id="kmlInput" accept=".kml" (change)="onFileSelected($event)" hidden>
+                <label for="kmlInput" class="upload-label">
+                    <ng-icon name="heroCloudArrowUp" class="upload-icon"></ng-icon>
+                    <span class="upload-text">Clique para selecionar um arquivo KML</span>
+                    <span class="upload-hint">ou arraste e solte aqui</span>
+                </label>
+            </div>
+
+            <div class="file-selected" *ngIf="arquivoSelecionado">
+                <div class="file-info">
+                    <ng-icon name="heroDocumentText" class="file-icon"></ng-icon>
+                    <div class="file-details">
+                        <span class="file-name">{{ arquivoSelecionado.name }}</span>
+                        <span class="file-size">{{ (arquivoSelecionado.size / 1024).toFixed(2) }} KB</span>
+                    </div>
+                    <button class="remove-btn" (click)="removerArquivo()" *ngIf="!isUploading">
+                        <ng-icon name="heroXMark"></ng-icon>
+                    </button>
+                </div>
+
+                <div class="progress-bar" *ngIf="isUploading">
+                    <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+                </div>
+            </div>
+
+            <div class="message success" *ngIf="tipoMensagem === 'sucesso'">
+                <ng-icon name="heroCheckCircle"></ng-icon>
+                <span>{{ mensagem }}</span>
+            </div>
+
+            <div class="message error" *ngIf="tipoMensagem === 'erro'">
+                <ng-icon name="heroExclamationCircle"></ng-icon>
+                <span>{{ mensagem }}</span>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" (click)="fecharModal()" [disabled]="isUploading">
+                Cancelar
+            </button>
+            <button class="btn-upload" (click)="enviarArquivo()" [disabled]="!arquivoSelecionado || isUploading">
+                <ng-icon name="heroCloudArrowUp" *ngIf="!isUploading"></ng-icon>
+                {{ isUploading ? 'Enviando...' : 'Enviar para Storage' }}
+            </button>
+        </div>
+    </div>
+</div>

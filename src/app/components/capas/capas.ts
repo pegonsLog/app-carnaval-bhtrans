@@ -39,7 +39,8 @@ export class CapasComponent implements OnInit {
     // Modal de formulário
     showFormModal = false;
     isEditing = false;
-    capaAtual: Capa = { gerencia: '', equipe: '', responsavel: '' };
+    capaAtual: Capa = { gerencia: '', equipe: '', responsavel: '', regionais: [] };
+    novaRegional = '';
 
     // Modal de preview
     showPreviewModal = false;
@@ -76,20 +77,34 @@ export class CapasComponent implements OnInit {
     }
 
     abrirFormNovo() {
-        this.capaAtual = { gerencia: '', equipe: '', responsavel: '' };
+        this.capaAtual = { gerencia: '', equipe: '', responsavel: '', regionais: [] };
+        this.novaRegional = '';
         this.isEditing = false;
         this.showFormModal = true;
     }
 
     abrirFormEditar(capa: Capa) {
-        this.capaAtual = { ...capa };
+        this.capaAtual = { ...capa, regionais: capa.regionais || [] };
+        this.novaRegional = '';
         this.isEditing = true;
         this.showFormModal = true;
     }
 
     fecharFormModal() {
         this.showFormModal = false;
-        this.capaAtual = { gerencia: '', equipe: '', responsavel: '' };
+        this.capaAtual = { gerencia: '', equipe: '', responsavel: '', regionais: [] };
+        this.novaRegional = '';
+    }
+
+    adicionarRegional() {
+        if (this.novaRegional.trim() && !this.capaAtual.regionais.includes(this.novaRegional.trim())) {
+            this.capaAtual.regionais.push(this.novaRegional.trim());
+            this.novaRegional = '';
+        }
+    }
+
+    removerRegional(index: number) {
+        this.capaAtual.regionais.splice(index, 1);
     }
 
     async salvarCapa() {

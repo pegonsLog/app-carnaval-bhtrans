@@ -49,14 +49,26 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th *ngFor="let header of headers">{{ header }}</th>
+                        <th *ngFor="let col of displayColumns">{{ col.label }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let row of excelData; let i = index">
                         <td class="row-number">{{ i + 1 }}</td>
-                        <td *ngFor="let header of headers">
-                            {{ row[header] || '-' }}
+                        <td *ngFor="let col of displayColumns" class="cell-content">
+                            <div class="cell-wrapper">
+                                <span class="text-truncate">{{ getTruncatedText(row[col.key]) }}</span>
+                                <button *ngIf="isTextLong(row[col.key])" class="tooltip-trigger"
+                                    (click)="showTooltip(i, col.key, row[col.key])">
+                                    <ng-icon name="heroEllipsisHorizontal"></ng-icon>
+                                </button>
+                                <div class="tooltip-balloon" *ngIf="isTooltipActive(i, col.key)">
+                                    <button class="tooltip-close" (click)="hideTooltip()">
+                                        <ng-icon name="heroXMark"></ng-icon>
+                                    </button>
+                                    <p>{{ tooltipContent }}</p>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 </tbody>

@@ -137,8 +137,13 @@ export class BlocosListComponent implements OnInit {
 
       // Garante que o Angular detecte a mudança
       this.ngZone.run(() => {
-        this.blocos = blocos;
-        this.blocosFiltrados = blocos;
+        // Ordena por nome do bloco
+        this.blocos = blocos.sort((a: any, b: any) => {
+          const nomeA = (a.nomeDoBloco || '').toLowerCase();
+          const nomeB = (b.nomeDoBloco || '').toLowerCase();
+          return nomeA.localeCompare(nomeB, 'pt-BR');
+        });
+        this.blocosFiltrados = this.blocos;
         this.extrairRegionais();
         this.isLoading = false;
         console.log('Blocos carregados:', this.blocos.length);
@@ -368,5 +373,13 @@ export class BlocosListComponent implements OnInit {
     this.filtroDataDesfile = '';
     this.filtroLivre = '';
     this.blocosFiltrados = this.blocos;
+  }
+
+  getDiaSemana(dataStr: string): string {
+    if (!dataStr) return '';
+    const [dia, mes, ano] = dataStr.split('/');
+    const data = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+    const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    return diasSemana[data.getDay()];
   }
 }

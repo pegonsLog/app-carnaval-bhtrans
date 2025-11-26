@@ -31,6 +31,12 @@
                     <span class="label">Responsável:</span>
                     <span class="value">{{ capa.responsavel }}</span>
                 </div>
+                <div class="capa-field" *ngIf="capa.regionais && capa.regionais.length > 0">
+                    <span class="label">Regionais:</span>
+                    <div class="regionais-tags">
+                        <span class="regional-tag-card" *ngFor="let regional of capa.regionais">{{ regional }}</span>
+                    </div>
+                </div>
             </div>
             <div class="capa-actions">
                 <button class="action-btn preview" (click)="abrirPreview(capa)" title="Visualizar">
@@ -78,6 +84,24 @@
                 <label for="responsavel">Responsável</label>
                 <input type="text" id="responsavel" [(ngModel)]="capaAtual.responsavel"
                     placeholder="Ex: Robson José dos Santos - GARNE" />
+            </div>
+            <div class="form-group">
+                <label>Regionais</label>
+                <div class="regionais-input">
+                    <input type="text" [(ngModel)]="novaRegional" placeholder="Ex: Regional Norte"
+                        (keyup.enter)="adicionarRegional()" />
+                    <button type="button" class="btn-add-regional" (click)="adicionarRegional()">
+                        <ng-icon name="heroPlus"></ng-icon>
+                    </button>
+                </div>
+                <div class="regionais-list" *ngIf="capaAtual.regionais.length > 0">
+                    <span class="regional-tag" *ngFor="let regional of capaAtual.regionais; let i = index">
+                        {{ regional }}
+                        <button type="button" class="remove-regional" (click)="removerRegional(i)">
+                            <ng-icon name="heroXMark"></ng-icon>
+                        </button>
+                    </span>
+                </div>
             </div>
         </div>
         <div class="modal-footer">

@@ -4,13 +4,13 @@ import * as XLSX from 'xlsx';
 import { BlocosService } from '../../services/blocos';
 import { Blocos } from '../../interfaces/blocos.interface';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar } from '@ng-icons/heroicons/outline';
+import { heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar, heroEllipsisHorizontal, heroXMark } from '@ng-icons/heroicons/outline';
 
 
 @Component({
   selector: 'app-excel-upload',
   imports: [CommonModule, NgIcon],
-  viewProviders: [provideIcons({ heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar })],
+  viewProviders: [provideIcons({ heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar, heroEllipsisHorizontal, heroXMark })],
   templateUrl: './excel-upload.html',
   styleUrl: './excel-upload.scss'
 })
@@ -22,11 +22,66 @@ export class ExcelUploadComponent {
   saveMessage = '';
   saveMessageType: 'success' | 'error' | '' = '';
 
+  // Colunas ordenadas (mesma sequência da lista de blocos)
+  displayColumns = [
+    { key: 'Nome Do Bloco', label: 'Nome do Bloco' },
+    { key: 'Data Do Desfile', label: 'Data Desfile' },
+    { key: 'Regional', label: 'Regional' },
+    { key: 'Periodo', label: 'Período' },
+    { key: 'Público Anterior', label: 'Público Anterior' },
+    { key: 'Público Declarado', label: 'Público Declarado' },
+    { key: 'Possui Desfiles?', label: 'Possui Desfiles' },
+    { key: 'Status do Desfile', label: 'Status' },
+    { key: 'Justificativa Status', label: 'Justificativa' },
+    { key: 'Nº de Inscrição', label: 'Nº Inscrição' },
+    { key: 'Categoria Do Bloco', label: 'Categoria' },
+    { key: 'Autoriza Divulgação', label: 'Autoriza Divulgação' },
+    { key: 'Data de Cadastro ou Modificação', label: 'Data Cadastro' },
+    { key: 'Primeiro Cadastro?', label: 'Primeiro Cadastro' },
+    { key: 'Observações Ano Anterior', label: 'Obs. Ano Anterior' },
+    { key: 'Perfil', label: 'Perfil' },
+    { key: 'Estilo de Música', label: 'Estilo Musical' },
+    { key: 'Descrição Do Bloco', label: 'Descrição' },
+    { key: 'Horário Deconcentração', label: 'Concentração' },
+    { key: 'Início Do Desfile', label: 'Início' },
+    { key: 'Horário Encerramento', label: 'Encerramento' },
+    { key: 'Duração Do Desfile', label: 'Duração' },
+    { key: 'Horário Dispersão', label: 'Dispersão' },
+    { key: 'Equipamentos Utilizados', label: 'Equipamentos' },
+    { key: 'Largura Metros', label: 'Largura (m)' },
+    { key: 'Comprimento Metros', label: 'Comprimento (m)' },
+    { key: 'Altura Metros', label: 'Altura (m)' },
+    { key: 'Potência Watts', label: 'Potência (W)' },
+    { key: 'Dimensão De Veículos', label: 'Dimensão Veículos' },
+    { key: 'Percurso', label: 'Percurso' },
+    { key: 'Endereço De Concentração', label: 'End. Concentração' },
+    { key: 'Bairro De Concentração', label: 'Bairro Concentração' },
+    { key: 'Endereço De Dispersão', label: 'End. Dispersão' },
+    { key: 'Bairro De Dispersão', label: 'Bairro Dispersão' },
+    { key: 'Extensão Do Desfile Metros', label: 'Extensão (m)' },
+    { key: 'Número De Quadras', label: 'Nº Quadras' },
+    { key: 'Área Do Trajeto M²', label: 'Área (m²)' },
+    { key: 'Capacidade Público Do Trajeto', label: 'Capacidade' },
+    { key: 'Informações Adicionais', label: 'Info. Adicionais' },
+    { key: 'Responsável Legal', label: 'Responsável' },
+    { key: 'CNPJ', label: 'CNPJ' },
+    { key: 'CPF', label: 'CPF' },
+    { key: 'E Mail', label: 'E-mail' },
+    { key: 'Telefone', label: 'Telefone' },
+    { key: 'Celular', label: 'Celular' },
+    { key: 'Nome Responsável Secundário', label: 'Resp. Secundário' },
+    { key: 'Celular Contato 2', label: 'Celular 2' }
+  ];
+
   // Progresso do salvamento
   progressoAtual = 0;
   progressoTotal = 0;
   progressoNovos = 0;
   progressoAtualizados = 0;
+
+  // Controle do tooltip
+  activeTooltip: { rowIndex: number; header: string } | null = null;
+  tooltipContent = '';
 
   constructor(
     private blocosService: BlocosService,
@@ -99,7 +154,12 @@ export class ExcelUploadComponent {
         // Converte para JSON
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false });
 
-        this.excelData = jsonData;
+        // Ordena por nome do bloco
+        this.excelData = jsonData.sort((a: any, b: any) => {
+          const nomeA = (a['Nome Do Bloco'] || '').toLowerCase();
+          const nomeB = (b['Nome Do Bloco'] || '').toLowerCase();
+          return nomeA.localeCompare(nomeB, 'pt-BR');
+        });
 
         // Extrai os headers (nomes das colunas)
         if (this.excelData.length > 0) {
@@ -260,5 +320,33 @@ export class ExcelUploadComponent {
     this.headers = [];
     this.saveMessage = '';
     this.saveMessageType = '';
+  }
+
+  // Funções de truncamento e tooltip
+  isTextLong(value: any): boolean {
+    const text = String(value || '');
+    return text.length > 30;
+  }
+
+  getTruncatedText(value: any): string {
+    const text = String(value || '-');
+    if (text.length > 30) {
+      return text.substring(0, 30) + '...';
+    }
+    return text;
+  }
+
+  showTooltip(rowIndex: number, header: string, value: any) {
+    this.activeTooltip = { rowIndex, header };
+    this.tooltipContent = String(value || '-');
+  }
+
+  hideTooltip() {
+    this.activeTooltip = null;
+    this.tooltipContent = '';
+  }
+
+  isTooltipActive(rowIndex: number, header: string): boolean {
+    return this.activeTooltip?.rowIndex === rowIndex && this.activeTooltip?.header === header;
   }
 }

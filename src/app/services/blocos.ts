@@ -10,12 +10,17 @@ export class BlocosService {
 
   constructor(private firestore: Firestore) { }
 
-  // Salva ou atualiza um bloco baseado no nome
+  // Salva ou atualiza um bloco baseado no número de inscrição, nome do bloco e data do desfile
   async salvarBloco(bloco: Blocos): Promise<void> {
     const blocosCollection = collection(this.firestore, this.collectionName);
 
-    // Busca se já existe um bloco com esse nome
-    const q = query(blocosCollection, where('nomeDoBloco', '==', bloco.nomeDoBloco));
+    // Busca se já existe um bloco com os mesmos campos identificadores
+    const q = query(
+      blocosCollection,
+      where('numeroInscricao', '==', bloco.numeroInscricao),
+      where('nomeDoBloco', '==', bloco.nomeDoBloco),
+      where('dataDoDesfile', '==', bloco.dataDoDesfile)
+    );
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty) {
@@ -41,7 +46,14 @@ export class BlocosService {
     for (let i = 0; i < blocos.length; i++) {
       const bloco = blocos[i];
       const blocosCollection = collection(this.firestore, this.collectionName);
-      const q = query(blocosCollection, where('nomeDoBloco', '==', bloco.nomeDoBloco));
+
+      // Busca usando os três campos identificadores: número de inscrição, nome do bloco e data do desfile
+      const q = query(
+        blocosCollection,
+        where('numeroInscricao', '==', bloco.numeroInscricao),
+        where('nomeDoBloco', '==', bloco.nomeDoBloco),
+        where('dataDoDesfile', '==', bloco.dataDoDesfile)
+      );
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {

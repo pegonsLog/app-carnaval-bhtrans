@@ -35,6 +35,7 @@
           <option value="">Escolha a data</option>
           <option *ngFor="let data of datasDesfileDisponiveis" [value]="data">{{ data }}</option>
         </select>
+        <span class="dia-semana-hint" *ngIf="filtroDataDesfile">{{ getDiaSemana(filtroDataDesfile) }}</span>
       </div>
       <div class="filter-group">
         <label>Busca Livre</label>

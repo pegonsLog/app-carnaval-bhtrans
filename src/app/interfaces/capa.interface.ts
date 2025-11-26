@@ -3,6 +3,7 @@ export interface Capa {
     gerencia: string;
     equipe: string;
     responsavel: string;
+    regionais: string[];
     dataCriacao?: Date;
     dataAtualizacao?: Date;
 }

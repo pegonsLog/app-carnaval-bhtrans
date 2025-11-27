@@ -1,23 +1,36 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Storage, ref, deleteObject } from '@angular/fire/storage';
 import { Firestore, collection, query, where, getDocs, updateDoc, doc, deleteField } from '@angular/fire/firestore';
 import { BlocosService } from '../../services/blocos';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroMapPin, heroDocumentText, heroTrash, heroClipboardDocument, heroGlobeAmericas, heroDocumentDuplicate } from '@ng-icons/heroicons/outline';
+import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroCog6Tooth } from '@ng-icons/heroicons/outline';
 import { BlocoDetalheComponent } from '../bloco-detalhe/bloco-detalhe';
 import { KmlUploadComponent } from '../kml-upload/kml-upload';
 import { PercursoViewerComponent } from '../percurso-viewer/percurso-viewer';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal';
 import { DadosBeloturComponent } from '../dados-belotur/dados-belotur';
 import { DadosMymapsComponent } from '../dados-mymaps/dados-mymaps';
+import { BlocoAcoesModalComponent } from '../bloco-acoes-modal/bloco-acoes-modal';
+import { CrudAgentesComponent } from '../crud-agentes/crud-agentes';
+import { CrudDesviosComponent } from '../crud-desvios/crud-desvios';
+import { CrudFaixaTecidoComponent } from '../crud-faixa-tecido/crud-faixa-tecido';
+import { CrudFechamentosComponent } from '../crud-fechamentos/crud-fechamentos';
+import { CrudReservaAreaComponent } from '../crud-reserva-area/crud-reserva-area';
+import { CrudSinalizacaoComponent } from '../crud-sinalizacao/crud-sinalizacao';
+import { Agentes } from '../../interfaces/agentes.interface';
+import { Desvios } from '../../interfaces/desvios.interface';
+import { FaixaTecido } from '../../interfaces/faixa-tecido.interface';
+import { Fechamentos } from '../../interfaces/fechamentos.interface';
+import { ReservaDeArea } from '../../interfaces/reserva-de-area.interface';
+import { Sinalizacao } from '../../interfaces/sinalizacao.interface';
 
 @Component({
   selector: 'app-blocos-list',
-  imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent],
-  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroMapPin, heroDocumentText, heroTrash, heroClipboardDocument, heroGlobeAmericas, heroDocumentDuplicate })],
+  imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent, BlocoAcoesModalComponent, CrudAgentesComponent, CrudDesviosComponent, CrudFaixaTecidoComponent, CrudFechamentosComponent, CrudReservaAreaComponent, CrudSinalizacaoComponent],
+  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroCog6Tooth })],
   templateUrl: './blocos-list.html',
   styleUrl: './blocos-list.scss'
 })
@@ -56,6 +69,20 @@ export class BlocosListComponent implements OnInit {
 
   // Controle do modal de documento My Maps
   blocoParaDocumentoMymaps: any = null;
+
+  // Controle do modal de ações
+  blocoParaAcoes: any = null;
+
+  // Guarda o bloco para reabrir o modal de ações após fechar modais secundários
+  private blocoAcoesAtivo: any = null;
+
+  // Controle dos modais de CRUD
+  blocoParaCrudAgentes: any = null;
+  blocoParaCrudDesvios: any = null;
+  blocoParaCrudFaixasTecido: any = null;
+  blocoParaCrudFechamentos: any = null;
+  blocoParaCrudReservasArea: any = null;
+  blocoParaCrudSinalizacoes: any = null;
 
   // Colunas a exibir (todas as colunas)
   displayColumns = [
@@ -116,15 +143,30 @@ export class BlocosListComponent implements OnInit {
     { key: 'celularContato2', label: 'Celular 2' }
   ];
 
+  // ID do bloco para abrir modal de ações (vindo de query param)
+  private blocoIdParaAbrirAcoes: string | null = null;
+
   constructor(
     private blocosService: BlocosService,
     private ngZone: NgZone,
     private storage: Storage,
     private firestore: Firestore,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit() {
+    // Verifica se há parâmetro para abrir modal de ações
+    this.route.queryParams.subscribe(params => {
+      if (params['abrirAcoes']) {
+        this.blocoIdParaAbrirAcoes = params['abrirAcoes'];
+        // Limpa o parâmetro da URL
+        this.router.navigate([], { 
+          queryParams: {}, 
+          replaceUrl: true 
+        });
+      }
+    });
     this.carregarBlocos();
   }
 
@@ -157,6 +199,15 @@ export class BlocosListComponent implements OnInit {
         this.extrairRegionais();
         this.isLoading = false;
         console.log('Blocos carregados:', this.blocos.length);
+
+        // Abre modal de ações se veio de navegação com parâmetro
+        if (this.blocoIdParaAbrirAcoes) {
+          const bloco = this.blocos.find(b => b.id === this.blocoIdParaAbrirAcoes);
+          if (bloco) {
+            this.abrirAcoes(bloco);
+          }
+          this.blocoIdParaAbrirAcoes = null;
+        }
       });
     } catch (error: any) {
       console.error('Erro ao carregar blocos:', error);
@@ -237,6 +288,7 @@ export class BlocosListComponent implements OnInit {
 
   fecharUploadKml() {
     this.blocoParaUploadKml = null;
+    this.voltarParaModalAcoes();
   }
 
   onKmlUploadConcluido(url: string) {
@@ -254,6 +306,7 @@ export class BlocosListComponent implements OnInit {
 
   fecharVisualizarPercurso() {
     this.blocoParaVisualizarPercurso = null;
+    this.voltarParaModalAcoes();
   }
 
   abrirModalRemover(bloco: any) {
@@ -262,6 +315,7 @@ export class BlocosListComponent implements OnInit {
 
   fecharModalRemover() {
     this.blocoParaRemover = null;
+    this.voltarParaModalAcoes();
   }
 
   abrirDocumentoBelotur(bloco: any) {
@@ -270,6 +324,7 @@ export class BlocosListComponent implements OnInit {
 
   fecharDocumentoBelotur() {
     this.blocoParaDocumento = null;
+    this.voltarParaModalAcoes();
   }
 
   abrirDocumentoMymaps(bloco: any) {
@@ -278,10 +333,179 @@ export class BlocosListComponent implements OnInit {
 
   fecharDocumentoMymaps() {
     this.blocoParaDocumentoMymaps = null;
+    this.voltarParaModalAcoes();
   }
 
   abrirDocumentoCompleto(bloco: any) {
     this.router.navigate(['/documento', bloco.id]);
+  }
+
+  abrirAcoes(bloco: any) {
+    this.blocoParaAcoes = bloco;
+  }
+
+  fecharAcoes() {
+    this.blocoParaAcoes = null;
+  }
+
+  onAcaoDocumentoBelotur(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.abrirDocumentoBelotur(bloco);
+  }
+
+  onAcaoUploadKml(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.abrirUploadKml(bloco);
+  }
+
+  onAcaoVisualizarPercurso(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.abrirVisualizarPercurso(bloco);
+  }
+
+  onAcaoDocumentoMymaps(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.abrirDocumentoMymaps(bloco);
+  }
+
+  onAcaoDocumentoCompleto(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.abrirDocumentoCompleto(bloco);
+  }
+
+  onAcaoRemoverArquivo(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.abrirModalRemover(bloco);
+  }
+
+  // Handlers dos CRUDs
+  onAcaoGerenciarAgentes(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.blocoParaCrudAgentes = bloco;
+  }
+
+  onAcaoGerenciarDesvios(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.blocoParaCrudDesvios = bloco;
+  }
+
+  onAcaoGerenciarFaixasTecido(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.blocoParaCrudFaixasTecido = bloco;
+  }
+
+  onAcaoGerenciarFechamentos(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.blocoParaCrudFechamentos = bloco;
+  }
+
+  onAcaoGerenciarReservasArea(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.blocoParaCrudReservasArea = bloco;
+  }
+
+  onAcaoGerenciarSinalizacoes(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.blocoParaCrudSinalizacoes = bloco;
+  }
+
+  fecharCrudAgentes() {
+    this.blocoParaCrudAgentes = null;
+    this.voltarParaModalAcoes();
+  }
+
+  fecharCrudDesvios() {
+    this.blocoParaCrudDesvios = null;
+    this.voltarParaModalAcoes();
+  }
+
+  fecharCrudFaixasTecido() {
+    this.blocoParaCrudFaixasTecido = null;
+    this.voltarParaModalAcoes();
+  }
+
+  fecharCrudFechamentos() {
+    this.blocoParaCrudFechamentos = null;
+    this.voltarParaModalAcoes();
+  }
+
+  fecharCrudReservasArea() {
+    this.blocoParaCrudReservasArea = null;
+    this.voltarParaModalAcoes();
+  }
+
+  fecharCrudSinalizacoes() {
+    this.blocoParaCrudSinalizacoes = null;
+    this.voltarParaModalAcoes();
+  }
+
+  async salvarAgentes(agentes: Agentes[]) {
+    await this.salvarDadosBloco(this.blocoParaCrudAgentes, { agentes });
+    this.fecharCrudAgentes();
+  }
+
+  async salvarDesvios(desvios: Desvios[]) {
+    await this.salvarDadosBloco(this.blocoParaCrudDesvios, { desvios });
+    this.fecharCrudDesvios();
+  }
+
+  async salvarFaixasTecido(faixasTecido: FaixaTecido[]) {
+    await this.salvarDadosBloco(this.blocoParaCrudFaixasTecido, { faixasTecido });
+    this.fecharCrudFaixasTecido();
+  }
+
+  async salvarFechamentos(fechamentos: Fechamentos[]) {
+    await this.salvarDadosBloco(this.blocoParaCrudFechamentos, { fechamentos });
+    this.fecharCrudFechamentos();
+  }
+
+  async salvarReservasArea(reservasArea: ReservaDeArea[]) {
+    await this.salvarDadosBloco(this.blocoParaCrudReservasArea, { reservasArea });
+    this.fecharCrudReservasArea();
+  }
+
+  async salvarSinalizacoes(sinalizacoes: Sinalizacao[]) {
+    await this.salvarDadosBloco(this.blocoParaCrudSinalizacoes, { sinalizacoes });
+    this.fecharCrudSinalizacoes();
+  }
+
+  private async salvarDadosBloco(bloco: any, dados: any) {
+    if (!bloco?.id) return;
+
+    try {
+      const docRef = doc(this.firestore, 'blocos', bloco.id);
+      await updateDoc(docRef, dados);
+
+      // Atualiza o bloco na lista local
+      const index = this.blocos.findIndex(b => b.id === bloco.id);
+      if (index !== -1) {
+        this.blocos[index] = { ...this.blocos[index], ...dados };
+      }
+    } catch (error: any) {
+      console.error('Erro ao salvar dados:', error);
+      alert(`Erro ao salvar: ${error.message}`);
+    }
+  }
+
+  private voltarParaModalAcoes() {
+    if (this.blocoAcoesAtivo) {
+      // Atualiza o bloco com dados mais recentes da lista
+      const blocoAtualizado = this.blocos.find(b => b.numeroInscricao === this.blocoAcoesAtivo.numeroInscricao);
+      this.blocoParaAcoes = blocoAtualizado || this.blocoAcoesAtivo;
+      this.blocoAcoesAtivo = null;
+    }
   }
 
   async confirmarRemocao() {
@@ -320,12 +544,14 @@ export class BlocosListComponent implements OnInit {
           delete this.blocos[index].percursoDataUpload;
         }
         this.blocoParaRemover = null;
+        this.voltarParaModalAcoes();
       });
 
     } catch (error: any) {
       console.error('Erro ao remover arquivo:', error);
       alert(`Erro ao remover arquivo: ${error.message}`);
       this.blocoParaRemover = null;
+      this.voltarParaModalAcoes();
     }
   }
 

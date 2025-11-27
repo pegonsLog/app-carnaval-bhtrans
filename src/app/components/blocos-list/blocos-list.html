@@ -68,28 +68,8 @@
                 <button class="view-btn" (click)="abrirDetalhe(bloco)" title="Ver detalhes">
                   <ng-icon name="heroEye"></ng-icon>
                 </button>
-                <button class="doc-btn" (click)="abrirDocumentoBelotur(bloco)" title="Documento Belotur">
-                  <ng-icon name="heroClipboardDocument"></ng-icon>
-                </button>
-                <button class="kml-btn" [class.has-kml]="bloco.percursoUrl" (click)="abrirUploadKml(bloco)"
-                  [title]="bloco.percursoUrl ? 'Descritivo enviado - Clique para substituir' : 'Enviar arquivo KML'">
-                  <ng-icon name="heroMapPin"></ng-icon>
-                </button>
-                <button class="percurso-btn" *ngIf="bloco.percursoUrl" (click)="abrirVisualizarPercurso(bloco)"
-                  title="Visualizar descritivo">
-                  <ng-icon name="heroDocumentText"></ng-icon>
-                </button>
-                <button class="mymaps-btn" *ngIf="bloco.percursoUrl" (click)="abrirDocumentoMymaps(bloco)"
-                  title="Documento My Maps">
-                  <ng-icon name="heroGlobeAmericas"></ng-icon>
-                </button>
-                <button class="completo-btn" (click)="abrirDocumentoCompleto(bloco)"
-                  title="Documento Completo (Capa + Belotur + MyMaps)">
-                  <ng-icon name="heroDocumentDuplicate"></ng-icon>
-                </button>
-                <button class="remove-btn" *ngIf="bloco.percursoUrl" (click)="abrirModalRemover(bloco)"
-                  title="Remover arquivo descritivo">
-                  <ng-icon name="heroTrash"></ng-icon>
+                <button class="acoes-btn" (click)="abrirAcoes(bloco)" title="Ações">
+                  <ng-icon name="heroCog6Tooth"></ng-icon>
                 </button>
               </div>
             </td>
@@ -153,3 +133,70 @@
 <app-dados-mymaps *ngIf="blocoParaDocumentoMymaps" [bloco]="blocoParaDocumentoMymaps"
   (fechar)="fecharDocumentoMymaps()">
 </app-dados-mymaps>
+
+<!-- Modal de Ações do Bloco -->
+<app-bloco-acoes-modal 
+  *ngIf="blocoParaAcoes" 
+  [bloco]="blocoParaAcoes"
+  (fechar)="fecharAcoes()"
+  (documentoBelotur)="onAcaoDocumentoBelotur($event)"
+  (uploadKml)="onAcaoUploadKml($event)"
+  (visualizarPercurso)="onAcaoVisualizarPercurso($event)"
+  (documentoMymaps)="onAcaoDocumentoMymaps($event)"
+  (documentoCompleto)="onAcaoDocumentoCompleto($event)"
+  (removerArquivo)="onAcaoRemoverArquivo($event)"
+  (gerenciarAgentes)="onAcaoGerenciarAgentes($event)"
+  (gerenciarDesvios)="onAcaoGerenciarDesvios($event)"
+  (gerenciarFaixasTecido)="onAcaoGerenciarFaixasTecido($event)"
+  (gerenciarFechamentos)="onAcaoGerenciarFechamentos($event)"
+  (gerenciarReservasArea)="onAcaoGerenciarReservasArea($event)"
+  (gerenciarSinalizacoes)="onAcaoGerenciarSinalizacoes($event)">
+</app-bloco-acoes-modal>
+
+<!-- Modal CRUD Agentes -->
+<app-crud-agentes 
+  *ngIf="blocoParaCrudAgentes" 
+  [bloco]="blocoParaCrudAgentes"
+  (fechar)="fecharCrudAgentes()"
+  (salvar)="salvarAgentes($event)">
+</app-crud-agentes>
+
+<!-- Modal CRUD Desvios -->
+<app-crud-desvios 
+  *ngIf="blocoParaCrudDesvios" 
+  [bloco]="blocoParaCrudDesvios"
+  (fechar)="fecharCrudDesvios()"
+  (salvar)="salvarDesvios($event)">
+</app-crud-desvios>
+
+<!-- Modal CRUD Faixas de Tecido -->
+<app-crud-faixa-tecido 
+  *ngIf="blocoParaCrudFaixasTecido" 
+  [bloco]="blocoParaCrudFaixasTecido"
+  (fechar)="fecharCrudFaixasTecido()"
+  (salvar)="salvarFaixasTecido($event)">
+</app-crud-faixa-tecido>
+
+<!-- Modal CRUD Fechamentos -->
+<app-crud-fechamentos 
+  *ngIf="blocoParaCrudFechamentos" 
+  [bloco]="blocoParaCrudFechamentos"
+  (fechar)="fecharCrudFechamentos()"
+  (salvar)="salvarFechamentos($event)">
+</app-crud-fechamentos>
+
+<!-- Modal CRUD Reserva de Área -->
+<app-crud-reserva-area 
+  *ngIf="blocoParaCrudReservasArea" 
+  [bloco]="blocoParaCrudReservasArea"
+  (fechar)="fecharCrudReservasArea()"
+  (salvar)="salvarReservasArea($event)">
+</app-crud-reserva-area>
+
+<!-- Modal CRUD Sinalização -->
+<app-crud-sinalizacao 
+  *ngIf="blocoParaCrudSinalizacoes" 
+  [bloco]="blocoParaCrudSinalizacoes"
+  (fechar)="fecharCrudSinalizacoes()"
+  (salvar)="salvarSinalizacoes($event)">
+</app-crud-sinalizacao>

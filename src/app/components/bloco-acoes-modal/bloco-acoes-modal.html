@@ -1,0 +1,92 @@
+<div class="modal-overlay" (click)="onFechar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="onFechar()">
+      <ng-icon name="heroXMark"></ng-icon>
+    </button>
+
+    <div class="modal-header">
+      <h3>Ações do Bloco</h3>
+    </div>
+
+    <div class="bloco-info">
+      <div class="info-item">
+        <span class="label">Nº Inscrição:</span>
+        <span class="value">{{ numeroInscricao }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Nome do Bloco:</span>
+        <span class="value">{{ nomeDoBloco }}</span>
+      </div>
+      <div class="info-item">
+        <span class="label">Data do Desfile:</span>
+        <span class="value">{{ dataDoDesfile }}</span>
+      </div>
+    </div>
+
+    <div class="secao-titulo">Documentos</div>
+    <div class="acoes-grid">
+      <button class="acao-btn belotur" (click)="onDocumentoBelotur()">
+        <ng-icon name="heroClipboardDocument"></ng-icon>
+        <span>Documento Belotur</span>
+      </button>
+
+      <button class="acao-btn kml" [class.has-kml]="bloco?.percursoUrl" (click)="onUploadKml()">
+        <ng-icon name="heroMapPin"></ng-icon>
+        <span>{{ bloco?.percursoUrl ? 'Substituir KML' : 'Enviar KML' }}</span>
+      </button>
+
+      <button class="acao-btn percurso" *ngIf="bloco?.percursoUrl" (click)="onVisualizarPercurso()">
+        <ng-icon name="heroDocumentText"></ng-icon>
+        <span>Visualizar Descritivo</span>
+      </button>
+
+      <button class="acao-btn mymaps" *ngIf="bloco?.percursoUrl" (click)="onDocumentoMymaps()">
+        <ng-icon name="heroGlobeAmericas"></ng-icon>
+        <span>Documento My Maps</span>
+      </button>
+
+      <button class="acao-btn completo" (click)="onDocumentoCompleto()">
+        <ng-icon name="heroDocumentDuplicate"></ng-icon>
+        <span>Documento Completo</span>
+      </button>
+
+      <button class="acao-btn remover" *ngIf="bloco?.percursoUrl" (click)="onRemoverArquivo()">
+        <ng-icon name="heroTrash"></ng-icon>
+        <span>Remover Descritivo</span>
+      </button>
+    </div>
+
+    <div class="secao-titulo">Dados Operacionais</div>
+    <div class="acoes-grid">
+      <button class="acao-btn agentes" (click)="onGerenciarAgentes()">
+        <ng-icon name="heroUserGroup"></ng-icon>
+        <span>Agentes</span>
+      </button>
+
+      <button class="acao-btn desvios" (click)="onGerenciarDesvios()">
+        <ng-icon name="heroArrowsRightLeft"></ng-icon>
+        <span>Desvios</span>
+      </button>
+
+      <button class="acao-btn faixas" (click)="onGerenciarFaixasTecido()">
+        <ng-icon name="heroFlag"></ng-icon>
+        <span>Faixas de Tecido</span>
+      </button>
+
+      <button class="acao-btn fechamentos" (click)="onGerenciarFechamentos()">
+        <ng-icon name="heroNoSymbol"></ng-icon>
+        <span>Fechamentos</span>
+      </button>
+
+      <button class="acao-btn reservas" (click)="onGerenciarReservasArea()">
+        <ng-icon name="heroSquare3Stack3d"></ng-icon>
+        <span>Reserva de Área</span>
+      </button>
+
+      <button class="acao-btn sinalizacao" (click)="onGerenciarSinalizacoes()">
+        <ng-icon name="heroExclamationTriangle"></ng-icon>
+        <span>Sinalização</span>
+      </button>
+    </div>
+  </div>
+</div>

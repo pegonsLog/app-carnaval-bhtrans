@@ -1,0 +1,224 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  animation: slideIn 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e0e0e0;
+    color: #333;
+  }
+}
+
+.modal-header {
+  margin-bottom: 1.5rem;
+
+  h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.bloco-info {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .label {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.85rem;
+    min-width: 120px;
+  }
+
+  .value {
+    color: #333;
+    font-size: 0.9rem;
+    word-break: break-word;
+  }
+}
+
+.secao-titulo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}
+
+.acoes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.acao-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: white;
+  transition: all 0.2s ease;
+
+  ng-icon {
+    font-size: 1.25rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &.belotur {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  }
+
+  &.kml {
+    background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+
+    &.has-kml {
+      background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    }
+  }
+
+  &.percurso {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  }
+
+  &.mymaps {
+    background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+  }
+
+  &.completo {
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+  }
+
+  &.remover {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  }
+
+  &.agentes {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  }
+
+  &.desvios {
+    background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+  }
+
+  &.faixas {
+    background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+  }
+
+  &.fechamentos {
+    background: linear-gradient(135deg, #795548 0%, #5d4037 100%);
+  }
+
+  &.reservas {
+    background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
+  }
+
+  &.sinalizacao {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1.5rem;
+  }
+
+  .acoes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-item {
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .label {
+      min-width: auto;
+    }
+  }
+}

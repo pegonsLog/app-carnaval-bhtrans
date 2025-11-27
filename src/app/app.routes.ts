@@ -8,6 +8,10 @@ import { DocumentoBlocoComponent } from './pages/documento-bloco/documento-bloco
 export const routes: Routes = [
     {
         path: '',
+        component: BlocosListComponent
+    },
+    {
+        path: 'home',
         component: HomeComponent
     },
     {
@@ -16,7 +20,8 @@ export const routes: Routes = [
     },
     {
         path: 'blocos',
-        component: BlocosListComponent
+        redirectTo: '',
+        pathMatch: 'full'
     },
     {
         path: 'capas',

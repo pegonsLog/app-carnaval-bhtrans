@@ -1,0 +1,71 @@
+<div class="modal-overlay" (click)="onFechar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="onFechar()">
+      <ng-icon name="heroXMark"></ng-icon>
+    </button>
+
+    <div class="modal-header">
+      <h3>Fechamentos - {{ bloco?.nomeDoBloco }}</h3>
+    </div>
+
+    <div class="lista-container" *ngIf="!mostrarForm">
+      <button class="btn-adicionar" (click)="abrirFormNovo()">
+        <ng-icon name="heroPlus"></ng-icon>
+        Adicionar Fechamento
+      </button>
+
+      <div class="lista-vazia" *ngIf="itens.length === 0">
+        Nenhum fechamento cadastrado
+      </div>
+
+      <div class="lista-itens" *ngIf="itens.length > 0">
+        <div class="item" *ngFor="let item of itens; let i = index">
+          <div class="item-info">
+            <span class="item-principal">{{ item.endereco }}</span>
+            <span class="item-secundario">{{ item.sinalizacao }}</span>
+            <span class="item-badge">Qtd: {{ item.quantidade }}</span>
+          </div>
+          <div class="item-acoes">
+            <button class="btn-editar" (click)="editarItem(item, i)">
+              <ng-icon name="heroPencil"></ng-icon>
+            </button>
+            <button class="btn-excluir" (click)="excluirItem(i)">
+              <ng-icon name="heroTrash"></ng-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancelar" (click)="onFechar()">Cancelar</button>
+        <button class="btn-salvar" (click)="onSalvar()">Salvar Alterações</button>
+      </div>
+    </div>
+
+    <div class="form-container" *ngIf="mostrarForm">
+      <h4>{{ indiceEditando >= 0 ? 'Editar' : 'Novo' }} Fechamento</h4>
+      
+      <div class="form-group">
+        <label>Endereço *</label>
+        <input type="text" [(ngModel)]="formItem.endereco" placeholder="Endereço do fechamento">
+      </div>
+
+      <div class="form-group">
+        <label>Sinalização</label>
+        <input type="text" [(ngModel)]="formItem.sinalizacao" placeholder="Tipo de sinalização">
+      </div>
+
+      <div class="form-group">
+        <label>Quantidade</label>
+        <input type="number" [(ngModel)]="formItem.quantidade" min="1">
+      </div>
+
+      <div class="form-footer">
+        <button class="btn-cancelar" (click)="cancelarForm()">Cancelar</button>
+        <button class="btn-salvar" (click)="salvarItem()" [disabled]="!formItem.endereco">
+          {{ indiceEditando >= 0 ? 'Atualizar' : 'Adicionar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -272,7 +272,10 @@ export class DocumentoBlocoComponent implements OnInit {
   }
 
   voltar() {
-    this.router.navigate(['/blocos']);
+    // Volta para a lista com parâmetro para reabrir o modal de ações
+    this.router.navigate(['/'], { 
+      queryParams: { abrirAcoes: this.bloco?.id } 
+    });
   }
 
   imprimir() {
@@ -305,5 +308,15 @@ export class DocumentoBlocoComponent implements OnInit {
   formatNumber(value: number | undefined): string {
     if (value === undefined || value === null) return '-';
     return value.toLocaleString('pt-BR');
+  }
+
+  getTotalAgentes(): number {
+    if (!this.bloco?.agentes) return 0;
+    return this.bloco.agentes.reduce((total: number, item: any) => total + (item.quantidade || 0), 0);
+  }
+
+  getTotalSinalizacoes(): number {
+    if (!this.bloco?.sinalizacoes) return 0;
+    return this.bloco.sinalizacoes.reduce((total: number, item: any) => total + (item.quantidade || 0), 0);
   }
 }

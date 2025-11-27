@@ -1,0 +1,97 @@
+<div class="modal-overlay" (click)="onFechar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="onFechar()">
+      <ng-icon name="heroXMark"></ng-icon>
+    </button>
+
+    <div class="modal-header">
+      <h3>Desvios - {{ bloco?.nomeDoBloco }}</h3>
+    </div>
+
+    <div class="lista-container" *ngIf="!mostrarForm">
+      <button class="btn-adicionar" (click)="abrirFormNovo()">
+        <ng-icon name="heroPlus"></ng-icon>
+        Adicionar Desvio
+      </button>
+
+      <div class="lista-vazia" *ngIf="itens.length === 0">
+        Nenhum desvio cadastrado
+      </div>
+
+      <div class="lista-itens" *ngIf="itens.length > 0">
+        <div class="item" *ngFor="let item of itens; let i = index">
+          <div class="item-info">
+            <span class="item-principal">{{ item.tipo }} - Linha {{ item.linha }}</span>
+            <span class="item-secundario">Horário: {{ item.hora }}</span>
+          </div>
+          <div class="item-acoes">
+            <button class="btn-editar" (click)="editarItem(item, i)">
+              <ng-icon name="heroPencil"></ng-icon>
+            </button>
+            <button class="btn-excluir" (click)="excluirItem(i)">
+              <ng-icon name="heroTrash"></ng-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancelar" (click)="onFechar()">Cancelar</button>
+        <button class="btn-salvar" (click)="onSalvar()">Salvar Alterações</button>
+      </div>
+    </div>
+
+    <div class="form-container" *ngIf="mostrarForm">
+      <h4>{{ indiceEditando >= 0 ? 'Editar' : 'Novo' }} Desvio</h4>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipo *</label>
+          <input type="text" [(ngModel)]="formItem.tipo" placeholder="Tipo do desvio">
+        </div>
+        <div class="form-group">
+          <label>Linha *</label>
+          <input type="text" [(ngModel)]="formItem.linha" placeholder="Número da linha">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" [(ngModel)]="formItem.data">
+        </div>
+        <div class="form-group">
+          <label>Hora</label>
+          <input type="time" [(ngModel)]="formItem.hora">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Sentido Horário</label>
+        <input type="text" [(ngModel)]="formItem.sentidoHorario" placeholder="Sentido horário">
+      </div>
+
+      <div class="form-group">
+        <label>Trajeto Sentido Horário</label>
+        <textarea [(ngModel)]="formItem.trajetoSentHorario" rows="2" placeholder="Descrição do trajeto"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Sentido Anti-Horário</label>
+        <input type="text" [(ngModel)]="formItem.sentidoAntiHorario" placeholder="Sentido anti-horário">
+      </div>
+
+      <div class="form-group">
+        <label>Trajeto Sentido Anti-Horário</label>
+        <textarea [(ngModel)]="formItem.trajetoSentAntiHorario" rows="2" placeholder="Descrição do trajeto"></textarea>
+      </div>
+
+      <div class="form-footer">
+        <button class="btn-cancelar" (click)="cancelarForm()">Cancelar</button>
+        <button class="btn-salvar" (click)="salvarItem()" [disabled]="!formItem.tipo || !formItem.linha">
+          {{ indiceEditando >= 0 ? 'Atualizar' : 'Adicionar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

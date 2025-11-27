@@ -1,0 +1,70 @@
+<div class="modal-overlay" (click)="onFechar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="onFechar()">
+      <ng-icon name="heroXMark"></ng-icon>
+    </button>
+
+    <div class="modal-header">
+      <h3>Faixas de Tecido - {{ bloco?.nomeDoBloco }}</h3>
+    </div>
+
+    <div class="lista-container" *ngIf="!mostrarForm">
+      <button class="btn-adicionar" (click)="abrirFormNovo()">
+        <ng-icon name="heroPlus"></ng-icon>
+        Adicionar Faixa
+      </button>
+
+      <div class="lista-vazia" *ngIf="itens.length === 0">
+        Nenhuma faixa de tecido cadastrada
+      </div>
+
+      <div class="lista-itens" *ngIf="itens.length > 0">
+        <div class="item" *ngFor="let item of itens; let i = index">
+          <div class="item-info">
+            <span class="item-principal">{{ item.faixa }}</span>
+            <span class="item-secundario">{{ item.local }} - {{ item.sentido }}</span>
+          </div>
+          <div class="item-acoes">
+            <button class="btn-editar" (click)="editarItem(item, i)">
+              <ng-icon name="heroPencil"></ng-icon>
+            </button>
+            <button class="btn-excluir" (click)="excluirItem(i)">
+              <ng-icon name="heroTrash"></ng-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancelar" (click)="onFechar()">Cancelar</button>
+        <button class="btn-salvar" (click)="onSalvar()">Salvar Alterações</button>
+      </div>
+    </div>
+
+    <div class="form-container" *ngIf="mostrarForm">
+      <h4>{{ indiceEditando >= 0 ? 'Editar' : 'Nova' }} Faixa de Tecido</h4>
+      
+      <div class="form-group">
+        <label>Faixa *</label>
+        <input type="text" [(ngModel)]="formItem.faixa" placeholder="Identificação da faixa">
+      </div>
+
+      <div class="form-group">
+        <label>Local *</label>
+        <input type="text" [(ngModel)]="formItem.local" placeholder="Local de instalação">
+      </div>
+
+      <div class="form-group">
+        <label>Sentido</label>
+        <input type="text" [(ngModel)]="formItem.sentido" placeholder="Sentido da faixa">
+      </div>
+
+      <div class="form-footer">
+        <button class="btn-cancelar" (click)="cancelarForm()">Cancelar</button>
+        <button class="btn-salvar" (click)="salvarItem()" [disabled]="!formItem.faixa || !formItem.local">
+          {{ indiceEditando >= 0 ? 'Atualizar' : 'Adicionar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -192,8 +192,72 @@
 // PÁGINAS DE DADOS
 .dados-page,
 .mymaps-page,
-.mapa-page {
+.mapa-page,
+.dados-operacionais-page {
   padding: 15mm;
+}
+
+// SEÇÕES OPERACIONAIS
+.secao-operacional {
+  margin-bottom: 6mm;
+  page-break-inside: avoid;
+}
+
+.total-secao {
+  font-size: 9pt;
+  color: #666;
+  text-align: right;
+  margin: 1mm 0 0 0;
+  font-style: italic;
+}
+
+// TABELAS OPERACIONAIS
+.tabela-operacional {
+  margin: 2mm 0;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    border: 1px solid #333;
+
+    thead {
+      background: transparent;
+      color: #333;
+
+      th {
+        padding: 2mm 2mm;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 1px solid #333;
+        font-size: 8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid #e0e0e0;
+
+        &:nth-child(even) {
+          background: #f8f9fa;
+        }
+      }
+
+      td {
+        padding: 1.5mm 2mm;
+        color: #333;
+        vertical-align: top;
+
+        &.center {
+          text-align: center;
+          font-weight: 600;
+          color: #667eea;
+        }
+      }
+    }
+  }
 }
 
 // PÁGINA DO MAPA
@@ -468,10 +532,31 @@
     page-break-after: always;
     margin: 0;
     width: 100%;
+    min-height: auto;
   }
 
   .a4-page:last-child {
     page-break-after: auto;
+  }
+
+  // Página de dados operacionais permite quebra interna
+  .dados-operacionais-page {
+    page-break-after: auto;
+    min-height: auto;
+
+    .secao-operacional {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .tabela-operacional {
+      page-break-inside: auto;
+
+      tr {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+    }
   }
 
   .aviso-sem-capa {
@@ -480,7 +565,7 @@
 
   @page {
     size: A4;
-    margin: 0;
+    margin: 10mm;
   }
 }
 

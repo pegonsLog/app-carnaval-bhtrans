@@ -1,0 +1,111 @@
+<div class="modal-overlay" (click)="fecharModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header no-print">
+      <h2>Documento My Maps</h2>
+      <div class="header-actions">
+        <button class="print-btn" (click)="imprimir()" title="Imprimir" [disabled]="isLoading">
+          <ng-icon name="heroPrinter"></ng-icon>
+          Imprimir
+        </button>
+        <button class="close-btn" (click)="fecharModal()">
+          <ng-icon name="heroXMark"></ng-icon>
+        </button>
+      </div>
+    </div>
+
+    <div class="document-wrapper">
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Carregando dados do My Maps...</p>
+      </div>
+
+      <!-- Erro -->
+      <div class="error-state" *ngIf="errorMessage && !isLoading">
+        <p>{{ errorMessage }}</p>
+      </div>
+
+      <!-- Documento A4 -->
+      <div class="a4-document" *ngIf="!isLoading && !errorMessage">
+        <!-- Cabeçalho do Documento -->
+        <div class="doc-header">
+          <div class="logo-section">
+            <img src="assets/images/logo-belotur.png" alt="Belotur" class="logo" onerror="this.style.display='none'">
+          </div>
+          <div class="header-text">
+            <h1>DADOS EXTRAÍDOS DO MY MAPS DO BLOCO</h1>
+            <h2>BHTRANS</h2>
+            <p class="subtitle">Carnaval de Belo Horizonte - Descritivo do Croqui (My Maps)</p>
+          </div>
+        </div>
+
+        <div class="doc-divider"></div>
+
+        <!-- Identificação do Bloco -->
+        <section class="doc-section">
+          <h3 class="section-title">IDENTIFICAÇÃO DO BLOCO</h3>
+          <div class="info-grid">
+            <div class="info-item full">
+              <span class="label">Nome do Bloco:</span>
+              <span class="value">{{ bloco.nomeDoBloco || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Nº Inscrição:</span>
+              <span class="value">{{ bloco.numeroInscricao || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Data do Desfile:</span>
+              <span class="value">{{ formatDate(bloco.dataDoDesfile) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Regional:</span>
+              <span class="value">{{ bloco.regional || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Data do Upload:</span>
+              <span class="value">{{ formatDate(bloco.percursoDataUpload) }}</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Título do Arquivo -->
+        <section class="doc-section" *ngIf="parsedData.titulo">
+          <h3 class="section-title">TÍTULO DO MAPA</h3>
+          <div class="titulo-mapa">
+            {{ parsedData.titulo }}
+          </div>
+        </section>
+
+        <!-- Seções do Markdown -->
+        <section class="doc-section" *ngFor="let secao of parsedData.secoes">
+          <h3 class="section-title">{{ secao.titulo | uppercase }}</h3>
+          <div class="info-grid">
+            <ng-container *ngFor="let item of secao.items">
+              <div class="info-item" [class.full]="!item.label || item.value?.length > 50">
+                <span class="label" *ngIf="item.label">{{ item.label }}:</span>
+                <span class="value" *ngIf="!item.url">{{ item.value || '-' }}</span>
+                <a class="value link" *ngIf="item.url" [href]="item.url" target="_blank" rel="noopener">
+                  {{ item.value }}
+                </a>
+              </div>
+            </ng-container>
+          </div>
+        </section>
+
+        <!-- Conteúdo Original (caso não tenha seções parseadas) -->
+        <section class="doc-section" *ngIf="parsedData.secoes?.length === 0 && markdownContent">
+          <h3 class="section-title">CONTEÚDO DO ARQUIVO</h3>
+          <div class="raw-content">
+            <pre>{{ markdownContent }}</pre>
+          </div>
+        </section>
+
+        <!-- Rodapé -->
+        <div class="doc-footer">
+          <p>Documento gerado a partir do arquivo My Maps</p>
+          <p class="footer-note">Sistema de Gestão do Carnaval de BH - Belotur</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -103,7 +103,8 @@
     font-size: 0.9rem;
   }
 
-  input {
+  input,
+  textarea {
     width: 100%;
     padding: 0.75rem 1rem;
     border: 1px solid #ddd;
@@ -112,6 +113,7 @@
     font-family: 'Montserrat', sans-serif;
     transition: all 0.2s;
     box-sizing: border-box;
+    resize: vertical;
 
     &:focus {
       outline: none;
@@ -132,11 +134,28 @@
     }
   }
 
+  textarea {
+    min-height: 80px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+  }
+
   .url-hint {
     display: block;
     font-size: 0.8rem;
-    color: #dc3545;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
+
+    &.info {
+      color: #666;
+    }
+
+    &.success {
+      color: #28a745;
+    }
+
+    &.error {
+      color: #dc3545;
+    }
   }
 }
 

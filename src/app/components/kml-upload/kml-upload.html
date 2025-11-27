@@ -18,11 +18,19 @@
             </div>
 
             <div class="url-input-group">
-                <label for="myMapsUrl">URL do Google My Maps (opcional)</label>
-                <input type="url" id="myMapsUrl" [(ngModel)]="myMapsUrl" placeholder="https://www.google.com/maps/d/..."
-                    [class.invalid]="myMapsUrl && !validarUrlMyMaps()">
-                <span class="url-hint" *ngIf="myMapsUrl && !validarUrlMyMaps()">
-                    URL inválida. Use o link do Google Maps.
+                <label for="myMapsUrl">Código de Incorporação do Google My Maps (opcional)</label>
+                <textarea id="myMapsUrl" [(ngModel)]="myMapsUrl" rows="3"
+                    placeholder='Cole aqui o iframe: <iframe src="https://www.google.com/maps/d/embed?mid=..." ...></iframe>'
+                    [class.invalid]="myMapsUrl && !validarUrlMyMaps()"></textarea>
+                <span class="url-hint info" *ngIf="!myMapsUrl">
+                    💡 No My Maps: Menu (⋮) → "Compartilhar ou incorporar mapa" → "Incorporar um mapa" → Copie o código
+                    completo do iframe
+                </span>
+                <span class="url-hint success" *ngIf="myMapsUrl && validarUrlMyMaps()">
+                    ✅ Código válido!
+                </span>
+                <span class="url-hint error" *ngIf="myMapsUrl && !validarUrlMyMaps()">
+                    ❌ Código inválido. Cole o iframe completo do Google Maps.
                 </span>
             </div>
 

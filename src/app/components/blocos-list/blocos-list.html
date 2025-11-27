@@ -68,6 +68,9 @@
                 <button class="view-btn" (click)="abrirDetalhe(bloco)" title="Ver detalhes">
                   <ng-icon name="heroEye"></ng-icon>
                 </button>
+                <button class="doc-btn" (click)="abrirDocumentoBelotur(bloco)" title="Documento Belotur">
+                  <ng-icon name="heroClipboardDocument"></ng-icon>
+                </button>
                 <button class="kml-btn" [class.has-kml]="bloco.percursoUrl" (click)="abrirUploadKml(bloco)"
                   [title]="bloco.percursoUrl ? 'Descritivo enviado - Clique para substituir' : 'Enviar arquivo KML'">
                   <ng-icon name="heroMapPin"></ng-icon>
@@ -75,6 +78,14 @@
                 <button class="percurso-btn" *ngIf="bloco.percursoUrl" (click)="abrirVisualizarPercurso(bloco)"
                   title="Visualizar descritivo">
                   <ng-icon name="heroDocumentText"></ng-icon>
+                </button>
+                <button class="mymaps-btn" *ngIf="bloco.percursoUrl" (click)="abrirDocumentoMymaps(bloco)"
+                  title="Documento My Maps">
+                  <ng-icon name="heroGlobeAmericas"></ng-icon>
+                </button>
+                <button class="completo-btn" (click)="abrirDocumentoCompleto(bloco)"
+                  title="Documento Completo (Capa + Belotur + MyMaps)">
+                  <ng-icon name="heroDocumentDuplicate"></ng-icon>
                 </button>
                 <button class="remove-btn" *ngIf="bloco.percursoUrl" (click)="abrirModalRemover(bloco)"
                   title="Remover arquivo descritivo">
@@ -133,3 +144,12 @@
   [mensagem]="'Deseja remover o arquivo descritivo do bloco ' + blocoParaRemover.nomeDoBloco + '?'" tipo="danger"
   (confirmar)="confirmarRemocao()" (cancelar)="fecharModalRemover()">
 </app-confirm-modal>
+
+<!-- Modal de Documento Belotur -->
+<app-dados-belotur *ngIf="blocoParaDocumento" [bloco]="blocoParaDocumento" (fechar)="fecharDocumentoBelotur()">
+</app-dados-belotur>
+
+<!-- Modal de Documento My Maps -->
+<app-dados-mymaps *ngIf="blocoParaDocumentoMymaps" [bloco]="blocoParaDocumentoMymaps"
+  (fechar)="fecharDocumentoMymaps()">
+</app-dados-mymaps>

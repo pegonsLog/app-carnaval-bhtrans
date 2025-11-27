@@ -1,0 +1,381 @@
+<div class="documento-container">
+  <!-- Header com ações (não imprime) -->
+  <div class="header-actions no-print">
+    <button class="btn-voltar" (click)="voltar()">
+      <ng-icon name="heroArrowLeft"></ng-icon>
+      Voltar
+    </button>
+    <h1>Documento do Bloco</h1>
+    <button class="btn-imprimir" (click)="imprimir()" [disabled]="isLoading">
+      <ng-icon name="heroPrinter"></ng-icon>
+      Imprimir
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Carregando documento...</p>
+  </div>
+
+  <!-- Erro -->
+  <div class="error-state" *ngIf="errorMessage && !isLoading">
+    <p>{{ errorMessage }}</p>
+    <button class="btn-voltar" (click)="voltar()">Voltar para lista</button>
+  </div>
+
+  <!-- Documento -->
+  <div class="documento-wrapper" *ngIf="!isLoading && !errorMessage && bloco">
+
+    <!-- PÁGINA 1: CAPA -->
+    <div class="a4-page capa-page" *ngIf="capa">
+      <div class="capa-header">
+        <p class="linha">PREFEITURA MUNICIPAL DE BELO HORIZONTE</p>
+        <p class="linha">EMPRESA DE TRANSPORTES E TRÂNSITO DE BELO HORIZONTE S/A - BHTRANS</p>
+        <p class="linha">DIRETORIA DE TRANSPORTE PÚBLICO - DTP</p>
+        <p class="linha variavel">{{ capa.gerencia }}</p>
+        <p class="linha variavel">{{ capa.equipe }}</p>
+        <p class="linha variavel">{{ capa.responsavel }}</p>
+      </div>
+
+      <div class="capa-logo">
+        <img src="assets/logomarcas/logomarcas.png" alt="Logo" />
+      </div>
+
+      <div class="capa-titulo">
+        <h1>CARNAVAL 2026</h1>
+        <h2>PLANO OPERACIONAL DE TRÂNSITO - DOT</h2>
+        <h3>{{ bloco.nomeDoBloco }}</h3>
+      </div>
+
+      <div class="capa-footer">
+        <p>Belo Horizonte</p>
+        <p>2026</p>
+      </div>
+    </div>
+
+    <!-- Aviso se não encontrou capa -->
+    <div class="aviso-sem-capa no-print" *ngIf="!capa">
+      <p>⚠️ Nenhuma capa encontrada para a regional "{{ bloco.regional }}"</p>
+    </div>
+
+    <!-- PÁGINA 2: DADOS MY MAPS (se existir) -->
+    <div class="a4-page mymaps-page" *ngIf="bloco.percursoUrl && parsedMymaps">
+      <div class="doc-header">
+        <div class="header-text">
+          <h1>DESCRITIVO DO PERCURSO</h1>
+          <h2>MY MAPS</h2>
+          <p class="subtitle">{{ bloco.nomeDoBloco }}</p>
+        </div>
+      </div>
+
+      <div class="doc-divider"></div>
+
+      <!-- Título do Mapa -->
+      <section class="doc-section" *ngIf="parsedMymaps.titulo">
+        <h3 class="section-title">TÍTULO DO MAPA</h3>
+        <div class="titulo-mapa">
+          {{ parsedMymaps.titulo }}
+        </div>
+      </section>
+
+      <!-- Seções do Markdown (Pastas do KML) -->
+      <section class="doc-section" *ngFor="let secao of parsedMymaps.secoes">
+        <h3 class="section-title">{{ secao.titulo | uppercase }}</h3>
+
+        <!-- Contagem apenas para pastas: presenças, sinalização, fechamentos -->
+        <div class="contagem-lista" *ngIf="secao.exibirContagem">
+          <div class="contagem-item" *ngFor="let item of secao.contagem">
+            <span class="item-nome">{{ item.nome }}</span>
+            <span class="item-qtd">{{ item.quantidade }}</span>
+          </div>
+          <div class="contagem-vazia" *ngIf="!secao.contagem || secao.contagem.length === 0">
+            Nenhum item encontrado
+          </div>
+        </div>
+
+        <!-- Outras pastas: lista de itens sem contagem -->
+        <div class="itens-lista" *ngIf="!secao.exibirContagem">
+          <div class="item-simples" *ngFor="let item of secao.itens">
+            {{ item }}
+          </div>
+          <div class="contagem-vazia" *ngIf="!secao.itens || secao.itens.length === 0">
+            Nenhum item encontrado
+          </div>
+        </div>
+      </section>
+
+      <!-- Conteúdo Original -->
+      <section class="doc-section" *ngIf="parsedMymaps.secoes?.length === 0 && markdownContent">
+        <h3 class="section-title">CONTEÚDO DO ARQUIVO</h3>
+        <div class="raw-content">
+          <pre>{{ markdownContent }}</pre>
+        </div>
+      </section>
+
+      <div class="doc-footer">
+        <p>Data do Upload: {{ formatDate(bloco.percursoDataUpload) }}</p>
+      </div>
+    </div>
+
+    <!-- PÁGINA 3: MAPA (iframe do Google Maps) -->
+    <div class="a4-page mapa-page" *ngIf="safeMapUrl || parsedMymaps?.mapUrl">
+      <div class="doc-header">
+        <div class="header-text">
+          <h1>MAPA DO BLOCO</h1>
+          <h2>VISUALIZAÇÃO</h2>
+          <p class="subtitle">{{ bloco.nomeDoBloco }}</p>
+        </div>
+      </div>
+
+      <div class="doc-divider"></div>
+
+      <div class="mapa-container" *ngIf="safeMapUrl">
+        <iframe [src]="safeMapUrl" width="100%" height="100%" frameborder="0" allowfullscreen>
+        </iframe>
+      </div>
+
+      <!-- Fallback: link para abrir o mapa -->
+      <div class="mapa-fallback" *ngIf="!safeMapUrl && parsedMymaps?.mapUrl">
+        <p>O mapa não pode ser exibido diretamente.</p>
+        <a [href]="parsedMymaps.mapUrl" target="_blank" rel="noopener" class="btn-abrir-mapa">
+          Abrir Mapa no Google Maps
+        </a>
+      </div>
+
+      <div class="doc-footer">
+        <p>Mapa gerado a partir do Google My Maps</p>
+        <p class="map-url no-print" *ngIf="mapEmbedUrl">URL: {{ mapEmbedUrl }}</p>
+      </div>
+    </div>
+
+    <!-- PÁGINA 4: DADOS BELOTUR -->
+    <div class="a4-page dados-page">
+      <div class="doc-header">
+        <div class="header-text">
+          <h1>DADOS EXTRAÍDOS DA PLANILHA DA BELOTUR</h1>
+          <p class="subtitle">Carnaval de Belo Horizonte - Ficha Cadastral do Bloco</p>
+        </div>
+      </div>
+
+      <div class="doc-divider"></div>
+
+      <!-- Identificação -->
+      <section class="doc-section">
+        <h3 class="section-title">IDENTIFICAÇÃO DO BLOCO</h3>
+        <div class="info-grid">
+          <div class="info-item full">
+            <span class="label">Nome do Bloco:</span>
+            <span class="value">{{ bloco.nomeDoBloco || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Nº Inscrição:</span>
+            <span class="value">{{ bloco.numeroInscricao || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Categoria:</span>
+            <span class="value">{{ bloco.categoriaDoBloco || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Período:</span>
+            <span class="value">{{ bloco.periodo || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Regional:</span>
+            <span class="value">{{ bloco.regional || '-' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Características -->
+      <section class="doc-section">
+        <h3 class="section-title">CARACTERÍSTICAS</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Perfil:</span>
+            <span class="value">{{ bloco.perfil || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Estilo Musical:</span>
+            <span class="value">{{ bloco.estiloDeMusica || '-' }}</span>
+          </div>
+          <div class="info-item full">
+            <span class="label">Descrição:</span>
+            <span class="value">{{ bloco.descricaoDoBloco || '-' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Data e Horários -->
+      <section class="doc-section">
+        <h3 class="section-title">DATA E HORÁRIOS DO DESFILE</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Data do Desfile:</span>
+            <span class="value">{{ formatDate(bloco.dataDoDesfile) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Concentração:</span>
+            <span class="value">{{ bloco.horarioDeconcentracao || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Início:</span>
+            <span class="value">{{ bloco.inicioDoDesfile || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Encerramento:</span>
+            <span class="value">{{ bloco.horarioEncerramento || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Duração:</span>
+            <span class="value">{{ bloco.duracaoDoDesfile || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Dispersão:</span>
+            <span class="value">{{ bloco.horarioDispersao || '-' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Percurso -->
+      <section class="doc-section">
+        <h3 class="section-title">PERCURSO E LOCALIZAÇÃO</h3>
+        <div class="info-grid">
+          <div class="info-item full">
+            <span class="label">Percurso:</span>
+            <span class="value">{{ bloco.percurso || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">End. Concentração:</span>
+            <span class="value">{{ bloco.enderecoDeConcentracao || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Bairro Concentração:</span>
+            <span class="value">{{ bloco.bairroDeConcentracao || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">End. Dispersão:</span>
+            <span class="value">{{ bloco.enderecoDeDispersao || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Bairro Dispersão:</span>
+            <span class="value">{{ bloco.bairroDeDispersao || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Extensão:</span>
+            <span class="value">{{ formatNumber(bloco.extensaoDoDesfileMetros) }} m</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Nº de Quadras:</span>
+            <span class="value">{{ bloco.numeroDeQuadras || '-' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Público -->
+      <section class="doc-section">
+        <h3 class="section-title">PÚBLICO ESTIMADO</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Público Anterior:</span>
+            <span class="value">{{ formatNumber(bloco.publicoAnterior) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Público Declarado:</span>
+            <span class="value">{{ formatNumber(bloco.publicoDeclarado) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Área do Trajeto:</span>
+            <span class="value">{{ formatNumber(bloco.areaDoTrajetoM2) }} m²</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Capacidade:</span>
+            <span class="value">{{ formatNumber(bloco.capacidadePublicoDoTrajeto) }} pessoas</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Equipamentos -->
+      <section class="doc-section">
+        <h3 class="section-title">EQUIPAMENTOS E DIMENSÕES</h3>
+        <div class="info-grid">
+          <div class="info-item full">
+            <span class="label">Equipamentos:</span>
+            <span class="value">{{ formatArray(bloco.equipamentosUtilizados) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Largura:</span>
+            <span class="value">{{ bloco.larguraMetros || '-' }} m</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Comprimento:</span>
+            <span class="value">{{ bloco.comprimentoMetros || '-' }} m</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Altura:</span>
+            <span class="value">{{ bloco.alturaMetros || '-' }} m</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Potência:</span>
+            <span class="value">{{ formatNumber(bloco.potenciaWatts) }} W</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Responsável -->
+      <section class="doc-section">
+        <h3 class="section-title">RESPONSÁVEL LEGAL</h3>
+        <div class="info-grid">
+          <div class="info-item full">
+            <span class="label">Nome:</span>
+            <span class="value">{{ bloco.responsavelLegal || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">CPF:</span>
+            <span class="value">{{ bloco.cpf || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">CNPJ:</span>
+            <span class="value">{{ bloco.cnpj || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">E-mail:</span>
+            <span class="value">{{ bloco.email || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Celular:</span>
+            <span class="value">{{ bloco.celular || '-' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Status -->
+      <section class="doc-section">
+        <h3 class="section-title">STATUS</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Possui Desfiles:</span>
+            <span class="value">{{ formatBoolean(bloco.possuiDesfiles) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Status do Desfile:</span>
+            <span class="value">{{ bloco.statusDoDesfile || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Autoriza Divulgação:</span>
+            <span class="value">{{ formatBoolean(bloco.autorizaDivulgacao) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Primeiro Cadastro:</span>
+            <span class="value">{{ formatBoolean(bloco.primeiroCadastro) }}</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="doc-footer">
+        <p>Data de Cadastro/Modificação: {{ formatDate(bloco.dataCadastroModificacao) }}</p>
+      </div>
+    </div>
+
+  </div>
+</div>

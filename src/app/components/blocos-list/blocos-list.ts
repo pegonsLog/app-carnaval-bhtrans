@@ -1,20 +1,23 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Storage, ref, deleteObject } from '@angular/fire/storage';
 import { Firestore, collection, query, where, getDocs, updateDoc, doc, deleteField } from '@angular/fire/firestore';
 import { BlocosService } from '../../services/blocos';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroMapPin, heroDocumentText, heroTrash } from '@ng-icons/heroicons/outline';
+import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroMapPin, heroDocumentText, heroTrash, heroClipboardDocument, heroGlobeAmericas, heroDocumentDuplicate } from '@ng-icons/heroicons/outline';
 import { BlocoDetalheComponent } from '../bloco-detalhe/bloco-detalhe';
 import { KmlUploadComponent } from '../kml-upload/kml-upload';
 import { PercursoViewerComponent } from '../percurso-viewer/percurso-viewer';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal';
+import { DadosBeloturComponent } from '../dados-belotur/dados-belotur';
+import { DadosMymapsComponent } from '../dados-mymaps/dados-mymaps';
 
 @Component({
   selector: 'app-blocos-list',
-  imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent],
-  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroMapPin, heroDocumentText, heroTrash })],
+  imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent],
+  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroMapPin, heroDocumentText, heroTrash, heroClipboardDocument, heroGlobeAmericas, heroDocumentDuplicate })],
   templateUrl: './blocos-list.html',
   styleUrl: './blocos-list.scss'
 })
@@ -47,6 +50,12 @@ export class BlocosListComponent implements OnInit {
 
   // Controle do modal de confirmação de exclusão
   blocoParaRemover: any = null;
+
+  // Controle do modal de documento Belotur
+  blocoParaDocumento: any = null;
+
+  // Controle do modal de documento My Maps
+  blocoParaDocumentoMymaps: any = null;
 
   // Colunas a exibir (todas as colunas)
   displayColumns = [
@@ -111,7 +120,8 @@ export class BlocosListComponent implements OnInit {
     private blocosService: BlocosService,
     private ngZone: NgZone,
     private storage: Storage,
-    private firestore: Firestore
+    private firestore: Firestore,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -252,6 +262,26 @@ export class BlocosListComponent implements OnInit {
 
   fecharModalRemover() {
     this.blocoParaRemover = null;
+  }
+
+  abrirDocumentoBelotur(bloco: any) {
+    this.blocoParaDocumento = bloco;
+  }
+
+  fecharDocumentoBelotur() {
+    this.blocoParaDocumento = null;
+  }
+
+  abrirDocumentoMymaps(bloco: any) {
+    this.blocoParaDocumentoMymaps = bloco;
+  }
+
+  fecharDocumentoMymaps() {
+    this.blocoParaDocumentoMymaps = null;
+  }
+
+  abrirDocumentoCompleto(bloco: any) {
+    this.router.navigate(['/documento', bloco.id]);
   }
 
   async confirmarRemocao() {

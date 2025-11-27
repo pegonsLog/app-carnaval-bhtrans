@@ -215,7 +215,7 @@
 }
 
 .action-col {
-  width: 140px;
+  width: 230px;
   text-align: center;
   position: sticky;
   left: 0;
@@ -262,6 +262,24 @@
   }
 }
 
+.doc-btn {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  border: none;
+  color: white;
+  padding: 0.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(155, 89, 182, 0.4);
+  }
+}
+
 .percurso-btn {
   background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
   border: none;
@@ -277,6 +295,42 @@
   &:hover {
     transform: scale(1.1);
     box-shadow: 0 2px 8px rgba(23, 162, 184, 0.4);
+  }
+}
+
+.mymaps-btn {
+  background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+  border: none;
+  color: white;
+  padding: 0.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.4);
+  }
+}
+
+.completo-btn {
+  background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+  border: none;
+  color: white;
+  padding: 0.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(230, 126, 34, 0.4);
   }
 }
 

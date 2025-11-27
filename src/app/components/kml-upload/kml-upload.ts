@@ -301,9 +301,9 @@ export class KmlUploadComponent {
         percursoDataUpload: new Date(),
       };
 
-      // Adiciona URL do My Maps se informada
+      // Adiciona URL de embed do My Maps se informada
       if (this.myMapsUrl.trim()) {
-        updateData.myMapsUrl = this.myMapsUrl.trim();
+        updateData.myMapsEmbedUrl = this.converterParaEmbedUrl(this.myMapsUrl);
       }
 
       await updateDoc(docRef, updateData);
@@ -327,8 +327,55 @@ export class KmlUploadComponent {
 
   validarUrlMyMaps(): boolean {
     if (!this.myMapsUrl.trim()) return true; // Campo opcional
+
+    const input = this.myMapsUrl.trim();
+
+    // Aceita iframe completo com src do Google Maps
+    if (input.includes('<iframe') && input.includes('google.com/maps')) {
+      return true;
+    }
+
+    // Aceita URL direta do Google Maps
     const urlPattern = /^https?:\/\/(www\.)?google\.(com|com\.br)\/maps\/.+/i;
-    return urlPattern.test(this.myMapsUrl.trim());
+    return urlPattern.test(input);
+  }
+
+  private converterParaEmbedUrl(input: string): string {
+    let embedUrl = input.trim();
+
+    // Se o usuário colou o iframe completo, extrai a URL do src
+    // Exemplo: <iframe src="https://www.google.com/maps/d/u/2/embed?mid=xxx" width="640" height="480"></iframe>
+    if (embedUrl.includes('<iframe') && embedUrl.includes('src=')) {
+      const srcMatch = embedUrl.match(/src=["']([^"']+)["']/);
+      if (srcMatch && srcMatch[1]) {
+        embedUrl = srcMatch[1];
+      }
+    }
+
+    // Se já é uma URL de embed, retorna como está
+    if (embedUrl.includes('/embed?')) {
+      return embedUrl;
+    }
+
+    // Converte /viewer? para /embed?
+    if (embedUrl.includes('/viewer?')) {
+      return embedUrl.replace('/viewer?', '/embed?');
+    }
+
+    // Converte /edit? para /embed?
+    if (embedUrl.includes('/edit?')) {
+      return embedUrl.replace('/edit?', '/embed?');
+    }
+
+    // Se tem mid= mas não tem embed, tenta converter
+    if (embedUrl.includes('mid=') && embedUrl.includes('/maps/d/')) {
+      const midMatch = embedUrl.match(/mid=([^&]+)/);
+      if (midMatch) {
+        return `https://www.google.com/maps/d/embed?mid=${midMatch[1]}`;
+      }
+    }
+
+    return embedUrl;
   }
 
   private slugify(text: string): string {

@@ -192,3 +192,77 @@
     from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+// Responsividade Mobile
+@media (max-width: 768px) {
+    .detalhe-modal {
+        width: 95%;
+        max-height: 90vh;
+        top: 50%;
+        left: 50%;
+    }
+
+    .modal-header {
+        padding: 1rem;
+
+        h2 {
+            font-size: 1rem;
+        }
+    }
+
+    .modal-content {
+        padding: 1rem;
+    }
+
+    .grupo h3 {
+        font-size: 0.9rem;
+    }
+
+    .campos-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .campo label {
+        font-size: 0.7rem;
+    }
+
+    .valor {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+    }
+
+    .tooltip-balloon {
+        min-width: 180px;
+        max-width: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .detalhe-modal {
+        width: 98%;
+        border-radius: 8px;
+    }
+
+    .modal-header {
+        padding: 0.75rem;
+        border-radius: 8px 8px 0 0;
+
+        h2 {
+            font-size: 0.9rem;
+        }
+    }
+
+    .modal-content {
+        padding: 0.75rem;
+    }
+
+    .grupo {
+        margin-bottom: 1rem;
+
+        h3 {
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+        }
+    }
+}

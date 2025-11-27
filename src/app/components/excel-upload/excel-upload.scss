@@ -381,3 +381,119 @@
     color: #bbb;
   }
 }
+
+// Responsividade Mobile
+@media (max-width: 768px) {
+  .excel-upload-container {
+    padding: 1rem;
+    margin: 1rem auto;
+  }
+
+  .upload-section {
+    padding: 1.25rem;
+
+    h2 {
+      font-size: 1.25rem;
+    }
+  }
+
+  .file-input-wrapper .file-label {
+    padding: 1rem 1.25rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .save-btn,
+  .clear-btn {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .progress-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .data-section {
+    padding: 1.25rem;
+
+    h3 {
+      font-size: 1.1rem;
+    }
+  }
+
+  .table-container {
+    max-height: 50vh;
+
+    table {
+      font-size: 0.8rem;
+
+      thead th {
+        padding: 0.75rem 0.5rem;
+      }
+
+      tbody td {
+        padding: 0.75rem 0.5rem;
+
+        &.cell-content {
+          max-width: 150px;
+        }
+      }
+    }
+  }
+
+  .text-truncate {
+    max-width: 100px;
+  }
+
+  .tooltip-balloon {
+    min-width: 200px;
+    max-width: 280px;
+  }
+
+  .empty-state {
+    padding: 2rem 1rem;
+
+    .empty-icon-svg {
+      font-size: 3rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .excel-upload-container {
+    padding: 0.5rem;
+    margin: 0.5rem auto;
+  }
+
+  .upload-section,
+  .data-section {
+    padding: 1rem;
+  }
+
+  .file-input-wrapper .file-label {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .table-container table {
+    font-size: 0.75rem;
+
+    thead th {
+      padding: 0.5rem 0.375rem;
+    }
+
+    tbody td {
+      padding: 0.5rem 0.375rem;
+    }
+  }
+
+  .text-truncate {
+    max-width: 80px;
+  }
+}

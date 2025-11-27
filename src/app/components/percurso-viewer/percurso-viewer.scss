@@ -232,3 +232,78 @@
     }
   }
 }
+
+
+// Responsividade Mobile
+@media (max-width: 768px) {
+  .viewer-modal {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .header-info {
+    h2 {
+      font-size: 1rem;
+    }
+
+    ng-icon {
+      font-size: 1.25rem;
+    }
+  }
+
+  .modal-content {
+    padding: 1rem;
+  }
+
+  ::ng-deep .markdown-body {
+    h2 {
+      font-size: 1.25rem;
+    }
+
+    h3 {
+      font-size: 1rem;
+    }
+
+    h4 {
+      font-size: 0.9rem;
+    }
+
+    p,
+    li {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .viewer-modal {
+    width: 98%;
+    border-radius: 8px;
+  }
+
+  .modal-header {
+    padding: 0.75rem;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .header-info h2 {
+    font-size: 0.9rem;
+  }
+
+  .header-actions {
+    gap: 0.25rem;
+  }
+
+  .action-btn,
+  .close-btn {
+    padding: 0.375rem;
+  }
+
+  .modal-content {
+    padding: 0.75rem;
+  }
+}

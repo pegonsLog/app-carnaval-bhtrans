@@ -599,3 +599,148 @@
     grid-column: 1;
   }
 }
+
+
+// Responsividade Mobile adicional
+@media (max-width: 768px) {
+  .header-actions {
+    padding: 0.875rem 1rem;
+
+    h1 {
+      font-size: 1rem;
+      text-align: center;
+    }
+  }
+
+  .btn-voltar,
+  .btn-imprimir {
+    padding: 0.625rem 1rem;
+    font-size: 0.85rem;
+
+    span {
+      display: none;
+    }
+  }
+
+  .documento-wrapper {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+
+  .a4-page {
+    padding: 8mm;
+  }
+
+  .capa-page {
+    padding: 15mm 10mm;
+  }
+
+  .capa-titulo {
+    h1 {
+      font-size: 18pt;
+    }
+
+    h2 {
+      font-size: 12pt;
+    }
+
+    h3 {
+      font-size: 11pt;
+    }
+  }
+
+  .capa-header .linha {
+    font-size: 9pt;
+  }
+
+  .capa-footer p {
+    font-size: 10pt;
+  }
+
+  .header-text {
+    h1 {
+      font-size: 9pt;
+    }
+
+    h2 {
+      font-size: 11pt;
+    }
+
+    .subtitle {
+      font-size: 9pt;
+    }
+  }
+
+  .section-title {
+    font-size: 9pt;
+    padding: 1.5mm 2mm;
+  }
+
+  .info-item {
+    .label {
+      font-size: 7pt;
+    }
+
+    .value {
+      font-size: 9pt;
+    }
+  }
+
+  .tabela-operacional table {
+    font-size: 8pt;
+
+    thead th {
+      font-size: 7pt;
+      padding: 1.5mm;
+    }
+
+    tbody td {
+      padding: 1mm 1.5mm;
+    }
+  }
+
+  .mapa-container {
+    height: 150mm;
+  }
+
+  .aviso-sem-capa {
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-actions {
+    gap: 0.5rem;
+
+    h1 {
+      font-size: 0.9rem;
+    }
+  }
+
+  .btn-voltar,
+  .btn-imprimir {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .documento-wrapper {
+    padding: 0.5rem;
+  }
+
+  .a4-page {
+    padding: 6mm;
+  }
+
+  .capa-page {
+    padding: 10mm 8mm;
+  }
+
+  .capa-titulo h1 {
+    font-size: 14pt;
+  }
+
+  .mapa-container {
+    height: 120mm;
+  }
+}

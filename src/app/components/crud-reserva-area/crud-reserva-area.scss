@@ -260,3 +260,55 @@
     transform: translateY(0) scale(1);
   }
 }
+
+
+// Responsividade Mobile
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    padding: 1.25rem;
+    max-height: 85vh;
+  }
+
+  .modal-header {
+    padding-right: 2.5rem;
+    h3 { font-size: 1.1rem; }
+  }
+
+  .btn-adicionar {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .item-acoes {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .modal-footer, .form-footer {
+    flex-direction: column;
+    .btn-cancelar, .btn-salvar { width: 100%; }
+  }
+
+  .form-group input, .form-group select, .form-group textarea {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 98%;
+    padding: 1rem;
+  }
+
+  .modal-header h3 { font-size: 1rem; }
+  .item { padding: 0.75rem; }
+  .item-principal { font-size: 0.95rem; }
+  .item-secundario { font-size: 0.8rem; }
+}

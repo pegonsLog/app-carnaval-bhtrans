@@ -30,27 +30,27 @@
     <!-- PÁGINA 1: CAPA -->
     <div class="a4-page capa-page" *ngIf="capa">
       <div class="capa-header">
-        <p class="linha">PREFEITURA MUNICIPAL DE BELO HORIZONTE</p>
-        <p class="linha">EMPRESA DE TRANSPORTES E TRÂNSITO DE BELO HORIZONTE S/A - BHTRANS</p>
-        <p class="linha">DIRETORIA DE TRANSPORTE PÚBLICO - DTP</p>
-        <p class="linha variavel">{{ capa.gerencia }}</p>
-        <p class="linha variavel">{{ capa.equipe }}</p>
-        <p class="linha variavel">{{ capa.responsavel }}</p>
+        <p class="linha">Empresa de Transportes e Trânsito de Belo Horizonte S/A - BHTRANS</p>
+        <p class="linha">Diretoria de Ação Regional e Operação – DRO</p>
+        <p class="linha">Superintendência de Ação Regional – SARE</p>
+        <p class="linha">{{ capa.gerencia }}</p>
       </div>
 
-      <div class="capa-logo">
-        <img src="assets/logomarcas/logomarcas.png" alt="Logo" />
+      <div class="capa-centro">
+        <h2 class="nome-bloco">{{ bloco.nomeDoBloco }}</h2>
+
+        <div class="capa-logo">
+          <img src="assets/logomarcas/logomarcas.png" alt="Logo" />
+        </div>
       </div>
 
-      <div class="capa-titulo">
-        <h1>CARNAVAL 2026</h1>
-        <h2>PLANO OPERACIONAL DE TRÂNSITO - DOT</h2>
-        <h3>{{ bloco.nomeDoBloco }}</h3>
+      <div class="capa-elaboracao">
+        <p class="linha" *ngIf="capa.elaboradoPor">Elaboração: {{ capa.elaboradoPor }}</p>
       </div>
 
       <div class="capa-footer">
-        <p>Belo Horizonte</p>
-        <p>2026</p>
+        <p class="cidade">BELO HORIZONTE</p>
+        <p class="data">{{ capa.dataElaboracao ? formatarDataCapa(capa.dataElaboracao) : '' }}</p>
       </div>
     </div>
 
@@ -58,8 +58,7 @@
     <div class="a4-page dados-page">
       <div class="doc-header">
         <div class="header-text">
-          <h1>INFORMAÇÕES DO BLOCO</h1>
-          <p class="subtitle">Carnaval de Belo Horizonte - 2026</p>
+          <h1>DADOS DO BLOCO</h1>
         </div>
       </div>
 
@@ -119,7 +118,7 @@
         </div>
       </section>
 
-  
+
 
       <!-- Data e Horários -->
       <section class="doc-section">
@@ -175,7 +174,7 @@
         </div>
       </section>
 
-           <!-- Percurso -->
+      <!-- Percurso -->
       <section class="doc-section">
         <h3 class="section-title">PERCURSO E LOCALIZAÇÃO</h3>
         <div class="info-grid">
@@ -210,7 +209,7 @@
         </div>
       </section>
 
-           <!-- Características -->
+      <!-- Características -->
       <section class="doc-section">
         <h3 class="section-title">CARACTERÍSTICAS</h3>
         <div class="info-grid">
@@ -229,7 +228,7 @@
         </div>
       </section>
 
-      
+
       <!-- Status -->
       <section class="doc-section">
         <h3 class="section-title">STATUS</h3>
@@ -316,7 +315,8 @@
     </div>
 
     <!-- PÁGINA: DADOS OPERACIONAIS (quebra automática) -->
-    <div class="a4-page dados-operacionais-page" *ngIf="bloco.fechamentos?.length > 0 || bloco.sinalizacoes?.length > 0 || bloco.desvios?.length > 0 || bloco.agentes?.length > 0 || bloco.reservasArea?.length > 0 || bloco.faixasTecido?.length > 0">
+    <div class="a4-page dados-operacionais-page"
+      *ngIf="bloco.fechamentos?.length > 0 || bloco.sinalizacoes?.length > 0 || bloco.desvios?.length > 0 || bloco.agentes?.length > 0 || bloco.reservasArea?.length > 0 || bloco.faixasTecido?.length > 0">
       <div class="doc-header">
         <div class="header-text">
           <h1>DADOS OPERACIONAIS</h1>

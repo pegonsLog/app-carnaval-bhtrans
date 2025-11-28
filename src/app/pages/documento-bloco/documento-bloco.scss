@@ -129,8 +129,7 @@
 .capa-page {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 25mm 20mm;
+  padding: 20mm 25mm;
   text-align: center;
 }
 
@@ -138,54 +137,54 @@
   .linha {
     margin: 0;
     font-size: 11pt;
-    line-height: 1.6;
+    line-height: 1.5;
     font-weight: 500;
-
-    &.variavel {
-      color: #1a365d;
-      font-weight: 600;
-    }
   }
+}
+
+.capa-centro {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20mm 0;
+}
+
+.nome-bloco {
+  font-size: 16pt;
+  font-weight: bold;
+  margin: 0 0 15mm 0;
+  color: #333;
+  text-transform: uppercase;
 }
 
 .capa-logo {
-  padding: 15mm 0;
-
   img {
-    max-width: 150mm;
-    max-height: 40mm;
+    max-width: 120mm;
+    max-height: 35mm;
   }
 }
 
-.capa-titulo {
-  h1 {
-    font-size: 28pt;
-    font-weight: bold;
-    margin: 0 0 5mm 0;
-    color: #1a365d;
-  }
+.capa-elaboracao {
+  margin-bottom: 25mm;
 
-  h2 {
-    font-size: 16pt;
-    font-weight: 600;
-    margin: 0 0 8mm 0;
-    color: #333;
-  }
-
-  h3 {
-    font-size: 14pt;
-    font-weight: 600;
+  .linha {
     margin: 0;
-    color: #667eea;
-    text-transform: uppercase;
+    font-size: 11pt;
   }
 }
 
 .capa-footer {
-  p {
+  .cidade {
     margin: 0;
-    font-size: 12pt;
-    line-height: 1.8;
+    font-size: 11pt;
+    font-weight: bold;
+  }
+
+  .data {
+    margin: 2mm 0 0 0;
+    font-size: 11pt;
   }
 }
 
@@ -599,7 +598,6 @@
     grid-column: 1;
   }
 }
-
 
 // Responsividade Mobile adicional
 @media (max-width: 768px) {

@@ -89,7 +89,6 @@ export class DocumentoBlocoComponent implements OnInit {
   async carregarCapa() {
     try {
       const capas = await this.capasService.getCapas();
-      // Busca a capa que contém a regional do bloco
       const regionalBloco = this.bloco.regional?.trim().toLowerCase();
 
       if (regionalBloco) {
@@ -273,8 +272,8 @@ export class DocumentoBlocoComponent implements OnInit {
 
   voltar() {
     // Volta para a lista com parâmetro para reabrir o modal de ações
-    this.router.navigate(['/'], { 
-      queryParams: { abrirAcoes: this.bloco?.id } 
+    this.router.navigate(['/'], {
+      queryParams: { abrirAcoes: this.bloco?.id }
     });
   }
 
@@ -318,5 +317,20 @@ export class DocumentoBlocoComponent implements OnInit {
   getTotalSinalizacoes(): number {
     if (!this.bloco?.sinalizacoes) return 0;
     return this.bloco.sinalizacoes.reduce((total: number, item: any) => total + (item.quantidade || 0), 0);
+  }
+
+  formatarDataCapa(data: any): string {
+    if (!data) return '';
+    if (typeof data === 'string') return data;
+    // Firestore Timestamp
+    if (data.toDate) {
+      const d = data.toDate();
+      return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+    }
+    // Date object
+    if (data instanceof Date) {
+      return `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`;
+    }
+    return String(data);
   }
 }

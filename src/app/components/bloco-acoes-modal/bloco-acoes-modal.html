@@ -23,36 +23,43 @@
       </div>
     </div>
 
+
+
+
+
+    <div class="secao-titulo">Mapa</div>
+    <div class="acoes-grid">
+
+      <button class="acao-btn kml" [class.has-kml]="bloco?.percursoUrl" (click)="onUploadKml()">
+        <ng-icon name="heroMapPin"></ng-icon>
+        <span>{{ bloco?.percursoUrl ? 'Inserir KML' : 'Enviar KML' }}</span>
+      </button>
+      <button class="acao-btn remover" *ngIf="bloco?.percursoUrl" (click)="onRemoverArquivo()">
+        <ng-icon name="heroTrash"></ng-icon>
+        <span>Remover KML</span>
+      </button>
+    </div>
+
     <div class="secao-titulo">Documentos</div>
     <div class="acoes-grid">
       <button class="acao-btn belotur" (click)="onDocumentoBelotur()">
         <ng-icon name="heroClipboardDocument"></ng-icon>
-        <span>Documento Belotur</span>
+        <span>Planilha Belotur</span>
       </button>
-
-      <button class="acao-btn kml" [class.has-kml]="bloco?.percursoUrl" (click)="onUploadKml()">
-        <ng-icon name="heroMapPin"></ng-icon>
-        <span>{{ bloco?.percursoUrl ? 'Substituir KML' : 'Enviar KML' }}</span>
-      </button>
-
+      <!--
       <button class="acao-btn percurso" *ngIf="bloco?.percursoUrl" (click)="onVisualizarPercurso()">
         <ng-icon name="heroDocumentText"></ng-icon>
         <span>Visualizar Descritivo</span>
-      </button>
-
+      </button> -->
+      <!--
       <button class="acao-btn mymaps" *ngIf="bloco?.percursoUrl" (click)="onDocumentoMymaps()">
         <ng-icon name="heroGlobeAmericas"></ng-icon>
         <span>Documento My Maps</span>
-      </button>
+      </button> -->
 
       <button class="acao-btn completo" (click)="onDocumentoCompleto()">
         <ng-icon name="heroDocumentDuplicate"></ng-icon>
-        <span>Documento Completo</span>
-      </button>
-
-      <button class="acao-btn remover" *ngIf="bloco?.percursoUrl" (click)="onRemoverArquivo()">
-        <ng-icon name="heroTrash"></ng-icon>
-        <span>Remover Descritivo</span>
+        <span>DOT</span>
       </button>
     </div>
 

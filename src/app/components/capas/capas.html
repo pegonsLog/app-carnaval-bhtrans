@@ -1,156 +1,124 @@
 <div class="capas-container">
-    <div class="header-section">
-        <h2>Gerenciar Capas de Documento</h2>
-        <button class="add-btn" (click)="abrirFormNovo()">
-            <ng-icon name="heroPlus"></ng-icon>
-            Nova Capa
-        </button>
-    </div>
+  <div class="header-section">
+    <h2>Gerenciar Capas de Documento</h2>
+    <button class="add-btn" (click)="abrirFormNovo()">
+      <ng-icon name="heroPlus"></ng-icon>
+      Nova Capa
+    </button>
+  </div>
 
-    <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
-    </div>
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
 
-    <div class="loading" *ngIf="isLoading">
-        <div class="spinner"></div>
-        <p>Carregando capas...</p>
-    </div>
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Carregando capas...</p>
+  </div>
 
-    <div class="capas-grid" *ngIf="!isLoading && capas.length > 0">
-        <div class="capa-card" *ngFor="let capa of capas">
-            <div class="capa-content">
-                <div class="capa-field">
-                    <span class="label">Gerência:</span>
-                    <span class="value">{{ capa.gerencia }}</span>
-                </div>
-                <div class="capa-field">
-                    <span class="label">Equipe:</span>
-                    <span class="value">{{ capa.equipe }}</span>
-                </div>
-                <div class="capa-field">
-                    <span class="label">Responsável:</span>
-                    <span class="value">{{ capa.responsavel }}</span>
-                </div>
-                <div class="capa-field" *ngIf="capa.regionais && capa.regionais.length > 0">
-                    <span class="label">Regionais:</span>
-                    <div class="regionais-tags">
-                        <span class="regional-tag-card" *ngFor="let regional of capa.regionais">{{ regional }}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="capa-actions">
-                <button class="action-btn preview" (click)="abrirPreview(capa)" title="Visualizar">
-                    <ng-icon name="heroEye"></ng-icon>
-                </button>
-                <button class="action-btn pdf" (click)="gerarPDF(capa)" title="Gerar PDF">
-                    <ng-icon name="heroDocumentArrowDown"></ng-icon>
-                </button>
-                <button class="action-btn edit" (click)="abrirFormEditar(capa)" title="Editar">
-                    <ng-icon name="heroPencil"></ng-icon>
-                </button>
-                <button class="action-btn delete" (click)="abrirConfirmExcluir(capa)" title="Excluir">
-                    <ng-icon name="heroTrash"></ng-icon>
-                </button>
-            </div>
+  <div class="capas-grid" *ngIf="!isLoading && capas.length > 0">
+    <div class="capa-card" *ngFor="let capa of capas">
+      <div class="capa-content">
+        <div class="capa-field">
+          <span class="label">Gerência:</span>
+          <span class="value">{{ capa.gerencia }}</span>
         </div>
+        <div class="capa-field">
+          <span class="label">Elaboração:</span>
+          <span class="value">{{ capa.elaboradoPor }}</span>
+        </div>
+        <div class="capa-field">
+          <span class="label">Data:</span>
+          <span class="value">{{ formatarData(capa.dataElaboracao) }}</span>
+        </div>
+        <div class="capa-field">
+          <span class="label">Responsável:</span>
+          <span class="value">{{ capa.responsavel }}</span>
+        </div>
+        <div class="capa-field" *ngIf="capa.regionais && capa.regionais.length > 0">
+          <span class="label">Regionais:</span>
+          <div class="regionais-tags">
+            <span class="regional-tag-card" *ngFor="let regional of capa.regionais">{{ regional }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="capa-actions">
+        <button class="action-btn edit" (click)="abrirFormEditar(capa)" title="Editar">
+          <ng-icon name="heroPencil"></ng-icon>
+        </button>
+        <button class="action-btn delete" (click)="abrirConfirmExcluir(capa)" title="Excluir">
+          <ng-icon name="heroTrash"></ng-icon>
+        </button>
+      </div>
     </div>
+  </div>
 
-    <div class="empty-state" *ngIf="!isLoading && capas.length === 0 && !errorMessage">
-        <p>Nenhuma capa cadastrada</p>
-        <p class="empty-subtitle">Clique em "Nova Capa" para criar uma</p>
-    </div>
+  <div class="empty-state" *ngIf="!isLoading && capas.length === 0 && !errorMessage">
+    <p>Nenhuma capa cadastrada</p>
+    <p class="empty-subtitle">Clique em "Nova Capa" para criar uma</p>
+  </div>
 </div>
 
 <!-- Modal de Formulário -->
 <div class="modal-overlay" *ngIf="showFormModal" (click)="fecharFormModal()">
-    <div class="modal-content form-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-            <h3>{{ isEditing ? 'Editar Capa' : 'Nova Capa' }}</h3>
-            <button class="close-btn" (click)="fecharFormModal()">
-                <ng-icon name="heroXMark"></ng-icon>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="form-group">
-                <label for="gerencia">Gerência</label>
-                <input type="text" id="gerencia" [(ngModel)]="capaAtual.gerencia"
-                    placeholder="Ex: Gerência de Ação Regional Nordeste/Leste - GARNE" />
-            </div>
-            <div class="form-group">
-                <label for="equipe">Equipe</label>
-                <input type="text" id="equipe" [(ngModel)]="capaAtual.equipe" placeholder="Ex: Equipe - GARNE" />
-            </div>
-            <div class="form-group">
-                <label for="responsavel">Responsável</label>
-                <input type="text" id="responsavel" [(ngModel)]="capaAtual.responsavel"
-                    placeholder="Ex: Robson José dos Santos - GARNE" />
-            </div>
-            <div class="form-group">
-                <label>Regionais</label>
-                <div class="regionais-input">
-                    <input type="text" [(ngModel)]="novaRegional" placeholder="Ex: Regional Norte"
-                        (keyup.enter)="adicionarRegional()" />
-                    <button type="button" class="btn-add-regional" (click)="adicionarRegional()">
-                        <ng-icon name="heroPlus"></ng-icon>
-                    </button>
-                </div>
-                <div class="regionais-list" *ngIf="capaAtual.regionais.length > 0">
-                    <span class="regional-tag" *ngFor="let regional of capaAtual.regionais; let i = index">
-                        {{ regional }}
-                        <button type="button" class="remove-regional" (click)="removerRegional(i)">
-                            <ng-icon name="heroXMark"></ng-icon>
-                        </button>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" (click)="fecharFormModal()">Cancelar</button>
-            <button class="btn-save" (click)="salvarCapa()"
-                [disabled]="!capaAtual.gerencia || !capaAtual.equipe || !capaAtual.responsavel">
-                {{ isEditing ? 'Atualizar' : 'Salvar' }}
-            </button>
-        </div>
+  <div class="modal-content form-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditing ? 'Editar Capa' : 'Nova Capa' }}</h3>
+      <button class="close-btn" (click)="fecharFormModal()">
+        <ng-icon name="heroXMark"></ng-icon>
+      </button>
     </div>
-</div>
-
-<!-- Modal de Preview -->
-<div class="modal-overlay preview-overlay" *ngIf="showPreviewModal" (click)="fecharPreview()">
-    <div class="preview-container" (click)="$event.stopPropagation()">
-        <button class="close-preview-btn" (click)="fecharPreview()">
-            <ng-icon name="heroXMark"></ng-icon>
-        </button>
-        <div class="capa-preview" *ngIf="capaPreview">
-            <div class="capa-page">
-                <div class="capa-header">
-                    <p class="linha">PREFEITURA MUNICIPAL DE BELO HORIZONTE</p>
-                    <p class="linha">EMPRESA DE TRANSPORTES E TRÂNSITO DE BELO HORIZONTE S/A - BHTRANS</p>
-                    <p class="linha">DIRETORIA DE TRANSPORTE PÚBLICO - DTP</p>
-                    <p class="linha variavel">{{ capaPreview.gerencia }}</p>
-                    <p class="linha variavel">{{ capaPreview.equipe }}</p>
-                    <p class="linha variavel">{{ capaPreview.responsavel }}</p>
-                </div>
-
-                <div class="capa-logo">
-                    <img src="assets/logomarcas/logomarcas.png" alt="Logo" />
-                </div>
-
-                <div class="capa-titulo">
-                    <h1>CARNAVAL 2026</h1>
-                    <h2>PLANO OPERACIONAL DE TRÂNSITO - DOT</h2>
-                </div>
-
-                <div class="capa-footer">
-                    <p>Belo Horizonte</p>
-                    <p>2026</p>
-                </div>
-            </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="gerencia">Gerência</label>
+        <input type="text" id="gerencia" [(ngModel)]="capaAtual.gerencia"
+          placeholder="Ex: Gerência de Ação Regional Nordeste/Leste - GARNE" />
+      </div>
+      <div class="form-group">
+        <label for="equipe">Elaborado Por</label>
+        <input type="text" id="equipe" [(ngModel)]="capaAtual.elaboradoPor" placeholder="Ex: Equipe - GARNE" />
+      </div>
+      <div class="form-group">
+        <label for="dataElaboracao">Data de Elaboração</label>
+        <input type="text" id="dataElaboracao" [ngModel]="capaAtual.dataElaboracao" (input)="aplicarMascaraData($event)"
+          placeholder="dd/mm/aaaa" maxlength="10" />
+      </div>
+      <div class="form-group">
+        <label for="responsavel">Responsável</label>
+        <input type="text" id="responsavel" [(ngModel)]="capaAtual.responsavel"
+          placeholder="Ex: Robson José dos Santos - GARNE" />
+      </div>
+      <div class="form-group">
+        <label>Regionais</label>
+        <div class="regionais-input">
+          <input type="text" [(ngModel)]="novaRegional" placeholder="Ex: Regional Norte"
+            (keyup.enter)="adicionarRegional()" />
+          <button type="button" class="btn-add-regional" (click)="adicionarRegional()">
+            <ng-icon name="heroPlus"></ng-icon>
+          </button>
         </div>
+        <div class="regionais-list" *ngIf="capaAtual.regionais.length > 0">
+          <span class="regional-tag" *ngFor="let regional of capaAtual.regionais; let i = index">
+            {{ regional }}
+            <button type="button" class="remove-regional" (click)="removerRegional(i)">
+              <ng-icon name="heroXMark"></ng-icon>
+            </button>
+          </span>
+        </div>
+      </div>
     </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="fecharFormModal()">Cancelar</button>
+      <button class="btn-save" (click)="salvarCapa()"
+        [disabled]="!capaAtual.gerencia || !capaAtual.elaboradoPor || !capaAtual.responsavel">
+        {{ isEditing ? 'Atualizar' : 'Salvar' }}
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Modal de Confirmação de Exclusão -->
 <app-confirm-modal *ngIf="capaParaExcluir" titulo="Excluir Capa"
-    [mensagem]="'Deseja excluir a capa de ' + capaParaExcluir.gerencia + '?'" tipo="danger"
-    (confirmar)="confirmarExclusao()" (cancelar)="fecharConfirmExcluir()">
+  [mensagem]="'Deseja excluir a capa de ' + capaParaExcluir.gerencia + '?'" tipo="danger"
+  (confirmar)="confirmarExclusao()" (cancelar)="fecharConfirmExcluir()">
 </app-confirm-modal>

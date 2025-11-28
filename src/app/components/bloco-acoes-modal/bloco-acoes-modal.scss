@@ -222,3 +222,13 @@
     }
   }
 }
+
+// Mobile: ocultar todos os botões exceto Planilha Belotur e DOT
+@media (max-width: 768px) {
+  .secao-titulo-mapa,
+  .secao-titulo-operacionais,
+  .acoes-grid-mapa,
+  .acoes-grid-operacionais {
+    display: none;
+  }
+}

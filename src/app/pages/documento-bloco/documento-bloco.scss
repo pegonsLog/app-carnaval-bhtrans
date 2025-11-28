@@ -160,9 +160,16 @@
 }
 
 .capa-logo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
   img {
     max-width: 120mm;
     max-height: 35mm;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 }
 
@@ -610,8 +617,11 @@
     }
   }
 
-  .btn-voltar,
   .btn-imprimir {
+    display: none;
+  }
+
+  .btn-voltar {
     padding: 0.625rem 1rem;
     font-size: 0.85rem;
 
@@ -631,6 +641,13 @@
 
   .capa-page {
     padding: 15mm 10mm;
+  }
+
+  .capa-logo {
+    img {
+      max-width: 90%;
+      max-height: 30mm;
+    }
   }
 
   .capa-titulo {
@@ -732,6 +749,13 @@
 
   .capa-page {
     padding: 10mm 8mm;
+  }
+
+  .capa-logo {
+    img {
+      max-width: 85%;
+      max-height: 25mm;
+    }
   }
 
   .capa-titulo h1 {

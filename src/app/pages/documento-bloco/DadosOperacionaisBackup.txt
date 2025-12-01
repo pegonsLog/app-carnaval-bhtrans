@@ -1,0 +1,167 @@
+<!-- PÁGINA: DADOS OPERACIONAIS (quebra automática) -->
+    <div class="a4-page dados-operacionais-page"
+      *ngIf="bloco.fechamentos?.length > 0 || bloco.sinalizacoes?.length > 0 || bloco.desvios?.length > 0 || bloco.agentes?.length > 0 || bloco.reservasArea?.length > 0 || bloco.faixasTecido?.length > 0">
+      <div class="doc-header">
+        <div class="header-text">
+          <h1>DADOS OPERACIONAIS</h1>
+          <p class="subtitle">{{ bloco.nomeDoBloco }}</p>
+        </div>
+      </div>
+      <div class="doc-divider"></div>
+
+      <!-- FECHAMENTOS -->
+      <section class="secao-operacional" *ngIf="bloco.fechamentos?.length > 0">
+        <h3 class="section-title">FECHAMENTOS</h3>
+        <div class="tabela-operacional">
+          <table>
+            <thead>
+              <tr>
+                <th>Endereço</th>
+                <th>Sinalização</th>
+                <th>Qtd</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of bloco.fechamentos">
+                <td>{{ item.endereco }}</td>
+                <td>{{ item.sinalizacao || '-' }}</td>
+                <td class="center">{{ item.quantidade }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="total-secao">Total: {{ bloco.fechamentos.length }} fechamento(s)</p>
+      </section>
+
+      <!-- SINALIZAÇÃO -->
+      <section class="secao-operacional" *ngIf="bloco.sinalizacoes?.length > 0">
+        <h3 class="section-title">SINALIZAÇÃO</h3>
+        <div class="tabela-operacional">
+          <table>
+            <thead>
+              <tr>
+                <th>Código da Placa</th>
+                <th>Local</th>
+                <th>Qtd</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of bloco.sinalizacoes">
+                <td>{{ item.codigoPlaca }}</td>
+                <td>{{ item.local }}</td>
+                <td class="center">{{ item.quantidade }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="total-secao">Total: {{ getTotalSinalizacoes() }} sinalização(ões)</p>
+      </section>
+
+      <!-- DESVIOS -->
+      <section class="secao-operacional" *ngIf="bloco.desvios?.length > 0">
+        <h3 class="section-title">DESVIOS</h3>
+        <div class="tabela-operacional">
+          <table>
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Linha</th>
+                <th>Hora</th>
+                <th>Sentido Horário</th>
+                <th>Trajeto Sent. Horário</th>
+                <th>Sentido Anti-Horário</th>
+                <th>Trajeto Sent. Anti-Horário</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of bloco.desvios">
+                <td>{{ item.tipo }}</td>
+                <td>{{ item.linha }}</td>
+                <td>{{ item.hora || '-' }}</td>
+                <td>{{ item.sentidoHorario || '-' }}</td>
+                <td>{{ item.trajetoSentHorario || '-' }}</td>
+                <td>{{ item.sentidoAntiHorario || '-' }}</td>
+                <td>{{ item.trajetoSentAntiHorario || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="total-secao">Total: {{ bloco.desvios.length }} desvio(s)</p>
+      </section>
+
+      <!-- AGENTES -->
+      <section class="secao-operacional" *ngIf="bloco.agentes?.length > 0">
+        <h3 class="section-title">AGENTES</h3>
+        <div class="tabela-operacional">
+          <table>
+            <thead>
+              <tr>
+                <th>Local</th>
+                <th>Órgão</th>
+                <th>Atividade</th>
+                <th>Qtd</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of bloco.agentes">
+                <td>{{ item.local }}</td>
+                <td>{{ item.orgao }}</td>
+                <td>{{ item.atividade || '-' }}</td>
+                <td class="center">{{ item.quantidade }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="total-secao">Total: {{ getTotalAgentes() }} agente(s)</p>
+      </section>
+
+      <!-- RESERVA DE ÁREA -->
+      <section class="secao-operacional" *ngIf="bloco.reservasArea?.length > 0">
+        <h3 class="section-title">RESERVA DE ÁREA</h3>
+        <div class="tabela-operacional">
+          <table>
+            <thead>
+              <tr>
+                <th>Endereço</th>
+                <th>Sentido</th>
+                <th>Sinalização</th>
+                <th>Qtd</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of bloco.reservasArea">
+                <td>{{ item.endereco }}</td>
+                <td>{{ item.sentido || '-' }}</td>
+                <td>{{ item.sinalizacao || '-' }}</td>
+                <td class="center">{{ item.quantidade }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="total-secao">Total: {{ bloco.reservasArea.length }} reserva(s)</p>
+      </section>
+
+      <!-- FAIXAS DE TECIDO -->
+      <section class="secao-operacional" *ngIf="bloco.faixasTecido?.length > 0">
+        <h3 class="section-title">FAIXAS DE TECIDO</h3>
+        <div class="tabela-operacional">
+          <table>
+            <thead>
+              <tr>
+                <th>Faixa</th>
+                <th>Local</th>
+                <th>Sentido</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of bloco.faixasTecido">
+                <td>{{ item.faixa }}</td>
+                <td>{{ item.local }}</td>
+                <td>{{ item.sentido || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="total-secao">Total: {{ bloco.faixasTecido.length }} faixa(s)</p>
+      </section>
+    </div>

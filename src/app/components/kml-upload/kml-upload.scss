@@ -315,6 +315,32 @@
   }
 }
 
+.btn-validate {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  transition: all 0.3s;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
 .btn-upload {
   display: flex;
   align-items: center;
@@ -341,6 +367,67 @@
   }
 }
 
+.validation-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+
+  .validation-hint {
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
+    color: #856404;
+  }
+
+  .folders-list {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #856404;
+    font-size: 0.9rem;
+
+    li {
+      margin-bottom: 0.25rem;
+    }
+  }
+}
+
+.folders-found {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+
+  .folders-title {
+    margin: 0 0 0.75rem 0;
+    font-weight: 500;
+    color: #333;
+    font-size: 0.9rem;
+  }
+
+  .folders-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .folder-tag {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+
+    &.found {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    &.extra {
+      background: #e2e3e5;
+      color: #383d41;
+    }
+  }
+}
 
 // Responsividade Mobile
 @media (max-width: 768px) {

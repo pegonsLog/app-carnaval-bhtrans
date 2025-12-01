@@ -62,7 +62,7 @@
         </div>
       </div>
 
-      <div class="doc-divider"></div>
+      <!-- <div class="doc-divider"></div> -->
 
       <!-- Identificação -->
       <section class="doc-section">
@@ -293,7 +293,7 @@
         </div>
       </div>
 
-      <div class="doc-divider"></div>
+      <!-- <div class="doc-divider"></div> -->
 
       <div class="mapa-container" *ngIf="safeMapUrl">
         <iframe [src]="safeMapUrl" width="100%" height="100%" frameborder="0" allowfullscreen>
@@ -315,177 +315,55 @@
     </div>
 
     <!-- PÁGINA: DADOS OPERACIONAIS (quebra automática) -->
-    <div class="a4-page dados-operacionais-page"
-      *ngIf="bloco.fechamentos?.length > 0 || bloco.sinalizacoes?.length > 0 || bloco.desvios?.length > 0 || bloco.agentes?.length > 0 || bloco.reservasArea?.length > 0 || bloco.faixasTecido?.length > 0">
+    <div class="a4-page dados-operacionais-page" *ngIf="parsedMymaps?.secoes?.length > 0">
       <div class="doc-header">
         <div class="header-text">
           <h1>DADOS OPERACIONAIS</h1>
           <p class="subtitle">{{ bloco.nomeDoBloco }}</p>
         </div>
       </div>
-      <div class="doc-divider"></div>
+      <!-- <div class="doc-divider"></div> -->
 
-      <!-- FECHAMENTOS -->
-      <section class="secao-operacional" *ngIf="bloco.fechamentos?.length > 0">
-        <h3 class="section-title">FECHAMENTOS</h3>
-        <div class="tabela-operacional">
-          <table>
-            <thead>
-              <tr>
-                <th>Endereço</th>
-                <th>Sinalização</th>
-                <th>Qtd</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of bloco.fechamentos">
-                <td>{{ item.endereco }}</td>
-                <td>{{ item.sinalizacao || '-' }}</td>
-                <td class="center">{{ item.quantidade }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="total-secao">Total: {{ bloco.fechamentos.length }} fechamento(s)</p>
-      </section>
+      <!-- Seções dinâmicas do KML -->
+      <ng-container *ngFor="let secao of parsedMymaps.secoes">
+        <section class="doc-section operacional-section">
+          <h3 class="section-title">{{ secao.titulo | uppercase }}</h3>
 
-      <!-- SINALIZAÇÃO -->
-      <section class="secao-operacional" *ngIf="bloco.sinalizacoes?.length > 0">
-        <h3 class="section-title">SINALIZAÇÃO</h3>
-        <div class="tabela-operacional">
-          <table>
-            <thead>
-              <tr>
-                <th>Código da Placa</th>
-                <th>Local</th>
-                <th>Qtd</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of bloco.sinalizacoes">
-                <td>{{ item.codigoPlaca }}</td>
-                <td>{{ item.local }}</td>
-                <td class="center">{{ item.quantidade }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="total-secao">Total: {{ getTotalSinalizacoes() }} sinalização(ões)</p>
-      </section>
+          <!-- Lista de Placemarks Agrupados -->
+          <div class="placemarks-list" *ngIf="secao.placemarks?.length > 0">
+            <div class="placemark-item" *ngFor="let placemark of secao.placemarks; let i = index">
+              <div class="placemark-header">
+                <span class="placemark-index">{{ i + 1 }}.</span>
+                <span class="placemark-name">{{ placemark.name }}</span>
+                <span class="placemark-quantidade">{{ placemark.quantidade }}</span>
+              </div>
+              <div class="placemark-descriptions" *ngIf="placemark.descriptions?.length > 0">
+                <div class="description-group" *ngFor="let desc of placemark.descriptions; let j = index">
+                  <p *ngFor="let linha of desc" [innerHTML]="formatDescriptionLine(linha)"></p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <!-- DESVIOS -->
-      <section class="secao-operacional" *ngIf="bloco.desvios?.length > 0">
-        <h3 class="section-title">DESVIOS</h3>
-        <div class="tabela-operacional">
-          <table>
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Linha</th>
-                <th>Hora</th>
-                <th>Sentido Horário</th>
-                <th>Trajeto Sent. Horário</th>
-                <th>Sentido Anti-Horário</th>
-                <th>Trajeto Sent. Anti-Horário</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of bloco.desvios">
-                <td>{{ item.tipo }}</td>
-                <td>{{ item.linha }}</td>
-                <td>{{ item.hora || '-' }}</td>
-                <td>{{ item.sentidoHorario || '-' }}</td>
-                <td>{{ item.trajetoSentHorario || '-' }}</td>
-                <td>{{ item.sentidoAntiHorario || '-' }}</td>
-                <td>{{ item.trajetoSentAntiHorario || '-' }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="total-secao">Total: {{ bloco.desvios.length }} desvio(s)</p>
-      </section>
+          <!-- Contagem no final -->
+          <div class="secao-contagem" *ngIf="secao.totalItens > 0">
+            <div class="contagem-total">
+              <strong>Total:</strong> {{ secao.totalItens }} item(ns)
+            </div>
+          </div>
 
-      <!-- AGENTES -->
-      <section class="secao-operacional" *ngIf="bloco.agentes?.length > 0">
-        <h3 class="section-title">AGENTES</h3>
-        <div class="tabela-operacional">
-          <table>
-            <thead>
-              <tr>
-                <th>Local</th>
-                <th>Órgão</th>
-                <th>Atividade</th>
-                <th>Qtd</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of bloco.agentes">
-                <td>{{ item.local }}</td>
-                <td>{{ item.orgao }}</td>
-                <td>{{ item.atividade || '-' }}</td>
-                <td class="center">{{ item.quantidade }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="total-secao">Total: {{ getTotalAgentes() }} agente(s)</p>
-      </section>
+          <!-- Mensagem se não houver placemarks -->
+          <p class="sem-dados" *ngIf="!secao.placemarks || secao.placemarks.length === 0">
+            Nenhum item cadastrado nesta seção.
+          </p>
+        </section>
+      </ng-container>
 
-      <!-- RESERVA DE ÁREA -->
-      <section class="secao-operacional" *ngIf="bloco.reservasArea?.length > 0">
-        <h3 class="section-title">RESERVA DE ÁREA</h3>
-        <div class="tabela-operacional">
-          <table>
-            <thead>
-              <tr>
-                <th>Endereço</th>
-                <th>Sentido</th>
-                <th>Sinalização</th>
-                <th>Qtd</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of bloco.reservasArea">
-                <td>{{ item.endereco }}</td>
-                <td>{{ item.sentido || '-' }}</td>
-                <td>{{ item.sinalizacao || '-' }}</td>
-                <td class="center">{{ item.quantidade }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="total-secao">Total: {{ bloco.reservasArea.length }} reserva(s)</p>
-      </section>
+      <!-- Aviso se não encontrou capa -->
+      <div class="aviso-sem-capa no-print" *ngIf="!capa">
+        <p>⚠️ Nenhuma capa encontrada para a regional "{{ bloco.regional }}"</p>
+      </div>
 
-      <!-- FAIXAS DE TECIDO -->
-      <section class="secao-operacional" *ngIf="bloco.faixasTecido?.length > 0">
-        <h3 class="section-title">FAIXAS DE TECIDO</h3>
-        <div class="tabela-operacional">
-          <table>
-            <thead>
-              <tr>
-                <th>Faixa</th>
-                <th>Local</th>
-                <th>Sentido</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of bloco.faixasTecido">
-                <td>{{ item.faixa }}</td>
-                <td>{{ item.local }}</td>
-                <td>{{ item.sentido || '-' }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="total-secao">Total: {{ bloco.faixasTecido.length }} faixa(s)</p>
-      </section>
     </div>
-
-    <!-- Aviso se não encontrou capa -->
-    <div class="aviso-sem-capa no-print" *ngIf="!capa">
-      <p>⚠️ Nenhuma capa encontrada para a regional "{{ bloco.regional }}"</p>
-    </div>
-
   </div>
 </div>

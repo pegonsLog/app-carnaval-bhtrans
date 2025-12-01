@@ -1,7 +1,7 @@
 <div class="blocos-list-container">
   <div class="header-section">
     <h2>Blocos Cadastrados</h2>
-    <button class="refresh-btn" (click)="carregarBlocos()" [disabled]="isLoading">
+    <button class="refresh-btn" (click)="carregarBlocos()" [disabled]="isLoading" *ngIf="authService.podeEditar">
       <ng-icon name="heroMagnifyingGlass"></ng-icon>
       {{ isLoading ? 'Carregando...' : 'Atualizar' }}
     </button>
@@ -33,9 +33,9 @@
         <label>Data do Desfile</label>
         <select [(ngModel)]="filtroDataDesfile" (ngModelChange)="aplicarFiltros()">
           <option value="">Escolha a data</option>
-          <option *ngFor="let data of datasDesfileDisponiveis" [value]="data">{{ data }}</option>
+          <option *ngFor="let data of datasDesfileDisponiveis" [value]="data">{{ data }} - {{ getDiaSemana(data) }}
+          </option>
         </select>
-        <span class="dia-semana-hint" *ngIf="filtroDataDesfile">{{ getDiaSemana(filtroDataDesfile) }}</span>
       </div>
       <div class="filter-group">
         <label>Busca Livre</label>
@@ -65,10 +65,13 @@
           <tr *ngFor="let bloco of blocosFiltrados; let i = index">
             <td class="action-col">
               <div class="action-buttons">
-                <button class="view-btn" (click)="abrirDetalhe(bloco)" title="Ver detalhes">
+                <button class="view-btn" (click)="abrirDocumentoCompleto(bloco)" title="Ver documento completo">
                   <ng-icon name="heroEye"></ng-icon>
                 </button>
-                <button class="acoes-btn" (click)="abrirAcoes(bloco)" title="Ações">
+                <button class="map-btn" (click)="abrirMapaExterno(bloco)" title="Ver mapa" *ngIf="bloco.myMapsEmbedUrl">
+                  <ng-icon name="heroMapPin"></ng-icon>
+                </button>
+                <button class="acoes-btn" (click)="abrirAcoes(bloco)" title="Ações" *ngIf="authService.podeEditar">
                   <ng-icon name="heroCog6Tooth"></ng-icon>
                 </button>
               </div>
@@ -76,8 +79,8 @@
             <td class="row-number">{{ i + 1 }}</td>
             <td *ngFor="let col of displayColumns" class="cell-content">
               <div class="cell-wrapper">
-                <span class="text-truncate">{{ getTruncatedText(formatValue(bloco[col.key], col.key))
-                  }}</span>
+                <span class="text-truncate" [title]="formatValue(bloco[col.key], col.key)">{{
+                  getTruncatedText(formatValue(bloco[col.key], col.key)) }}</span>
 
                 <button *ngIf="isTextLong(formatValue(bloco[col.key], col.key))" class="tooltip-trigger"
                   (click)="showTooltip(i, col.key, bloco[col.key])">
@@ -135,18 +138,11 @@
 </app-dados-mymaps>
 
 <!-- Modal de Ações do Bloco -->
-<app-bloco-acoes-modal 
-  *ngIf="blocoParaAcoes" 
-  [bloco]="blocoParaAcoes"
-  (fechar)="fecharAcoes()"
-  (documentoBelotur)="onAcaoDocumentoBelotur($event)"
-  (uploadKml)="onAcaoUploadKml($event)"
-  (visualizarPercurso)="onAcaoVisualizarPercurso($event)"
-  (documentoMymaps)="onAcaoDocumentoMymaps($event)"
-  (documentoCompleto)="onAcaoDocumentoCompleto($event)"
-  (removerArquivo)="onAcaoRemoverArquivo($event)"
-  (gerenciarAgentes)="onAcaoGerenciarAgentes($event)"
-  (gerenciarDesvios)="onAcaoGerenciarDesvios($event)"
+<app-bloco-acoes-modal *ngIf="blocoParaAcoes" [bloco]="blocoParaAcoes" (fechar)="fecharAcoes()"
+  (documentoBelotur)="onAcaoDocumentoBelotur($event)" (uploadKml)="onAcaoUploadKml($event)"
+  (visualizarPercurso)="onAcaoVisualizarPercurso($event)" (documentoMymaps)="onAcaoDocumentoMymaps($event)"
+  (documentoCompleto)="onAcaoDocumentoCompleto($event)" (removerArquivo)="onAcaoRemoverArquivo($event)"
+  (gerenciarAgentes)="onAcaoGerenciarAgentes($event)" (gerenciarDesvios)="onAcaoGerenciarDesvios($event)"
   (gerenciarFaixasTecido)="onAcaoGerenciarFaixasTecido($event)"
   (gerenciarFechamentos)="onAcaoGerenciarFechamentos($event)"
   (gerenciarReservasArea)="onAcaoGerenciarReservasArea($event)"
@@ -154,49 +150,35 @@
 </app-bloco-acoes-modal>
 
 <!-- Modal CRUD Agentes -->
-<app-crud-agentes 
-  *ngIf="blocoParaCrudAgentes" 
-  [bloco]="blocoParaCrudAgentes"
-  (fechar)="fecharCrudAgentes()"
+<app-crud-agentes *ngIf="blocoParaCrudAgentes" [bloco]="blocoParaCrudAgentes" (fechar)="fecharCrudAgentes()"
   (salvar)="salvarAgentes($event)">
 </app-crud-agentes>
 
 <!-- Modal CRUD Desvios -->
-<app-crud-desvios 
-  *ngIf="blocoParaCrudDesvios" 
-  [bloco]="blocoParaCrudDesvios"
-  (fechar)="fecharCrudDesvios()"
+<app-crud-desvios *ngIf="blocoParaCrudDesvios" [bloco]="blocoParaCrudDesvios" (fechar)="fecharCrudDesvios()"
   (salvar)="salvarDesvios($event)">
 </app-crud-desvios>
 
 <!-- Modal CRUD Faixas de Tecido -->
-<app-crud-faixa-tecido 
-  *ngIf="blocoParaCrudFaixasTecido" 
-  [bloco]="blocoParaCrudFaixasTecido"
-  (fechar)="fecharCrudFaixasTecido()"
-  (salvar)="salvarFaixasTecido($event)">
+<app-crud-faixa-tecido *ngIf="blocoParaCrudFaixasTecido" [bloco]="blocoParaCrudFaixasTecido"
+  (fechar)="fecharCrudFaixasTecido()" (salvar)="salvarFaixasTecido($event)">
 </app-crud-faixa-tecido>
 
 <!-- Modal CRUD Fechamentos -->
-<app-crud-fechamentos 
-  *ngIf="blocoParaCrudFechamentos" 
-  [bloco]="blocoParaCrudFechamentos"
-  (fechar)="fecharCrudFechamentos()"
-  (salvar)="salvarFechamentos($event)">
+<app-crud-fechamentos *ngIf="blocoParaCrudFechamentos" [bloco]="blocoParaCrudFechamentos"
+  (fechar)="fecharCrudFechamentos()" (salvar)="salvarFechamentos($event)">
 </app-crud-fechamentos>
 
 <!-- Modal CRUD Reserva de Área -->
-<app-crud-reserva-area 
-  *ngIf="blocoParaCrudReservasArea" 
-  [bloco]="blocoParaCrudReservasArea"
-  (fechar)="fecharCrudReservasArea()"
-  (salvar)="salvarReservasArea($event)">
+<app-crud-reserva-area *ngIf="blocoParaCrudReservasArea" [bloco]="blocoParaCrudReservasArea"
+  (fechar)="fecharCrudReservasArea()" (salvar)="salvarReservasArea($event)">
 </app-crud-reserva-area>
 
 <!-- Modal CRUD Sinalização -->
-<app-crud-sinalizacao 
-  *ngIf="blocoParaCrudSinalizacoes" 
-  [bloco]="blocoParaCrudSinalizacoes"
-  (fechar)="fecharCrudSinalizacoes()"
-  (salvar)="salvarSinalizacoes($event)">
+<app-crud-sinalizacao *ngIf="blocoParaCrudSinalizacoes" [bloco]="blocoParaCrudSinalizacoes"
+  (fechar)="fecharCrudSinalizacoes()" (salvar)="salvarSinalizacoes($event)">
 </app-crud-sinalizacao>
+
+<!-- Modal de Mapa -->
+<app-mapa-modal *ngIf="mapaUrl" [url]="mapaUrl" [titulo]="mapaTitulo" (fechar)="fecharMapa()">
+</app-mapa-modal>

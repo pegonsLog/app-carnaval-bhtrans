@@ -228,7 +228,8 @@
 }
 
 .view-btn,
-.acoes-btn {
+.acoes-btn,
+.map-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
   color: white;
@@ -243,6 +244,14 @@
   &:hover {
     transform: scale(1.1);
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+  }
+}
+
+.map-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
   }
 }
 
@@ -433,7 +442,8 @@
   }
 
   .view-btn,
-  .acoes-btn {
+  .acoes-btn,
+  .map-btn {
     padding: 0.5rem;
   }
 

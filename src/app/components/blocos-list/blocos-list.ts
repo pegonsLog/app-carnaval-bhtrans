@@ -5,8 +5,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Storage, ref, deleteObject } from '@angular/fire/storage';
 import { Firestore, collection, query, where, getDocs, updateDoc, doc, deleteField } from '@angular/fire/firestore';
 import { BlocosService } from '../../services/blocos';
+import { AuthService } from '../../services/auth.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroCog6Tooth } from '@ng-icons/heroicons/outline';
+import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroCog6Tooth, heroMapPin } from '@ng-icons/heroicons/outline';
 import { BlocoDetalheComponent } from '../bloco-detalhe/bloco-detalhe';
 import { KmlUploadComponent } from '../kml-upload/kml-upload';
 import { PercursoViewerComponent } from '../percurso-viewer/percurso-viewer';
@@ -20,6 +21,7 @@ import { CrudFaixaTecidoComponent } from '../crud-faixa-tecido/crud-faixa-tecido
 import { CrudFechamentosComponent } from '../crud-fechamentos/crud-fechamentos';
 import { CrudReservaAreaComponent } from '../crud-reserva-area/crud-reserva-area';
 import { CrudSinalizacaoComponent } from '../crud-sinalizacao/crud-sinalizacao';
+import { MapaModalComponent } from '../mapa-modal/mapa-modal';
 import { Agentes } from '../../interfaces/agentes.interface';
 import { Desvios } from '../../interfaces/desvios.interface';
 import { FaixaTecido } from '../../interfaces/faixa-tecido.interface';
@@ -29,8 +31,8 @@ import { Sinalizacao } from '../../interfaces/sinalizacao.interface';
 
 @Component({
   selector: 'app-blocos-list',
-  imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent, BlocoAcoesModalComponent, CrudAgentesComponent, CrudDesviosComponent, CrudFaixaTecidoComponent, CrudFechamentosComponent, CrudReservaAreaComponent, CrudSinalizacaoComponent],
-  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroCog6Tooth })],
+  imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent, BlocoAcoesModalComponent, CrudAgentesComponent, CrudDesviosComponent, CrudFaixaTecidoComponent, CrudFechamentosComponent, CrudReservaAreaComponent, CrudSinalizacaoComponent, MapaModalComponent],
+  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroCog6Tooth, heroMapPin })],
   templateUrl: './blocos-list.html',
   styleUrl: './blocos-list.scss'
 })
@@ -83,6 +85,10 @@ export class BlocosListComponent implements OnInit {
   blocoParaCrudFechamentos: any = null;
   blocoParaCrudReservasArea: any = null;
   blocoParaCrudSinalizacoes: any = null;
+
+  // Controle do modal de mapa
+  mapaUrl: string = '';
+  mapaTitulo: string = '';
 
   // Colunas a exibir (todas as colunas)
   displayColumns = [
@@ -152,7 +158,8 @@ export class BlocosListComponent implements OnInit {
     private storage: Storage,
     private firestore: Firestore,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public authService: AuthService
   ) { }
 
   ngOnInit() {
@@ -161,9 +168,9 @@ export class BlocosListComponent implements OnInit {
       if (params['abrirAcoes']) {
         this.blocoIdParaAbrirAcoes = params['abrirAcoes'];
         // Limpa o parâmetro da URL
-        this.router.navigate([], { 
-          queryParams: {}, 
-          replaceUrl: true 
+        this.router.navigate([], {
+          queryParams: {},
+          replaceUrl: true
         });
       }
     });
@@ -189,8 +196,17 @@ export class BlocosListComponent implements OnInit {
 
       // Garante que o Angular detecte a mudança
       this.ngZone.run(() => {
+        // Filtra por área se for operador
+        let blocosFiltradosPorPerfil = blocos;
+        if (this.authService.isOperador && this.authService.filtraPorArea) {
+          const regionaisPermitidas = this.authService.regionaisDaArea;
+          blocosFiltradosPorPerfil = blocos.filter((b: any) =>
+            regionaisPermitidas.some(r => r.toLowerCase() === (b.regional || '').toLowerCase())
+          );
+        }
+
         // Ordena por nome do bloco
-        this.blocos = blocos.sort((a: any, b: any) => {
+        this.blocos = blocosFiltradosPorPerfil.sort((a: any, b: any) => {
           const nomeA = (a.nomeDoBloco || '').toLowerCase();
           const nomeB = (b.nomeDoBloco || '').toLowerCase();
           return nomeA.localeCompare(nomeB, 'pt-BR');
@@ -302,6 +318,18 @@ export class BlocosListComponent implements OnInit {
 
   abrirVisualizarPercurso(bloco: any) {
     this.blocoParaVisualizarPercurso = bloco;
+  }
+
+  abrirMapaExterno(bloco: any) {
+    if (bloco.myMapsEmbedUrl) {
+      this.mapaUrl = bloco.myMapsEmbedUrl;
+      this.mapaTitulo = `Mapa - ${bloco.nomeDoBloco || 'Percurso'}`;
+    }
+  }
+
+  fecharMapa() {
+    this.mapaUrl = '';
+    this.mapaTitulo = '';
   }
 
   fecharVisualizarPercurso() {

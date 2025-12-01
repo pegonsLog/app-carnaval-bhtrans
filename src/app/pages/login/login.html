@@ -1,0 +1,48 @@
+<div class="login-container">
+    <div class="login-backdrop"></div>
+
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo-wrapper">
+                <img src="assets/logomarcas/logomarcas.png" alt="Logo" class="logo" />
+            </div>
+            <h1>Carnaval BHTrans</h1>
+            <p>Sistema de Gestão de Blocos</p>
+        </div>
+
+        <form class="login-form" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label for="matricula">Matrícula</label>
+                <div class="input-wrapper">
+                    <ng-icon name="heroUser" class="input-icon"></ng-icon>
+                    <input type="text" id="matricula" [(ngModel)]="matricula" name="matricula"
+                        placeholder="Digite sua matrícula" autocomplete="username" [disabled]="isLoading">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <div class="input-wrapper">
+                    <ng-icon name="heroLockClosed" class="input-icon"></ng-icon>
+                    <input [type]="mostrarSenha ? 'text' : 'password'" id="senha" [(ngModel)]="senha" name="senha"
+                        placeholder="Digite sua senha" autocomplete="current-password" [disabled]="isLoading">
+                    <button type="button" class="toggle-senha" (click)="toggleMostrarSenha()">
+                        <ng-icon [name]="mostrarSenha ? 'heroEyeSlash' : 'heroEye'"></ng-icon>
+                    </button>
+                </div>
+            </div>
+
+            <div class="error-message" *ngIf="mensagemErro">
+                {{ mensagemErro }}
+            </div>
+
+            <button type="submit" class="btn-login" [disabled]="isLoading">
+                {{ isLoading ? 'Entrando...' : 'Entrar' }}
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p>BHTRANS - Empresa de Transportes e Trânsito de Belo Horizonte</p>
+        </div>
+    </div>
+</div>

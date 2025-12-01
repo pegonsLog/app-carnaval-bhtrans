@@ -47,6 +47,10 @@ export class KmlUploadComponent {
   uploadProgress = 0;
   mensagem = '';
   tipoMensagem: 'sucesso' | 'erro' | '' = '';
+  kmlValidado = false;
+  isValidando = false;
+  foldersEncontradas: string[] = [];
+  foldersObrigatorias = ['RESERVA DE ÁREA', 'DESVIOS', 'SINALIZAÇÃO', 'AGENTES', 'FAIXA DE TECIDO'];
 
   constructor(
     private storage: Storage,
@@ -67,6 +71,64 @@ export class KmlUploadComponent {
       this.arquivoSelecionado = file;
       this.mensagem = '';
       this.tipoMensagem = '';
+      this.kmlValidado = false;
+      this.foldersEncontradas = [];
+    }
+  }
+
+  async validarKml() {
+    if (!this.arquivoSelecionado) return;
+
+    this.isValidando = true;
+    this.mensagem = '';
+    this.tipoMensagem = '';
+
+    try {
+      const kmlContent = await this.lerArquivo(this.arquivoSelecionado);
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(kmlContent, 'text/xml');
+
+      // Extrai os nomes das folders do KML
+      const folders = xmlDoc.querySelectorAll('Folder');
+      const foldersTemp: string[] = [];
+
+      folders.forEach((folder) => {
+        const folderName = folder.querySelector(':scope > name')?.textContent?.trim().toUpperCase();
+        if (folderName) {
+          foldersTemp.push(folderName);
+        }
+      });
+
+      // Verifica se todas as folders obrigatórias estão presentes
+      const foldersFaltando = this.foldersObrigatorias.filter(
+        (obrigatoria) => !foldersTemp.some(
+          (encontrada) => encontrada === obrigatoria.toUpperCase()
+        )
+      );
+
+      this.ngZone.run(() => {
+        this.foldersEncontradas = foldersTemp;
+
+        if (foldersFaltando.length === 0) {
+          this.kmlValidado = true;
+          this.mostrarMensagem('✅ KML validado com sucesso! Todas as pastas obrigatórias foram encontradas.', 'sucesso');
+        } else {
+          this.kmlValidado = false;
+          this.mostrarMensagem(
+            `❌ Pastas obrigatórias não encontradas: ${foldersFaltando.join(', ')}`,
+            'erro'
+          );
+        }
+        this.isValidando = false;
+      });
+    } catch (error: any) {
+      console.error('Erro ao validar KML:', error);
+      this.ngZone.run(() => {
+        this.kmlValidado = false;
+        this.foldersEncontradas = [];
+        this.mostrarMensagem(`Erro ao validar arquivo: ${error.message}`, 'erro');
+        this.isValidando = false;
+      });
     }
   }
 
@@ -164,7 +226,7 @@ export class KmlUploadComponent {
       });
 
       if (folderContent.trim() && folderName) {
-        md += `\n## 📁 ${folderName}\n\n`;
+        md += `\n## ${folderName}\n\n`;
         md += folderContent;
       }
     });
@@ -181,7 +243,7 @@ export class KmlUploadComponent {
       });
 
       if (rootContent.trim()) {
-        md += `\n## 📍 Pontos de Interesse\n\n`;
+        md += `\n## Pontos de Interesse\n\n`;
         md += rootContent;
       }
     }
@@ -226,8 +288,7 @@ export class KmlUploadComponent {
     // Só adiciona o marcador se tiver nome ou descrição com conteúdo
     if (name || descContent.trim()) {
       if (name) {
-        const icon = point ? '📍' : lineString ? '🛤️' : '📌';
-        md += `### ${icon} ${name}\n\n`;
+        md += `### ${name}\n\n`;
       }
 
       if (descContent.trim()) {
@@ -323,6 +384,12 @@ export class KmlUploadComponent {
     this.arquivoSelecionado = null;
     this.mensagem = '';
     this.tipoMensagem = '';
+    this.kmlValidado = false;
+    this.foldersEncontradas = [];
+  }
+
+  isFolderObrigatoria(folder: string): boolean {
+    return this.foldersObrigatorias.some(f => f.toUpperCase() === folder.toUpperCase());
   }
 
   validarUrlMyMaps(): boolean {

@@ -1,0 +1,16 @@
+<div class="modal-overlay" (click)="onFechar()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>{{ titulo }}</h2>
+            <div class="header-actions">
+                <button class="btn-nova-aba" (click)="abrirNovaAba()">Abrir em nova aba</button>
+                <button class="btn-fechar" (click)="onFechar()">
+                    <ng-icon name="heroXMark"></ng-icon>
+                </button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <iframe [src]="url | safe" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>

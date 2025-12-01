@@ -766,3 +766,130 @@
     height: 120mm;
   }
 }
+
+// PLACEMARKS DO KML
+.operacional-section {
+  margin-bottom: 8mm;
+}
+
+.placemarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2mm;
+  padding: 2mm 0;
+}
+
+.placemark-item {
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  padding: 2mm 3mm;
+  page-break-inside: avoid;
+}
+
+.placemark-header {
+  display: flex;
+  align-items: baseline;
+  gap: 2mm;
+  margin-bottom: 1mm;
+}
+
+.placemark-index {
+  font-size: 9pt;
+  font-weight: bold;
+  color: #667eea;
+  min-width: 20px;
+}
+
+.placemark-name {
+  font-size: 10pt;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.placemark-quantidade {
+  font-size: 10pt;
+  font-weight: 700;
+  color: #667eea;
+  margin-left: 2mm;
+}
+
+.placemark-description {
+  padding-left: 22px;
+
+  p {
+    margin: 0.5mm 0;
+    font-size: 9pt;
+    color: #555;
+    line-height: 1.4;
+
+    strong {
+      color: #333;
+    }
+  }
+}
+
+.secao-contagem {
+  margin-top: 3mm;
+  padding: 2mm 3mm;
+  background: #f0f4f8;
+  border-radius: 3px;
+  border-left: 3px solid #667eea;
+}
+
+.contagem-total {
+  font-size: 10pt;
+  color: #1a365d;
+
+  strong {
+    font-weight: 700;
+  }
+}
+
+.contagem-detalhada {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2mm 4mm;
+  margin-top: 1mm;
+
+  .contagem-item {
+    font-size: 9pt;
+    color: #555;
+    background: white;
+    padding: 1mm 2mm;
+    border-radius: 2px;
+  }
+}
+
+.sem-dados {
+  font-size: 10pt;
+  color: #999;
+  font-style: italic;
+  padding: 3mm;
+  text-align: center;
+}
+
+.placemark-descriptions {
+  padding-left: 22px;
+
+  .description-group {
+    padding: 1mm 0;
+    border-bottom: 1px dotted #e0e0e0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  p {
+    margin: 0.5mm 0;
+    font-size: 9pt;
+    color: #555;
+    line-height: 1.4;
+
+    strong {
+      color: #333;
+    }
+  }
+}

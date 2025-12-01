@@ -132,10 +132,11 @@ export class DocumentoBlocoComponent implements OnInit {
     const data: any = { titulo: '', secoes: [], mapUrl: '' };
     const lines = md.split('\n');
     let currentSection: any = null;
-    let placemarkNames: string[] = []; // Coleta nomes dos placemarks (###)
+    let currentPlacemark: any = null;
+    let placemarks: any[] = []; // Lista de placemarks com name e description
 
-    for (const line of lines) {
-      const trimmed = line.trim();
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim();
 
       // Título principal (# )
       if (trimmed.startsWith('# ') && !trimmed.startsWith('## ') && !trimmed.startsWith('### ')) {
@@ -145,10 +146,16 @@ export class DocumentoBlocoComponent implements OnInit {
 
       // Seção/Pasta (## )
       if (trimmed.startsWith('## ') && !trimmed.startsWith('### ')) {
-        // Finaliza seção anterior com contagem e itens únicos
+        // Finaliza placemark anterior
+        if (currentPlacemark && currentSection) {
+          placemarks.push(currentPlacemark);
+        }
+        currentPlacemark = null;
+
+        // Finaliza seção anterior
         if (currentSection) {
-          currentSection.contagem = this.contarItens(placemarkNames);
-          currentSection.itens = [...new Set(placemarkNames)]; // Itens únicos sem contagem
+          currentSection.placemarks = this.agruparPlacemarks(placemarks);
+          currentSection.totalItens = placemarks.length;
           data.secoes.push(currentSection);
         }
 
@@ -157,54 +164,99 @@ export class DocumentoBlocoComponent implements OnInit {
         // Ignora a pasta "Ícone" e variações
         if (this.isPastaIgnorada(tituloSecao)) {
           currentSection = null;
-          placemarkNames = [];
+          placemarks = [];
           continue;
         }
 
         currentSection = {
           titulo: tituloSecao,
+          placemarks: [],
           contagem: [],
-          itens: [], // Lista de itens únicos (sem contagem)
           exibirContagem: this.isPastaComContagem(tituloSecao)
         };
-        placemarkNames = [];
+        placemarks = [];
         continue;
       }
 
-      // Placemark (### ) - coleta o nome para contagem
+      // Placemark (### ) - inicia novo placemark
       if (trimmed.startsWith('### ') && currentSection) {
+        // Salva placemark anterior se existir
+        if (currentPlacemark) {
+          placemarks.push(currentPlacemark);
+        }
+
         const nomeItem = trimmed.substring(4).trim();
-        placemarkNames.push(nomeItem);
+        currentPlacemark = {
+          name: nomeItem,
+          description: []
+        };
         continue;
+      }
+
+      // Coleta descrição do placemark atual (linhas que começam com - ** ou texto simples)
+      if (currentPlacemark && trimmed) {
+        // Linhas de descrição (formato: - **Label:** Valor)
+        if (trimmed.startsWith('- **')) {
+          currentPlacemark.description.push(trimmed);
+        } else if (!trimmed.startsWith('#') && !trimmed.startsWith('[')) {
+          // Texto simples que não é título nem link
+          currentPlacemark.description.push(trimmed);
+        }
       }
 
       // Busca links no formato markdown [texto](url)
       const linkMatch = trimmed.match(/\[([^\]]+)\]\(([^)]+)\)/);
       if (linkMatch) {
         const url = linkMatch[2];
-        // Extrai o link do Google Maps para embed
         if (this.isGoogleMapsUrl(url) && !data.mapUrl) {
           data.mapUrl = url;
           this.convertToEmbedUrl(url);
         }
       }
 
-      // Busca URLs diretas do Google Maps (sem formato markdown)
+      // Busca URLs diretas do Google Maps
       if (!linkMatch && this.isGoogleMapsUrl(trimmed) && !data.mapUrl) {
         data.mapUrl = trimmed;
         this.convertToEmbedUrl(trimmed);
       }
     }
 
+    // Finaliza último placemark
+    if (currentPlacemark && currentSection) {
+      placemarks.push(currentPlacemark);
+    }
+
     // Finaliza última seção
     if (currentSection) {
-      currentSection.contagem = this.contarItens(placemarkNames);
-      currentSection.itens = [...new Set(placemarkNames)]; // Itens únicos sem contagem
+      currentSection.placemarks = this.agruparPlacemarks(placemarks);
+      currentSection.totalItens = placemarks.length;
       data.secoes.push(currentSection);
     }
 
     console.log('Markdown parseado:', data);
     return data;
+  }
+
+  private agruparPlacemarks(placemarks: any[]): any[] {
+    const grupos: { [key: string]: { name: string; quantidade: number; descriptions: string[][] } } = {};
+
+    for (const p of placemarks) {
+      const nomeNormalizado = p.name.trim();
+      if (!grupos[nomeNormalizado]) {
+        grupos[nomeNormalizado] = {
+          name: nomeNormalizado,
+          quantidade: 0,
+          descriptions: []
+        };
+      }
+      grupos[nomeNormalizado].quantidade++;
+      if (p.description && p.description.length > 0) {
+        grupos[nomeNormalizado].descriptions.push(p.description);
+      }
+    }
+
+    // Converte para array e ordena por quantidade (maior primeiro)
+    return Object.values(grupos).sort((a, b) => b.quantidade - a.quantidade);
   }
 
   private contarItens(nomes: string[]): { nome: string; quantidade: number }[] {
@@ -234,7 +286,7 @@ export class DocumentoBlocoComponent implements OnInit {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, ''); // Remove acentos
 
-    const pastasIgnoradas = ['icone', 'icones', 'icon', 'icons'];
+    const pastasIgnoradas = ['icone', 'icones', 'icon', 'icons', 'evento', 'dados gerais'];
     return pastasIgnoradas.some(pasta => tituloLower.includes(pasta));
   }
 
@@ -271,10 +323,8 @@ export class DocumentoBlocoComponent implements OnInit {
   }
 
   voltar() {
-    // Volta para a lista com parâmetro para reabrir o modal de ações
-    this.router.navigate(['/'], {
-      queryParams: { abrirAcoes: this.bloco?.id }
-    });
+    // Volta para a lista de blocos
+    this.router.navigate(['/']);
   }
 
   imprimir() {
@@ -332,5 +382,12 @@ export class DocumentoBlocoComponent implements OnInit {
       return `${String(data.getDate()).padStart(2, '0')}/${String(data.getMonth() + 1).padStart(2, '0')}/${data.getFullYear()}`;
     }
     return String(data);
+  }
+
+  formatDescriptionLine(linha: string): string {
+    // Converte markdown bold **texto** para HTML <strong>
+    return linha
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/^- /, '');
   }
 }

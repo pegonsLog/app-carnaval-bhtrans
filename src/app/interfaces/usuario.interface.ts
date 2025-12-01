@@ -3,5 +3,5 @@ export interface Usuario {
     matricula: string;
     senha: string;
     area: 'GARBO' | 'GARNP' | 'GARNE' | 'GARVN' | 'GEACE' | 'OUTRAS';
-    perfil: 'admin' | 'operador' | 'visualizador';
+    perfil: 'admin' | 'operador' | 'visualizador' | 'administrador';
 }

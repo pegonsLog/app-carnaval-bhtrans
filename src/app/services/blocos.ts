@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, getDocs, query, where, updateDoc, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, getDocs, query, where, updateDoc, doc, setDoc, deleteDoc } from '@angular/fire/firestore';
 import { Blocos } from '../interfaces/blocos.interface';
 
 @Injectable({
@@ -86,5 +86,22 @@ export class BlocosService {
       id: doc.id,
       ...doc.data()
     }));
+  }
+
+  // Exclui todos os blocos
+  async excluirTodosBlocos(onProgress?: (atual: number, total: number) => void): Promise<number> {
+    const blocosCollection = collection(this.firestore, this.collectionName);
+    const querySnapshot = await getDocs(blocosCollection);
+    const total = querySnapshot.docs.length;
+
+    for (let i = 0; i < querySnapshot.docs.length; i++) {
+      const docSnapshot = querySnapshot.docs[i];
+      await deleteDoc(doc(this.firestore, this.collectionName, docSnapshot.id));
+      if (onProgress) {
+        onProgress(i + 1, total);
+      }
+    }
+
+    return total;
   }
 }

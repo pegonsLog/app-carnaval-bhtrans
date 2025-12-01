@@ -19,7 +19,7 @@
         <ng-icon name="heroHome" class="nav-icon"></ng-icon>
         <span>Início</span>
       </a>
-      <a routerLink="/importar" routerLinkActive="active" class="nav-link" *ngIf="authService.podeEditar">
+      <a routerLink="/importar" routerLinkActive="active" class="nav-link" *ngIf="authService.isAdmin">
         <ng-icon name="heroArrowUpTray" class="nav-icon"></ng-icon>
         <span>Importar</span>
       </a>

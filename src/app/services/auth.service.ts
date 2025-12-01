@@ -48,6 +48,8 @@ export class AuthService {
 
       const doc = querySnapshot.docs[0];
       const dadosUsuario = doc.data() as Omit<Usuario, 'id'>;
+      console.log('Dados do usuário do Firestore:', dadosUsuario);
+      console.log('Perfil:', dadosUsuario.perfil);
 
       if (dadosUsuario.senha !== senha) {
         return { sucesso: false, mensagem: 'Matrícula ou senha inválidos' };
@@ -84,7 +86,8 @@ export class AuthService {
   }
 
   get isAdmin(): boolean {
-    return this.usuarioLogadoSubject.value?.perfil === 'admin';
+    const perfil = this.usuarioLogadoSubject.value?.perfil?.toLowerCase();
+    return perfil === 'administrador';
   }
 
   get isOperador(): boolean {
@@ -96,6 +99,7 @@ export class AuthService {
   }
 
   get podeEditar(): boolean {
+    if (this.isAdmin) return true;
     const perfil = this.usuarioLogadoSubject.value?.perfil;
     return perfil === 'admin' || perfil === 'operador';
   }
@@ -119,7 +123,9 @@ export class AuthService {
     return this.mapaAreaRegionais[area] || [];
   }
 
+  // Administrador nunca filtra por área - vê tudo
   get filtraPorArea(): boolean {
+    if (this.isAdmin) return false;
     const area = this.areaUsuario.toUpperCase();
     return area !== 'OUTRAS' && area !== '' && (this.mapaAreaRegionais[area]?.length || 0) > 0;
   }

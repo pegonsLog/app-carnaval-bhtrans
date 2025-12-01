@@ -2,6 +2,7 @@ import { Component, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as XLSX from 'xlsx';
 import { BlocosService } from '../../services/blocos';
+import { AuthService } from '../../services/auth.service';
 import { Blocos } from '../../interfaces/blocos.interface';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar, heroEllipsisHorizontal, heroXMark } from '@ng-icons/heroicons/outline';
@@ -83,9 +84,16 @@ export class ExcelUploadComponent {
   activeTooltip: { rowIndex: number; header: string } | null = null;
   tooltipContent = '';
 
+  // Exclusão em massa
+  isDeleting = false;
+  deleteProgressoAtual = 0;
+  deleteProgressoTotal = 0;
+  showDeleteConfirm = false;
+
   constructor(
     private blocosService: BlocosService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    public authService: AuthService
   ) { }
 
   // Função auxiliar para parsear datas do Excel
@@ -154,8 +162,14 @@ export class ExcelUploadComponent {
         // Converte para JSON
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false });
 
+        // Filtra apenas registros com status "APROVADO"
+        const dadosFiltrados = jsonData.filter((row: any) => {
+          const status = (row['Status do Desfile'] || '').toString().toUpperCase().trim();
+          return status === 'APROVADO';
+        });
+
         // Ordena por nome do bloco
-        this.excelData = jsonData.sort((a: any, b: any) => {
+        this.excelData = dadosFiltrados.sort((a: any, b: any) => {
           const nomeA = (a['Nome Do Bloco'] || '').toLowerCase();
           const nomeB = (b['Nome Do Bloco'] || '').toLowerCase();
           return nomeA.localeCompare(nomeB, 'pt-BR');
@@ -348,5 +362,48 @@ export class ExcelUploadComponent {
 
   isTooltipActive(rowIndex: number, header: string): boolean {
     return this.activeTooltip?.rowIndex === rowIndex && this.activeTooltip?.header === header;
+  }
+
+  // Exclusão em massa - apenas admin
+  abrirConfirmacaoExclusao() {
+    this.showDeleteConfirm = true;
+  }
+
+  fecharConfirmacaoExclusao() {
+    this.showDeleteConfirm = false;
+  }
+
+  async excluirTodosBlocos() {
+    this.showDeleteConfirm = false;
+    this.isDeleting = true;
+    this.deleteProgressoAtual = 0;
+    this.deleteProgressoTotal = 0;
+
+    try {
+      const total = await this.blocosService.excluirTodosBlocos((atual, total) => {
+        this.ngZone.run(() => {
+          this.deleteProgressoAtual = atual;
+          this.deleteProgressoTotal = total;
+        });
+      });
+
+      this.ngZone.run(() => {
+        this.saveMessage = `✓ ${total} bloco(s) excluído(s) com sucesso!`;
+        this.saveMessageType = 'success';
+        this.isDeleting = false;
+      });
+    } catch (error) {
+      console.error('Erro ao excluir blocos:', error);
+      this.ngZone.run(() => {
+        this.saveMessage = `✗ Erro ao excluir blocos: ${error}`;
+        this.saveMessageType = 'error';
+        this.isDeleting = false;
+      });
+    }
+  }
+
+  get deleteProgressoPorcentagem(): number {
+    if (this.deleteProgressoTotal === 0) return 0;
+    return Math.round((this.deleteProgressoAtual / this.deleteProgressoTotal) * 100);
   }
 }

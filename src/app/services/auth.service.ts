@@ -101,7 +101,7 @@ export class AuthService {
   get podeEditar(): boolean {
     if (this.isAdmin) return true;
     const perfil = this.usuarioLogadoSubject.value?.perfil;
-    return perfil === 'admin' || perfil === 'operador';
+    return perfil === 'administrador' || perfil === 'operador';
   }
 
   get areaUsuario(): string {
@@ -112,7 +112,7 @@ export class AuthService {
   private readonly mapaAreaRegionais: Record<string, string[]> = {
     'GARBO': ['Oeste', 'Barreiro'],
     'GARNP': ['Noroeste', 'Pampulha'],
-    'GARNE': ['Nordeste', 'Norte'],
+    'GARNE': ['Nordeste', 'Leste'],
     'GARVN': ['Norte', 'Venda Nova'],
     'GEACE': ['Centro-Sul', 'Hipercentro'],
     'OUTRAS': []

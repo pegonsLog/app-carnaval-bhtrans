@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, NgZone } from '@angular/core';
+import { Component, Input, Output, EventEmitter, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Storage, ref, uploadString, getDownloadURL } from '@angular/fire/storage';
@@ -10,6 +10,8 @@ import {
   getDocs,
   updateDoc,
   doc,
+  setDoc,
+  getDoc,
 } from '@angular/fire/firestore';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
@@ -36,13 +38,14 @@ import {
   templateUrl: './kml-upload.html',
   styleUrl: './kml-upload.scss',
 })
-export class KmlUploadComponent {
+export class KmlUploadComponent implements OnInit {
   @Input() bloco: any;
   @Output() fechar = new EventEmitter<void>();
-  @Output() uploadConcluido = new EventEmitter<string>();
+  @Output() uploadConcluido = new EventEmitter<{ percursoUrl: string; myMapsEmbedUrl: string }>();
 
-  arquivoSelecionado: File | null = null;
   myMapsUrl = '';
+  kmlContent = '';
+  kmlCarregado = false;
   isUploading = false;
   uploadProgress = 0;
   mensagem = '';
@@ -58,37 +61,130 @@ export class KmlUploadComponent {
     private ngZone: NgZone
   ) { }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-
-      if (!file.name.toLowerCase().endsWith('.kml')) {
-        this.mostrarMensagem('Por favor, selecione um arquivo KML válido.', 'erro');
-        return;
-      }
-
-      this.arquivoSelecionado = file;
-      this.mensagem = '';
-      this.tipoMensagem = '';
-      this.kmlValidado = false;
-      this.foldersEncontradas = [];
+  async ngOnInit() {
+    // Carrega dados do mapa salvos anteriormente (se existirem)
+    if (this.bloco?.numeroInscricao) {
+      await this.carregarDadosMapaSalvos();
     }
   }
 
-  async validarKml() {
-    if (!this.arquivoSelecionado) return;
+  private async carregarDadosMapaSalvos() {
+    try {
+      const mapaDocRef = doc(this.firestore, 'blocos-mapas', this.bloco.numeroInscricao);
+      const mapaDoc = await getDoc(mapaDocRef);
+
+      if (mapaDoc.exists()) {
+        const dados = mapaDoc.data();
+        if (dados['myMapsUrl']) {
+          this.ngZone.run(() => {
+            this.myMapsUrl = dados['myMapsUrl'];
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados do mapa:', error);
+    }
+  }
+
+  validarUrlMyMaps(): boolean {
+    if (!this.myMapsUrl.trim()) return false;
+
+    const input = this.myMapsUrl.trim();
+
+    // Aceita URLs do Google My Maps
+    const urlPatterns = [
+      /^https?:\/\/(www\.)?google\.(com|com\.br)\/maps\/d\/.+/i,
+      /^https?:\/\/maps\.google\.(com|com\.br)\/maps\/d\/.+/i,
+    ];
+
+    return urlPatterns.some(pattern => pattern.test(input));
+  }
+
+  extrairMidDaUrl(url: string): string | null {
+    const patterns = [
+      /mid=([^&\/]+)/,
+      /\/maps\/d\/(?:u\/\d+\/)?(?:edit|viewer|embed)\?mid=([^&]+)/,
+      /\/maps\/d\/([^\/\?]+)/,
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    return null;
+  }
+
+  montarUrlKml(mid: string): string {
+    return `https://www.google.com/maps/d/kml?mid=${mid}&forcekml=1`;
+  }
+
+  async buscarEValidarKml() {
+    if (!this.myMapsUrl || !this.validarUrlMyMaps()) return;
 
     this.isValidando = true;
     this.mensagem = '';
     this.tipoMensagem = '';
+    this.kmlValidado = false;
+    this.kmlCarregado = false;
+    this.kmlContent = '';
+    this.foldersEncontradas = [];
 
     try {
-      const kmlContent = await this.lerArquivo(this.arquivoSelecionado);
+      const mid = this.extrairMidDaUrl(this.myMapsUrl);
+
+      if (!mid) {
+        throw new Error('Não foi possível extrair o ID do mapa da URL fornecida.');
+      }
+
+      const kmlUrl = this.montarUrlKml(mid);
+      const response = await fetch(kmlUrl);
+
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar o mapa: ${response.status} ${response.statusText}`);
+      }
+
+      const kmlText = await response.text();
+
+      if (!kmlText.includes('<kml') && !kmlText.includes('<Document')) {
+        throw new Error('O conteúdo retornado não é um KML válido. Verifique se o mapa está público.');
+      }
+
+      this.kmlContent = kmlText;
+      this.kmlCarregado = true;
+
+      await this.validarKml(kmlText);
+
+    } catch (error: any) {
+      console.error('Erro ao buscar KML:', error);
+      this.ngZone.run(() => {
+        this.kmlValidado = false;
+        this.kmlCarregado = false;
+        this.foldersEncontradas = [];
+
+        let mensagemErro = error.message;
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          mensagemErro = 'Não foi possível acessar o mapa. Verifique se ele está configurado como público.';
+        }
+
+        this.mostrarMensagem(`❌ ${mensagemErro}`, 'erro');
+        this.isValidando = false;
+      });
+    }
+  }
+
+  async validarKml(kmlContent: string) {
+    try {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(kmlContent, 'text/xml');
 
-      // Extrai os nomes das folders do KML
+      const parseError = xmlDoc.querySelector('parsererror');
+      if (parseError) {
+        throw new Error('Erro ao processar o KML. O arquivo pode estar corrompido.');
+      }
+
       const folders = xmlDoc.querySelectorAll('Folder');
       const foldersTemp: string[] = [];
 
@@ -99,7 +195,6 @@ export class KmlUploadComponent {
         }
       });
 
-      // Verifica se todas as folders obrigatórias estão presentes
       const foldersFaltando = this.foldersObrigatorias.filter(
         (obrigatoria) => !foldersTemp.some(
           (encontrada) => encontrada === obrigatoria.toUpperCase()
@@ -133,18 +228,15 @@ export class KmlUploadComponent {
   }
 
   async enviarArquivo() {
-    if (!this.arquivoSelecionado || !this.bloco) return;
+    if (!this.kmlContent || !this.bloco || !this.kmlValidado) return;
 
     this.isUploading = true;
     this.uploadProgress = 0;
 
     try {
-      // Lê o conteúdo do arquivo KML
-      const kmlContent = await this.lerArquivo(this.arquivoSelecionado);
       this.uploadProgress = 25;
 
-      // Converte KML para Markdown
-      const markdownContent = this.converterKmlParaMarkdown(kmlContent);
+      const markdownContent = this.converterKmlParaMarkdown(this.kmlContent);
       this.uploadProgress = 50;
 
       const numeroInscricao = this.bloco.numeroInscricao;
@@ -152,23 +244,28 @@ export class KmlUploadComponent {
       const nomeBlocoSlug = this.slugify(nomeBloco);
       const nomeArquivo = `blocos/${numeroInscricao}_${nomeBlocoSlug}.md`;
 
-      // Cria referência no Storage e faz upload do Markdown
       const storageRef = ref(this.storage, nomeArquivo);
       await uploadString(storageRef, markdownContent, 'raw', {
         contentType: 'text/markdown',
       });
       this.uploadProgress = 75;
 
-      // Obtém URL de download
       const downloadURL = await getDownloadURL(storageRef);
 
-      // Atualiza o documento do bloco no Firestore
+      // Salva na coleção separada (blocos-mapas) para persistência
+      await this.salvarDadosMapa(numeroInscricao, downloadURL);
+
+      // Atualiza o bloco atual
       await this.atualizarBlocoComPercurso(numeroInscricao, downloadURL);
+
       this.ngZone.run(() => {
         this.uploadProgress = 100;
         this.isUploading = false;
         this.mostrarMensagem('Arquivo convertido e enviado com sucesso!', 'sucesso');
-        this.uploadConcluido.emit(downloadURL);
+        this.uploadConcluido.emit({
+          percursoUrl: downloadURL,
+          myMapsEmbedUrl: this.converterParaEmbedUrl(this.myMapsUrl)
+        });
       });
 
       setTimeout(() => {
@@ -183,13 +280,21 @@ export class KmlUploadComponent {
     }
   }
 
-  private lerArquivo(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(new Error('Erro ao ler arquivo'));
-      reader.readAsText(file);
-    });
+  // Salva os dados do mapa em coleção separada para não perder ao deletar blocos
+  private async salvarDadosMapa(numeroInscricao: string, percursoUrl: string) {
+    const mapaDocRef = doc(this.firestore, 'blocos-mapas', numeroInscricao);
+
+    const dadosMapa = {
+      numeroInscricao: numeroInscricao,
+      nomeDoBloco: this.bloco.nomeDoBloco || '',
+      myMapsUrl: this.myMapsUrl.trim(),
+      myMapsEmbedUrl: this.converterParaEmbedUrl(this.myMapsUrl),
+      percursoUrl: percursoUrl,
+      percursoDataUpload: new Date(),
+      updatedAt: new Date(),
+    };
+
+    await setDoc(mapaDocRef, dadosMapa, { merge: true });
   }
 
   private converterKmlParaMarkdown(kmlContent: string): string {
@@ -199,7 +304,6 @@ export class KmlUploadComponent {
     const nomeBloco = this.bloco?.nomeDoBloco || 'Bloco';
     let md = `# ${nomeBloco} - Informações do Percurso\n\n`;
 
-    // Extrai informações do Document
     const docDesc = xmlDoc.querySelector('Document > description')?.textContent;
 
     if (docDesc) {
@@ -210,13 +314,11 @@ export class KmlUploadComponent {
       }
     }
 
-    // Processa as pastas (Folders)
     const folders = xmlDoc.querySelectorAll('Folder');
     folders.forEach((folder) => {
       const folderName = folder.querySelector(':scope > name')?.textContent;
       const placemarks = folder.querySelectorAll(':scope > Placemark');
 
-      // Só adiciona a pasta se tiver placemarks com conteúdo
       let folderContent = '';
       placemarks.forEach((placemark) => {
         const placemarkContent = this.processarPlacemark(placemark);
@@ -231,7 +333,6 @@ export class KmlUploadComponent {
       }
     });
 
-    // Processa Placemarks fora de pastas
     const rootPlacemarks = xmlDoc.querySelectorAll('Document > Placemark');
     if (rootPlacemarks.length > 0) {
       let rootContent = '';
@@ -248,7 +349,6 @@ export class KmlUploadComponent {
       }
     }
 
-    // Remove linhas em branco extras
     md = md.replace(/\n{3,}/g, '\n\n');
 
     return md;
@@ -258,34 +358,25 @@ export class KmlUploadComponent {
     const name = placemark.querySelector('name')?.textContent?.trim();
     const description = placemark.querySelector('description')?.textContent;
 
-    // Se não tem nome nem descrição, retorna vazio
     if (!name && !description) {
       return '';
     }
 
-    // Ignora marcadores de início/término sem descrição
     const nomeLower = name?.toLowerCase() || '';
     const marcadoresIgnorar = ['início', 'inicio', 'término', 'termino', 'fim'];
     const ehMarcadorSimples = marcadoresIgnorar.some(m => nomeLower.includes(m));
 
-    // Processa descrição primeiro para verificar se tem conteúdo
     let descContent = '';
     if (description) {
       descContent = this.parseDescricaoHtml(description);
     }
 
-    // Se é marcador de início/término sem descrição, ignora
     if (ehMarcadorSimples && !descContent.trim()) {
       return '';
     }
 
     let md = '';
 
-    // Verifica o tipo de geometria
-    const point = placemark.querySelector('Point');
-    const lineString = placemark.querySelector('LineString');
-
-    // Só adiciona o marcador se tiver nome ou descrição com conteúdo
     if (name || descContent.trim()) {
       if (name) {
         md += `### ${name}\n\n`;
@@ -309,12 +400,10 @@ export class KmlUploadComponent {
       .replace(/&nbsp;/g, ' ')
       .trim();
 
-    // Se não tem texto, retorna vazio
     if (!text) {
       return '';
     }
 
-    // Converte campos conhecidos para formato de lista
     const campos = [
       { regex: /Bloco:\s*(.+)/i, label: 'Bloco' },
       { regex: /Dia:\s*(.+)/i, label: 'Data' },
@@ -340,7 +429,6 @@ export class KmlUploadComponent {
       }
     });
 
-    // Adiciona texto restante se houver conteúdo significativo
     textoRestante = textoRestante.replace(/\n+/g, ' ').trim();
     if (textoRestante && textoRestante.length > 2 && !resultado) {
       resultado = textoRestante + '\n';
@@ -362,13 +450,20 @@ export class KmlUploadComponent {
         percursoDataUpload: new Date(),
       };
 
-      // Adiciona URL de embed do My Maps se informada
       if (this.myMapsUrl.trim()) {
         updateData.myMapsEmbedUrl = this.converterParaEmbedUrl(this.myMapsUrl);
       }
 
       await updateDoc(docRef, updateData);
     }
+  }
+
+  private converterParaEmbedUrl(url: string): string {
+    const mid = this.extrairMidDaUrl(url);
+    if (mid) {
+      return `https://www.google.com/maps/d/embed?mid=${mid}`;
+    }
+    return url;
   }
 
   private mostrarMensagem(msg: string, tipo: 'sucesso' | 'erro') {
@@ -380,11 +475,12 @@ export class KmlUploadComponent {
     this.fechar.emit();
   }
 
-  removerArquivo() {
-    this.arquivoSelecionado = null;
+  limparKml() {
+    this.kmlContent = '';
+    this.kmlCarregado = false;
+    this.kmlValidado = false;
     this.mensagem = '';
     this.tipoMensagem = '';
-    this.kmlValidado = false;
     this.foldersEncontradas = [];
   }
 
@@ -392,66 +488,13 @@ export class KmlUploadComponent {
     return this.foldersObrigatorias.some(f => f.toUpperCase() === folder.toUpperCase());
   }
 
-  validarUrlMyMaps(): boolean {
-    if (!this.myMapsUrl.trim()) return true; // Campo opcional
-
-    const input = this.myMapsUrl.trim();
-
-    // Aceita iframe completo com src do Google Maps
-    if (input.includes('<iframe') && input.includes('google.com/maps')) {
-      return true;
-    }
-
-    // Aceita URL direta do Google Maps
-    const urlPattern = /^https?:\/\/(www\.)?google\.(com|com\.br)\/maps\/.+/i;
-    return urlPattern.test(input);
-  }
-
-  private converterParaEmbedUrl(input: string): string {
-    let embedUrl = input.trim();
-
-    // Se o usuário colou o iframe completo, extrai a URL do src
-    // Exemplo: <iframe src="https://www.google.com/maps/d/u/2/embed?mid=xxx" width="640" height="480"></iframe>
-    if (embedUrl.includes('<iframe') && embedUrl.includes('src=')) {
-      const srcMatch = embedUrl.match(/src=["']([^"']+)["']/);
-      if (srcMatch && srcMatch[1]) {
-        embedUrl = srcMatch[1];
-      }
-    }
-
-    // Se já é uma URL de embed, retorna como está
-    if (embedUrl.includes('/embed?')) {
-      return embedUrl;
-    }
-
-    // Converte /viewer? para /embed?
-    if (embedUrl.includes('/viewer?')) {
-      return embedUrl.replace('/viewer?', '/embed?');
-    }
-
-    // Converte /edit? para /embed?
-    if (embedUrl.includes('/edit?')) {
-      return embedUrl.replace('/edit?', '/embed?');
-    }
-
-    // Se tem mid= mas não tem embed, tenta converter
-    if (embedUrl.includes('mid=') && embedUrl.includes('/maps/d/')) {
-      const midMatch = embedUrl.match(/mid=([^&]+)/);
-      if (midMatch) {
-        return `https://www.google.com/maps/d/embed?mid=${midMatch[1]}`;
-      }
-    }
-
-    return embedUrl;
-  }
-
   private slugify(text: string): string {
     return text
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-      .replace(/[^a-z0-9]+/g, '_') // Substitui caracteres especiais por _
-      .replace(/^_+|_+$/g, '') // Remove _ do início e fim
-      .substring(0, 50); // Limita tamanho
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .substring(0, 50);
   }
 }

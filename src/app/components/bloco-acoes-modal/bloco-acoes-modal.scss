@@ -155,7 +155,8 @@
     background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
   }
 
-  &.remover {
+  &.remover,
+  &.remover-mapa {
     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
   }
 

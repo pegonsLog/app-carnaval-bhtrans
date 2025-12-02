@@ -41,7 +41,7 @@
     </div>
 
     <!-- Botão de exclusão em massa - apenas admin -->
-    <div class="admin-section" *ngIf="authService.isAdmin" hidden>
+    <div class="admin-section" *ngIf="authService.isAdmin">
       <hr class="divider">
       <h4>Área Administrativa</h4>
       <button class="delete-all-btn" (click)="abrirConfirmacaoExclusao()" [disabled]="isDeleting">

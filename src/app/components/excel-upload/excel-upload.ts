@@ -309,7 +309,11 @@ export class ExcelUploadComponent {
       });
 
       this.ngZone.run(() => {
-        this.saveMessage = `✓ Sucesso! ${resultado.total} registro(s) processado(s): ${resultado.novos} novo(s), ${resultado.atualizados} atualizado(s).`;
+        let mensagem = `✓ Sucesso! ${resultado.total} registro(s) processado(s): ${resultado.novos} novo(s), ${resultado.atualizados} atualizado(s).`;
+        if (resultado.mapasVinculados > 0) {
+          mensagem += ` 🗺️ ${resultado.mapasVinculados} mapa(s) vinculado(s) automaticamente.`;
+        }
+        this.saveMessage = mensagem;
         this.saveMessageType = 'success';
         this.isSaving = false;
       });

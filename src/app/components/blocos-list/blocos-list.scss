@@ -208,6 +208,26 @@
           font-weight: 600;
           color: #667eea;
           text-align: center;
+
+          .row-index {
+            display: inline-block;
+            min-width: 20px;
+          }
+
+          .kml-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 4px;
+            vertical-align: middle;
+          }
         }
       }
     }

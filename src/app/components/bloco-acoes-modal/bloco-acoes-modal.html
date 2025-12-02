@@ -27,11 +27,12 @@
     <div class="acoes-grid acoes-grid-mapa">
       <button class="acao-btn kml" [class.has-kml]="bloco?.percursoUrl" (click)="onUploadKml()">
         <ng-icon name="heroMapPin"></ng-icon>
-        <span>{{ bloco?.percursoUrl ? 'Inserir KML' : 'Enviar KML' }}</span>
+        <span>{{ bloco?.percursoUrl ? 'Atualizar Mapa' : 'Importar Mapa' }}</span>
       </button>
-      <button class="acao-btn remover" *ngIf="bloco?.percursoUrl" (click)="onRemoverArquivo()">
+      <button class="acao-btn remover-mapa" *ngIf="bloco?.myMapsEmbedUrl || bloco?.percursoUrl"
+        (click)="onRemoverMapa()">
         <ng-icon name="heroTrash"></ng-icon>
-        <span>Remover KML</span>
+        <span>Remover Mapa e Kml</span>
       </button>
     </div>
 

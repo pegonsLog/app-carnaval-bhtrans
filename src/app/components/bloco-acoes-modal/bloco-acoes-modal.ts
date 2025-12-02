@@ -1,13 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { 
-  heroXMark, 
-  heroClipboardDocument, 
-  heroMapPin, 
-  heroDocumentText, 
-  heroGlobeAmericas, 
-  heroDocumentDuplicate, 
+import {
+  heroXMark,
+  heroClipboardDocument,
+  heroMapPin,
+  heroDocumentText,
+  heroGlobeAmericas,
+  heroDocumentDuplicate,
   heroTrash,
   heroUserGroup,
   heroArrowsRightLeft,
@@ -20,13 +20,13 @@ import {
 @Component({
   selector: 'app-bloco-acoes-modal',
   imports: [CommonModule, NgIcon],
-  viewProviders: [provideIcons({ 
-    heroXMark, 
-    heroClipboardDocument, 
-    heroMapPin, 
-    heroDocumentText, 
-    heroGlobeAmericas, 
-    heroDocumentDuplicate, 
+  viewProviders: [provideIcons({
+    heroXMark,
+    heroClipboardDocument,
+    heroMapPin,
+    heroDocumentText,
+    heroGlobeAmericas,
+    heroDocumentDuplicate,
     heroTrash,
     heroUserGroup,
     heroArrowsRightLeft,
@@ -47,6 +47,7 @@ export class BlocoAcoesModalComponent {
   @Output() documentoMymaps = new EventEmitter<any>();
   @Output() documentoCompleto = new EventEmitter<any>();
   @Output() removerArquivo = new EventEmitter<any>();
+  @Output() removerMapa = new EventEmitter<any>();
   @Output() gerenciarAgentes = new EventEmitter<any>();
   @Output() gerenciarDesvios = new EventEmitter<any>();
   @Output() gerenciarFaixasTecido = new EventEmitter<any>();
@@ -65,8 +66,8 @@ export class BlocoAcoesModalComponent {
   get dataDoDesfile(): string {
     if (!this.bloco?.dataDoDesfile) return '-';
     try {
-      const date = this.bloco.dataDoDesfile.toDate 
-        ? this.bloco.dataDoDesfile.toDate() 
+      const date = this.bloco.dataDoDesfile.toDate
+        ? this.bloco.dataDoDesfile.toDate()
         : new Date(this.bloco.dataDoDesfile);
       if (!isNaN(date.getTime())) {
         return date.toLocaleDateString('pt-BR');
@@ -103,6 +104,10 @@ export class BlocoAcoesModalComponent {
 
   onRemoverArquivo() {
     this.removerArquivo.emit(this.bloco);
+  }
+
+  onRemoverMapa() {
+    this.removerMapa.emit(this.bloco);
   }
 
   onGerenciarAgentes() {

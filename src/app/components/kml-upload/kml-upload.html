@@ -1,7 +1,7 @@
 <div class="modal-overlay" (click)="fecharModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>Upload de Arquivo KML</h3>
+      <h3>Importar Mapa do Google My Maps</h3>
       <button class="close-btn" (click)="fecharModal()">
         <ng-icon name="heroXMark"></ng-icon>
       </button>
@@ -18,39 +18,38 @@
       </div>
 
       <div class="url-input-group">
-        <label for="myMapsUrl">Código de Incorporação do Google My Maps (opcional)</label>
-        <textarea id="myMapsUrl" [(ngModel)]="myMapsUrl" rows="3"
-          placeholder='Cole aqui o iframe: <iframe src="https://www.google.com/maps/d/embed?mid=..." ...></iframe>'
-          [class.invalid]="myMapsUrl && !validarUrlMyMaps()"></textarea>
+        <label for="myMapsUrl">URL do Google My Maps</label>
+        <input type="text" id="myMapsUrl" [(ngModel)]="myMapsUrl"
+          placeholder="Cole a URL do mapa: https://www.google.com/maps/d/..."
+          [class.invalid]="myMapsUrl && !validarUrlMyMaps()" [disabled]="isUploading || isValidando">
         <span class="url-hint info" *ngIf="!myMapsUrl">
-          💡 No My Maps: Menu (⋮) → "Compartilhar ou incorporar mapa" → "Incorporar um mapa" → Copie o código
-          completo do iframe
+          💡 Copie a URL do navegador quando estiver visualizando o mapa no My Maps
         </span>
         <span class="url-hint success" *ngIf="myMapsUrl && validarUrlMyMaps()">
-          ✅ Código válido!
+          ✅ URL válida! Clique em "Buscar e Validar" para importar o KML.
         </span>
         <span class="url-hint error" *ngIf="myMapsUrl && !validarUrlMyMaps()">
-          ❌ Código inválido. Cole o iframe completo do Google Maps.
+          ❌ URL inválida. Cole uma URL do Google My Maps (ex: https://www.google.com/maps/d/...)
         </span>
       </div>
 
-      <div class="upload-area" *ngIf="!arquivoSelecionado">
-        <input type="file" id="kmlInput" accept=".kml" (change)="onFileSelected($event)" hidden>
-        <label for="kmlInput" class="upload-label">
-          <ng-icon name="heroCloudArrowUp" class="upload-icon"></ng-icon>
-          <span class="upload-text">Clique para selecionar um arquivo KML</span>
-          <span class="upload-hint">ou arraste e solte aqui</span>
-        </label>
+      <div class="validation-info" *ngIf="!kmlValidado">
+        <p class="validation-hint">
+          📋 O mapa deve conter as seguintes pastas obrigatórias:
+        </p>
+        <ul class="folders-list">
+          <li *ngFor="let folder of foldersObrigatorias">{{ folder }}</li>
+        </ul>
       </div>
 
-      <div class="file-selected" *ngIf="arquivoSelecionado">
-        <div class="file-info">
+      <div class="kml-loaded" *ngIf="kmlCarregado">
+        <div class="kml-info">
           <ng-icon name="heroDocumentText" class="file-icon"></ng-icon>
-          <div class="file-details">
-            <span class="file-name">{{ arquivoSelecionado.name }}</span>
-            <span class="file-size">{{ (arquivoSelecionado.size / 1024).toFixed(2) }} KB</span>
+          <div class="kml-details">
+            <span class="kml-name">KML carregado com sucesso</span>
+            <span class="kml-size">{{ (kmlContent.length / 1024).toFixed(2) }} KB</span>
           </div>
-          <button class="remove-btn" (click)="removerArquivo()" *ngIf="!isUploading">
+          <button class="remove-btn" (click)="limparKml()" *ngIf="!isUploading">
             <ng-icon name="heroXMark"></ng-icon>
           </button>
         </div>
@@ -60,17 +59,8 @@
         </div>
       </div>
 
-      <div class="validation-info" *ngIf="arquivoSelecionado && !kmlValidado">
-        <p class="validation-hint">
-          📋 O arquivo KML deve conter as seguintes pastas obrigatórias:
-        </p>
-        <ul class="folders-list">
-          <li *ngFor="let folder of foldersObrigatorias">{{ folder }}</li>
-        </ul>
-      </div>
-
       <div class="folders-found" *ngIf="foldersEncontradas.length > 0">
-        <p class="folders-title">Pastas encontradas no arquivo:</p>
+        <p class="folders-title">Pastas encontradas no mapa:</p>
         <div class="folders-tags">
           <span *ngFor="let folder of foldersEncontradas" class="folder-tag" [class.found]="isFolderObrigatoria(folder)"
             [class.extra]="!isFolderObrigatoria(folder)">
@@ -94,13 +84,12 @@
       <button class="btn-cancel" (click)="fecharModal()" [disabled]="isUploading || isValidando">
         Cancelar
       </button>
-      <button class="btn-validate" (click)="validarKml()"
-        [disabled]="!arquivoSelecionado || isUploading || isValidando || kmlValidado">
+      <button class="btn-validate" (click)="buscarEValidarKml()"
+        [disabled]="!myMapsUrl || !validarUrlMyMaps() || isUploading || isValidando || kmlValidado">
         <ng-icon name="heroCheckCircle" *ngIf="!isValidando"></ng-icon>
-        {{ isValidando ? 'Validando...' : (kmlValidado ? 'Validado ✓' : 'Validar KML') }}
+        {{ isValidando ? 'Buscando...' : (kmlValidado ? 'Validado ✓' : 'Buscar e Validar') }}
       </button>
-      <button class="btn-upload" (click)="enviarArquivo()"
-        [disabled]="!arquivoSelecionado || isUploading || !kmlValidado">
+      <button class="btn-upload" (click)="enviarArquivo()" [disabled]="!kmlValidado || isUploading">
         <ng-icon name="heroCloudArrowUp" *ngIf="!isUploading"></ng-icon>
         {{ isUploading ? 'Enviando...' : 'Enviar para Storage' }}
       </button>

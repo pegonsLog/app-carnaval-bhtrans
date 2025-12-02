@@ -66,6 +66,9 @@ export class BlocosListComponent implements OnInit {
   // Controle do modal de confirmação de exclusão
   blocoParaRemover: any = null;
 
+  // Controle do modal de confirmação de remoção do mapa
+  blocoParaRemoverMapa: any = null;
+
   // Controle do modal de documento Belotur
   blocoParaDocumento: any = null;
 
@@ -307,12 +310,15 @@ export class BlocosListComponent implements OnInit {
     this.voltarParaModalAcoes();
   }
 
-  onKmlUploadConcluido(url: string) {
+  onKmlUploadConcluido(dados: any) {
     // Atualiza o bloco na lista local
     const index = this.blocos.findIndex(b => b.numeroInscricao === this.blocoParaUploadKml?.numeroInscricao);
     if (index !== -1) {
-      this.blocos[index].percursoUrl = url;
+      this.blocos[index].percursoUrl = dados.percursoUrl;
       this.blocos[index].percursoDataUpload = new Date();
+      if (dados.myMapsEmbedUrl) {
+        this.blocos[index].myMapsEmbedUrl = dados.myMapsEmbedUrl;
+      }
     }
   }
 
@@ -410,6 +416,12 @@ export class BlocosListComponent implements OnInit {
     this.blocoAcoesAtivo = bloco;
     this.blocoParaAcoes = null;
     this.abrirModalRemover(bloco);
+  }
+
+  onAcaoRemoverMapa(bloco: any) {
+    this.blocoAcoesAtivo = bloco;
+    this.blocoParaAcoes = null;
+    this.blocoParaRemoverMapa = bloco;
   }
 
   // Handlers dos CRUDs
@@ -560,7 +572,8 @@ export class BlocosListComponent implements OnInit {
         const docRef = doc(this.firestore, 'blocos', docId);
         await updateDoc(docRef, {
           percursoUrl: deleteField(),
-          percursoDataUpload: deleteField()
+          percursoDataUpload: deleteField(),
+          myMapsEmbedUrl: deleteField()
         });
       }
 
@@ -570,6 +583,7 @@ export class BlocosListComponent implements OnInit {
         if (index !== -1) {
           delete this.blocos[index].percursoUrl;
           delete this.blocos[index].percursoDataUpload;
+          delete this.blocos[index].myMapsEmbedUrl;
         }
         this.blocoParaRemover = null;
         this.voltarParaModalAcoes();
@@ -579,6 +593,62 @@ export class BlocosListComponent implements OnInit {
       console.error('Erro ao remover arquivo:', error);
       alert(`Erro ao remover arquivo: ${error.message}`);
       this.blocoParaRemover = null;
+      this.voltarParaModalAcoes();
+    }
+  }
+
+  fecharModalRemoverMapa() {
+    this.blocoParaRemoverMapa = null;
+    this.voltarParaModalAcoes();
+  }
+
+  async confirmarRemocaoMapa() {
+    if (!this.blocoParaRemoverMapa) return;
+
+    const bloco = this.blocoParaRemoverMapa;
+
+    try {
+      // Remove o arquivo do Storage se existir
+      if (bloco.percursoUrl) {
+        const match = bloco.percursoUrl.match(/\/o\/([^?]+)/);
+        if (match) {
+          const storagePath = decodeURIComponent(match[1]);
+          const storageRef = ref(this.storage, storagePath);
+          await deleteObject(storageRef);
+        }
+      }
+
+      // Remove as referências do Firestore
+      const blocosCollection = collection(this.firestore, 'blocos');
+      const q = query(blocosCollection, where('numeroInscricao', '==', bloco.numeroInscricao));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const docId = querySnapshot.docs[0].id;
+        const docRef = doc(this.firestore, 'blocos', docId);
+        await updateDoc(docRef, {
+          percursoUrl: deleteField(),
+          percursoDataUpload: deleteField(),
+          myMapsEmbedUrl: deleteField()
+        });
+      }
+
+      // Atualiza a lista local
+      this.ngZone.run(() => {
+        const index = this.blocos.findIndex(b => b.numeroInscricao === bloco.numeroInscricao);
+        if (index !== -1) {
+          delete this.blocos[index].percursoUrl;
+          delete this.blocos[index].percursoDataUpload;
+          delete this.blocos[index].myMapsEmbedUrl;
+        }
+        this.blocoParaRemoverMapa = null;
+        this.voltarParaModalAcoes();
+      });
+
+    } catch (error: any) {
+      console.error('Erro ao remover mapa:', error);
+      alert(`Erro ao remover mapa: ${error.message}`);
+      this.blocoParaRemoverMapa = null;
       this.voltarParaModalAcoes();
     }
   }

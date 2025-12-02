@@ -65,7 +65,7 @@
           <tr *ngFor="let bloco of blocosFiltrados; let i = index">
             <td class="action-col">
               <div class="action-buttons">
-                <button class="view-btn" (click)="abrirDocumentoCompleto(bloco)" title="Ver documento completo">
+                <button class="view-btn" (click)="abrirDocumentoCompleto(bloco)" title="Ver DOT">
                   <ng-icon name="heroEye"></ng-icon>
                 </button>
                 <button class="map-btn" (click)="abrirMapaExterno(bloco)" title="Ver mapa" *ngIf="bloco.myMapsEmbedUrl">
@@ -76,7 +76,10 @@
                 </button>
               </div>
             </td>
-            <td class="row-number">{{ i + 1 }}</td>
+            <td class="row-number">
+              <span class="row-index">{{ i + 1 }}</span>
+              <span class="kml-badge" *ngIf="bloco.percursoUrl" title="KML importado">✓</span>
+            </td>
             <td *ngFor="let col of displayColumns" class="cell-content">
               <div class="cell-wrapper">
                 <span class="text-truncate" [title]="formatValue(bloco[col.key], col.key)">{{
@@ -128,6 +131,12 @@
   (confirmar)="confirmarRemocao()" (cancelar)="fecharModalRemover()">
 </app-confirm-modal>
 
+<!-- Modal de Confirmação de Remoção do Mapa -->
+<app-confirm-modal *ngIf="blocoParaRemoverMapa" titulo="Remover Mapa"
+  [mensagem]="'Deseja remover o mapa do bloco ' + blocoParaRemoverMapa.nomeDoBloco + '? Isso removerá a URL do mapa e o arquivo descritivo.'"
+  tipo="danger" (confirmar)="confirmarRemocaoMapa()" (cancelar)="fecharModalRemoverMapa()">
+</app-confirm-modal>
+
 <!-- Modal de Documento Belotur -->
 <app-dados-belotur *ngIf="blocoParaDocumento" [bloco]="blocoParaDocumento" (fechar)="fecharDocumentoBelotur()">
 </app-dados-belotur>
@@ -142,8 +151,8 @@
   (documentoBelotur)="onAcaoDocumentoBelotur($event)" (uploadKml)="onAcaoUploadKml($event)"
   (visualizarPercurso)="onAcaoVisualizarPercurso($event)" (documentoMymaps)="onAcaoDocumentoMymaps($event)"
   (documentoCompleto)="onAcaoDocumentoCompleto($event)" (removerArquivo)="onAcaoRemoverArquivo($event)"
-  (gerenciarAgentes)="onAcaoGerenciarAgentes($event)" (gerenciarDesvios)="onAcaoGerenciarDesvios($event)"
-  (gerenciarFaixasTecido)="onAcaoGerenciarFaixasTecido($event)"
+  (removerMapa)="onAcaoRemoverMapa($event)" (gerenciarAgentes)="onAcaoGerenciarAgentes($event)"
+  (gerenciarDesvios)="onAcaoGerenciarDesvios($event)" (gerenciarFaixasTecido)="onAcaoGerenciarFaixasTecido($event)"
   (gerenciarFechamentos)="onAcaoGerenciarFechamentos($event)"
   (gerenciarReservasArea)="onAcaoGerenciarReservasArea($event)"
   (gerenciarSinalizacoes)="onAcaoGerenciarSinalizacoes($event)">

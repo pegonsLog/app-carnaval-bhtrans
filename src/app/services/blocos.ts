@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, getDocs, query, where, updateDoc, doc, setDoc, deleteDoc } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, getDocs, query, where, updateDoc, doc, setDoc, deleteDoc, getDoc } from '@angular/fire/firestore';
 import { Blocos } from '../interfaces/blocos.interface';
 
 @Injectable({
@@ -7,8 +7,54 @@ import { Blocos } from '../interfaces/blocos.interface';
 })
 export class BlocosService {
   private collectionName = 'blocos';
+  private mapasCollectionName = 'blocos-mapas';
 
   constructor(private firestore: Firestore) { }
+
+  // Busca dados do mapa salvos na coleção separada
+  async getDadosMapa(numeroInscricao: string): Promise<any | null> {
+    try {
+      const mapaDocRef = doc(this.firestore, this.mapasCollectionName, numeroInscricao);
+      const mapaDoc = await getDoc(mapaDocRef);
+
+      if (mapaDoc.exists()) {
+        return mapaDoc.data();
+      }
+      return null;
+    } catch (error) {
+      console.error('Erro ao buscar dados do mapa:', error);
+      return null;
+    }
+  }
+
+  // Vincula dados do mapa ao bloco (usado após importação)
+  async vincularDadosMapa(numeroInscricao: string, blocoDocId: string): Promise<boolean> {
+    try {
+      const dadosMapa = await this.getDadosMapa(numeroInscricao);
+
+      if (dadosMapa && (dadosMapa.percursoUrl || dadosMapa.myMapsEmbedUrl)) {
+        const docRef = doc(this.firestore, this.collectionName, blocoDocId);
+        const updateData: any = {};
+
+        if (dadosMapa.percursoUrl) {
+          updateData.percursoUrl = dadosMapa.percursoUrl;
+        }
+        if (dadosMapa.myMapsEmbedUrl) {
+          updateData.myMapsEmbedUrl = dadosMapa.myMapsEmbedUrl;
+        }
+        if (dadosMapa.percursoDataUpload) {
+          updateData.percursoDataUpload = dadosMapa.percursoDataUpload;
+        }
+
+        await updateDoc(docRef, updateData);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Erro ao vincular dados do mapa:', error);
+      return false;
+    }
+  }
 
   // Salva ou atualiza um bloco baseado no número de inscrição, nome do bloco e data do desfile
   async salvarBloco(bloco: Blocos): Promise<void> {
@@ -38,9 +84,10 @@ export class BlocosService {
   async salvarBlocos(
     blocos: Blocos[],
     onProgress?: (atual: number, total: number, novos: number, atualizados: number) => void
-  ): Promise<{ total: number, novos: number, atualizados: number }> {
+  ): Promise<{ total: number, novos: number, atualizados: number, mapasVinculados: number }> {
     let novos = 0;
     let atualizados = 0;
+    let mapasVinculados = 0;
     const total = blocos.length;
 
     for (let i = 0; i < blocos.length; i++) {
@@ -56,16 +103,27 @@ export class BlocosService {
       );
       const querySnapshot = await getDocs(q);
 
+      let blocoDocId: string;
+
       if (!querySnapshot.empty) {
         // Atualiza documento existente
-        const docId = querySnapshot.docs[0].id;
-        const docRef = doc(this.firestore, this.collectionName, docId);
+        blocoDocId = querySnapshot.docs[0].id;
+        const docRef = doc(this.firestore, this.collectionName, blocoDocId);
         await updateDoc(docRef, { ...bloco } as any);
         atualizados++;
       } else {
         // Cria novo documento
-        await addDoc(blocosCollection, { ...bloco } as any);
+        const docRef = await addDoc(blocosCollection, { ...bloco } as any);
+        blocoDocId = docRef.id;
         novos++;
+      }
+
+      // Tenta vincular dados do mapa salvos anteriormente
+      if (bloco.numeroInscricao) {
+        const vinculado = await this.vincularDadosMapa(bloco.numeroInscricao, blocoDocId);
+        if (vinculado) {
+          mapasVinculados++;
+        }
       }
 
       // Chama callback de progresso
@@ -74,7 +132,7 @@ export class BlocosService {
       }
     }
 
-    return { total, novos, atualizados };
+    return { total, novos, atualizados, mapasVinculados };
   }
 
   // Busca todos os blocos

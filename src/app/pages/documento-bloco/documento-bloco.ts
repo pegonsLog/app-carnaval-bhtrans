@@ -4,15 +4,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Storage, ref, getBytes } from '@angular/fire/storage';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroArrowLeft, heroPrinter } from '@ng-icons/heroicons/outline';
+import { heroArrowLeft, heroPrinter, heroDocumentArrowDown } from '@ng-icons/heroicons/outline';
 import { BlocosService } from '../../services/blocos';
 import { CapasService } from '../../services/capas';
+import { DocxExportService } from '../../services/docx-export.service';
 import { Capa } from '../../interfaces/capa.interface';
 
 @Component({
   selector: 'app-documento-bloco',
   imports: [CommonModule, NgIcon],
-  viewProviders: [provideIcons({ heroArrowLeft, heroPrinter })],
+  viewProviders: [provideIcons({ heroArrowLeft, heroPrinter, heroDocumentArrowDown })],
   templateUrl: './documento-bloco.html',
   styleUrl: './documento-bloco.scss'
 })
@@ -32,6 +33,7 @@ export class DocumentoBlocoComponent implements OnInit {
     private router: Router,
     private blocosService: BlocosService,
     private capasService: CapasService,
+    private docxExportService: DocxExportService,
     private storage: Storage,
     private ngZone: NgZone,
     private sanitizer: DomSanitizer
@@ -329,6 +331,15 @@ export class DocumentoBlocoComponent implements OnInit {
 
   imprimir() {
     window.print();
+  }
+
+  async exportarDocx() {
+    if (!this.bloco) return;
+    try {
+      await this.docxExportService.exportarDocumento(this.bloco, this.capa, this.parsedMymaps);
+    } catch (error) {
+      console.error('Erro ao exportar DOCX:', error);
+    }
   }
 
   formatDate(value: any): string {

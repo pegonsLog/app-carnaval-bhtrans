@@ -61,6 +61,10 @@
             ],
             "styles": [
               "src/styles.scss"
+            ],
+            "allowedCommonJsDependencies": [
+              "file-saver",
+              "buffer"
             ]
           },
           "configurations": {

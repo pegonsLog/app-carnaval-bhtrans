@@ -23,7 +23,8 @@
 }
 
 .btn-voltar,
-.btn-imprimir {
+.btn-imprimir,
+.btn-exportar {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -46,7 +47,13 @@
   }
 }
 
-.btn-imprimir {
+.header-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-imprimir,
+.btn-exportar {
   background: white;
   color: #667eea;
 
@@ -58,6 +65,15 @@
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+}
+
+.btn-exportar {
+  background: #28a745;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: #218838;
   }
 }
 

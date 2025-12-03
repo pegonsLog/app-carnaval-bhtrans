@@ -6,10 +6,16 @@
       Voltar
     </button>
     <h1>Documento do Bloco</h1>
-    <button class="btn-imprimir" (click)="imprimir()" [disabled]="isLoading">
-      <ng-icon name="heroPrinter"></ng-icon>
-      Imprimir
-    </button>
+    <div class="header-buttons">
+      <button class="btn-exportar" (click)="exportarDocx()" [disabled]="isLoading">
+        <ng-icon name="heroDocumentArrowDown"></ng-icon>
+        Exportar DOCX
+      </button>
+      <button class="btn-imprimir" (click)="imprimir()" [disabled]="isLoading">
+        <ng-icon name="heroPrinter"></ng-icon>
+        Imprimir
+      </button>
+    </div>
   </div>
 
   <!-- Loading -->

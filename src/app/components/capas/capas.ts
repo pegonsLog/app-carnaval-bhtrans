@@ -7,6 +7,7 @@ import {
   heroPencil,
   heroTrash,
   heroXMark,
+  heroEye,
 } from '@ng-icons/heroicons/outline';
 import { CapasService } from '../../services/capas';
 import { Capa } from '../../interfaces/capa.interface';
@@ -22,6 +23,7 @@ import { ConfirmModalComponent } from '../confirm-modal/confirm-modal';
       heroPencil,
       heroTrash,
       heroXMark,
+      heroEye,
     }),
   ],
   templateUrl: './capas.html',
@@ -40,6 +42,9 @@ export class CapasComponent implements OnInit {
 
   // Modal de confirmação de exclusão
   capaParaExcluir: Capa | null = null;
+
+  // Modal de visualização
+  capaParaVisualizar: Capa | null = null;
 
   constructor(
     private capasService: CapasService,
@@ -135,6 +140,14 @@ export class CapasComponent implements OnInit {
     } catch (error: any) {
       console.error('Erro ao excluir capa:', error);
     }
+  }
+
+  visualizarCapa(capa: Capa) {
+    this.capaParaVisualizar = capa;
+  }
+
+  fecharVisualizacao() {
+    this.capaParaVisualizar = null;
   }
 
   aplicarMascaraData(event: Event): void {

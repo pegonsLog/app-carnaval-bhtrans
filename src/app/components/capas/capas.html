@@ -43,6 +43,9 @@
         </div>
       </div>
       <div class="capa-actions">
+        <button class="action-btn preview" (click)="visualizarCapa(capa)" title="Visualizar">
+          <ng-icon name="heroEye"></ng-icon>
+        </button>
         <button class="action-btn edit" (click)="abrirFormEditar(capa)" title="Editar">
           <ng-icon name="heroPencil"></ng-icon>
         </button>
@@ -113,6 +116,42 @@
         [disabled]="!capaAtual.gerencia || !capaAtual.elaboradoPor || !capaAtual.responsavel">
         {{ isEditing ? 'Atualizar' : 'Salvar' }}
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Visualização da Capa -->
+<div class="modal-overlay preview-overlay" *ngIf="capaParaVisualizar" (click)="fecharVisualizacao()">
+  <button class="close-preview-btn" (click)="fecharVisualizacao()">
+    <ng-icon name="heroXMark"></ng-icon>
+  </button>
+  <div class="preview-container" (click)="$event.stopPropagation()">
+    <div class="capa-preview">
+      <div class="a4-page capa-page">
+        <div class="capa-header">
+          <p class="linha">Empresa de Transportes e Trânsito de Belo Horizonte S/A - BHTRANS</p>
+          <p class="linha">Diretoria de Ação Regional e Operação – DRO</p>
+          <p class="linha">Superintendência de Ação Regional – SARE</p>
+          <p class="linha">{{ capaParaVisualizar.gerencia }}</p>
+        </div>
+
+        <div class="capa-centro">
+          <h2 class="nome-bloco">NOME DO BLOCO</h2>
+          <div class="capa-logo">
+            <img src="assets/logomarcas/logomarcas.png" alt="Logo" />
+          </div>
+        </div>
+
+        <div class="capa-elaboracao">
+          <p class="linha" *ngIf="capaParaVisualizar.elaboradoPor">Elaboração: {{ capaParaVisualizar.elaboradoPor }}</p>
+        </div>
+
+        <div class="capa-footer">
+          <p class="cidade">BELO HORIZONTE</p>
+          <p class="data">{{ capaParaVisualizar.dataElaboracao ? formatarData(capaParaVisualizar.dataElaboracao) : '' }}
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

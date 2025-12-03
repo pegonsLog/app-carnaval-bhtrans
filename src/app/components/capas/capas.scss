@@ -408,6 +408,7 @@
 // Preview da Capa
 .preview-overlay {
   background: rgba(0, 0, 0, 0.9);
+  overflow: auto;
 }
 
 .preview-container {
@@ -444,74 +445,85 @@
   padding: 2rem;
 }
 
-.capa-page {
+// Página A4
+.a4-page {
   width: 210mm;
   min-height: 297mm;
   background: white;
-  padding: 20mm;
-  box-sizing: border-box;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 11pt;
+  line-height: 1.4;
+  color: #333;
+}
+
+// CAPA
+.capa-page {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+  padding: 20mm 25mm;
+  text-align: center;
 }
 
 .capa-header {
-  text-align: center;
-
   .linha {
-    margin: 0.5rem 0;
-    font-size: 14pt;
-    color: #333;
+    margin: 0;
+    font-size: 11pt;
+    line-height: 1.5;
     font-weight: 500;
-
-    &.variavel {
-      color: #1a237e;
-      font-weight: 600;
-    }
   }
 }
 
-.capa-logo {
+.capa-centro {
   flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  padding: 3rem 0;
+  align-items: center;
+  padding: 20mm 0;
+}
+
+.nome-bloco {
+  font-size: 16pt;
+  font-weight: bold;
+  margin: 0 0 15mm 0;
+  color: #333;
+  text-transform: uppercase;
+}
+
+.capa-logo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 
   img {
-    max-width: 60%;
-    max-height: 200px;
+    max-width: 120mm;
+    max-height: 35mm;
+    width: 100%;
+    height: auto;
     object-fit: contain;
   }
 }
 
-.capa-titulo {
-  text-align: center;
-  margin: 2rem 0;
+.capa-elaboracao {
+  margin-bottom: 25mm;
 
-  h1 {
-    font-size: 28pt;
-    color: #1a237e;
-    margin: 0 0 1rem 0;
-    font-weight: 700;
-  }
-
-  h2 {
-    font-size: 18pt;
-    color: #333;
+  .linha {
     margin: 0;
-    font-weight: 600;
+    font-size: 11pt;
   }
 }
 
 .capa-footer {
-  text-align: center;
+  .cidade {
+    margin: 0;
+    font-size: 11pt;
+    font-weight: bold;
+  }
 
-  p {
-    margin: 0.25rem 0;
-    font-size: 14pt;
-    color: #333;
+  .data {
+    margin: 2mm 0 0 0;
+    font-size: 11pt;
   }
 }
 
@@ -571,28 +583,35 @@
     padding: 1rem;
   }
 
-  .capa-page {
+  .a4-page {
     width: 100%;
     min-height: auto;
-    padding: 10mm;
   }
 
-  .capa-titulo {
-    h1 {
-      font-size: 18pt;
-    }
+  .capa-page {
+    padding: 15mm 10mm;
+  }
 
-    h2 {
-      font-size: 14pt;
+  .capa-logo {
+    img {
+      max-width: 90%;
+      max-height: 30mm;
     }
+  }
+
+  .nome-bloco {
+    font-size: 14pt;
   }
 
   .capa-header .linha {
-    font-size: 11pt;
+    font-size: 9pt;
   }
 
-  .capa-footer p {
-    font-size: 11pt;
+  .capa-footer {
+    .cidade,
+    .data {
+      font-size: 10pt;
+    }
   }
 }
 

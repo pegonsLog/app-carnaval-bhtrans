@@ -16,6 +16,7 @@ import {
   heroSquare3Stack3d,
   heroExclamationTriangle
 } from '@ng-icons/heroicons/outline';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-bloco-acoes-modal',
@@ -39,6 +40,7 @@ import {
   styleUrl: './bloco-acoes-modal.scss'
 })
 export class BlocoAcoesModalComponent {
+  constructor(public authService: AuthService) { }
   @Input() bloco: any;
   @Output() fechar = new EventEmitter<void>();
   @Output() documentoBelotur = new EventEmitter<any>();

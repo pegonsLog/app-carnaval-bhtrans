@@ -23,18 +23,20 @@
       </div>
     </div>
 
-    <div class="secao-titulo secao-titulo-mapa">Mapa</div>
-    <div class="acoes-grid acoes-grid-mapa">
-      <button class="acao-btn kml" [class.has-kml]="bloco?.percursoUrl" (click)="onUploadKml()">
-        <ng-icon name="heroMapPin"></ng-icon>
-        <span>{{ bloco?.percursoUrl ? 'Atualizar Mapa' : 'Importar Mapa' }}</span>
-      </button>
-      <button class="acao-btn remover-mapa" *ngIf="bloco?.myMapsEmbedUrl || bloco?.percursoUrl"
-        (click)="onRemoverMapa()">
-        <ng-icon name="heroTrash"></ng-icon>
-        <span>Remover Mapa e Kml</span>
-      </button>
-    </div>
+    <ng-container *ngIf="authService.podeEditar">
+      <div class="secao-titulo secao-titulo-mapa">Mapa</div>
+      <div class="acoes-grid acoes-grid-mapa">
+        <button class="acao-btn kml" [class.has-kml]="bloco?.percursoUrl" (click)="onUploadKml()">
+          <ng-icon name="heroMapPin"></ng-icon>
+          <span>{{ bloco?.percursoUrl ? 'Atualizar Mapa' : 'Importar Mapa' }}</span>
+        </button>
+        <button class="acao-btn remover-mapa" *ngIf="bloco?.myMapsEmbedUrl || bloco?.percursoUrl"
+          (click)="onRemoverMapa()">
+          <ng-icon name="heroTrash"></ng-icon>
+          <span>Remover Mapa e Kml</span>
+        </button>
+      </div>
+    </ng-container>
 
     <div class="secao-titulo">Documentos</div>
     <div class="acoes-grid">

@@ -7,7 +7,7 @@ import { Firestore, collection, query, where, getDocs, updateDoc, doc, deleteFie
 import { BlocosService } from '../../services/blocos';
 import { AuthService } from '../../services/auth.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroCog6Tooth, heroMapPin } from '@ng-icons/heroicons/outline';
+import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin } from '@ng-icons/heroicons/outline';
 import { BlocoDetalheComponent } from '../bloco-detalhe/bloco-detalhe';
 import { KmlUploadComponent } from '../kml-upload/kml-upload';
 import { PercursoViewerComponent } from '../percurso-viewer/percurso-viewer';
@@ -32,7 +32,7 @@ import { Sinalizacao } from '../../interfaces/sinalizacao.interface';
 @Component({
   selector: 'app-blocos-list',
   imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent, BlocoAcoesModalComponent, CrudAgentesComponent, CrudDesviosComponent, CrudFaixaTecidoComponent, CrudFechamentosComponent, CrudReservaAreaComponent, CrudSinalizacaoComponent, MapaModalComponent],
-  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroCog6Tooth, heroMapPin })],
+  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin })],
   templateUrl: './blocos-list.html',
   styleUrl: './blocos-list.scss'
 })

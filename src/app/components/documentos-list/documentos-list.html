@@ -1,0 +1,70 @@
+<div class="modal-overlay" (click)="onFechar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="onFechar()">
+      <ng-icon name="heroXMark"></ng-icon>
+    </button>
+
+    <div class="modal-header">
+      <h3>DOTs antigos (.docx)</h3>
+    </div>
+
+    <div class="upload-section" *ngIf="authService.podeEditar">
+      <label class="upload-btn" [class.disabled]="enviando">
+        <ng-icon name="heroDocumentArrowUp"></ng-icon>
+        <span>{{ enviando ? 'Enviando...' : 'Importar Documento' }}</span>
+        <input type="file" accept=".docx" (change)="onFileSelected($event)" [disabled]="enviando" hidden />
+      </label>
+    </div>
+
+    <div class="filtro-section">
+      <div class="filtro-input-wrapper">
+        <ng-icon name="heroMagnifyingGlass" class="filtro-icon"></ng-icon>
+        <input type="text" [(ngModel)]="filtroNome" (ngModelChange)="aplicarFiltro()"
+          placeholder="Buscar por nome do arquivo..." class="filtro-input" />
+      </div>
+    </div>
+
+    <div class="erro-msg" *ngIf="erro">
+      <ng-icon name="heroExclamationCircle"></ng-icon>
+      {{ erro }}
+    </div>
+
+    <div class="documentos-section">
+      <div class="loading" *ngIf="carregando">Carregando documentos...</div>
+
+      <div class="empty-state" *ngIf="!carregando && documentosFiltrados.length === 0">
+        <ng-icon name="heroDocumentText"></ng-icon>
+        <p *ngIf="documentos.length === 0">Nenhum documento encontrado</p>
+        <p *ngIf="documentos.length > 0 && documentosFiltrados.length === 0">
+          Nenhum documento corresponde à busca
+        </p>
+      </div>
+
+      <div class="documentos-list" *ngIf="!carregando && documentosFiltrados.length > 0">
+        <p class="count-info">
+          {{ documentosFiltrados.length }} de {{ documentos.length }}
+          documento(s)
+        </p>
+        <div class="documento-item" *ngFor="let doc of documentosFiltrados">
+          <div class="doc-icon">
+            <ng-icon name="heroDocumentText"></ng-icon>
+          </div>
+          <div class="doc-info">
+            <span class="doc-nome">{{ doc.nome }}</span>
+            <span class="doc-meta">{{ formatarTamanho(doc.tamanho) }} •
+              {{ formatarData(doc.dataUpload) }}</span>
+          </div>
+          <div class="doc-actions">
+            <button class="action-btn download" (click)="visualizarDocumento(doc)" title="Baixar">
+              <ng-icon name="heroArrowDownTray"></ng-icon>
+            </button>
+            <button class="action-btn delete" (click)="removerDocumento(doc)" title="Remover"
+              *ngIf="authService.isAdmin">
+              <ng-icon name="heroTrash"></ng-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

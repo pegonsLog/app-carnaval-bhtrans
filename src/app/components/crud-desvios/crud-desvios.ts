@@ -29,15 +29,15 @@ export class CrudDesviosComponent implements OnInit {
   }
 
   novoItem(): Desvios {
-    return { 
-      tipo: '', 
-      linha: '', 
-      data: new Date(), 
-      hora: '', 
-      sentidoHorario: '', 
-      trajetoSentHorario: '', 
-      sentidoAntiHorario: '', 
-      trajetoSentAntiHorario: '' 
+    return {
+      tipo: '',
+      linha: '',
+      data: '',
+      hora: '',
+      sentidoHorario: '',
+      trajetoSentHorario: '',
+      sentidoAntiHorario: '',
+      trajetoSentAntiHorario: ''
     };
   }
 
@@ -60,8 +60,8 @@ export class CrudDesviosComponent implements OnInit {
   }
 
   salvarItem() {
-    if (!this.formItem.tipo || !this.formItem.linha) return;
-    
+    if (!this.formItem.tipo) return;
+
     if (this.indiceEditando >= 0) {
       this.itens[this.indiceEditando] = { ...this.formItem };
     } else {
@@ -83,5 +83,23 @@ export class CrudDesviosComponent implements OnInit {
 
   onFechar() {
     this.fechar.emit();
+  }
+
+  aplicarMascaraData(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let valor = input.value.replace(/\D/g, '');
+
+    if (valor.length > 8) {
+      valor = valor.substring(0, 8);
+    }
+
+    if (valor.length > 4) {
+      valor = valor.substring(0, 2) + '/' + valor.substring(2, 4) + '/' + valor.substring(4);
+    } else if (valor.length > 2) {
+      valor = valor.substring(0, 2) + '/' + valor.substring(2);
+    }
+
+    this.formItem.data = valor;
+    input.value = valor;
   }
 }

@@ -7,7 +7,7 @@ import { Firestore, collection, query, where, getDocs, updateDoc, doc, deleteFie
 import { BlocosService } from '../../services/blocos';
 import { AuthService } from '../../services/auth.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin } from '@ng-icons/heroicons/outline';
+import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth } from '@ng-icons/heroicons/outline';
 import { BlocoDetalheComponent } from '../bloco-detalhe/bloco-detalhe';
 import { KmlUploadComponent } from '../kml-upload/kml-upload';
 import { PercursoViewerComponent } from '../percurso-viewer/percurso-viewer';
@@ -22,6 +22,7 @@ import { CrudFechamentosComponent } from '../crud-fechamentos/crud-fechamentos';
 import { CrudReservaAreaComponent } from '../crud-reserva-area/crud-reserva-area';
 import { CrudSinalizacaoComponent } from '../crud-sinalizacao/crud-sinalizacao';
 import { MapaModalComponent } from '../mapa-modal/mapa-modal';
+
 import { Agentes } from '../../interfaces/agentes.interface';
 import { Desvios } from '../../interfaces/desvios.interface';
 import { FaixaTecido } from '../../interfaces/faixa-tecido.interface';
@@ -32,7 +33,7 @@ import { Sinalizacao } from '../../interfaces/sinalizacao.interface';
 @Component({
   selector: 'app-blocos-list',
   imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent, BlocoAcoesModalComponent, CrudAgentesComponent, CrudDesviosComponent, CrudFaixaTecidoComponent, CrudFechamentosComponent, CrudReservaAreaComponent, CrudSinalizacaoComponent, MapaModalComponent],
-  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin })],
+  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth })],
   templateUrl: './blocos-list.html',
   styleUrl: './blocos-list.scss'
 })
@@ -92,6 +93,8 @@ export class BlocosListComponent implements OnInit {
   // Controle do modal de mapa
   mapaUrl: string = '';
   mapaTitulo: string = '';
+
+
 
   // Colunas a exibir (todas as colunas)
   displayColumns = [

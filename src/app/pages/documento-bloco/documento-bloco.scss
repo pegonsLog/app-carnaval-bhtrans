@@ -215,7 +215,8 @@
 .dados-page,
 .mymaps-page,
 .mapa-page,
-.dados-operacionais-page {
+.dados-operacionais-page,
+.desvios-page {
   padding: 15mm;
 }
 
@@ -906,6 +907,40 @@
 
     strong {
       color: #333;
+    }
+  }
+}
+
+// PÁGINA DE DESVIOS
+.desvios-page {
+  .doc-section {
+    margin-bottom: 8mm;
+    page-break-inside: avoid;
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  .info-grid {
+    background: #fafafa;
+    padding: 3mm;
+    border-radius: 3px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .info-item {
+    border-bottom: 1px dotted #ddd;
+    padding: 1.5mm 0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.full {
+      .value {
+        white-space: pre-wrap;
+      }
     }
   }
 }

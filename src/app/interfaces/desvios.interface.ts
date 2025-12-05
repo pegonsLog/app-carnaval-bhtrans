@@ -1,7 +1,7 @@
 export interface Desvios {
     tipo: string;
     linha: string;
-    data: Date;
+    data: string;
     hora: string;
     sentidoHorario: string;
     trajetoSentHorario: string;

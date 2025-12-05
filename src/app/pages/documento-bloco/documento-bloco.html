@@ -371,5 +371,57 @@
       </div>
 
     </div>
+
+    <!-- PÁGINA: DETALHAMENTO DE DESVIOS COMPLEXOS -->
+    <div class="a4-page desvios-page" *ngIf="bloco.desvios?.length > 0">
+      <div class="doc-header">
+        <div class="header-text">
+          <h1>DETALHAMENTO DE DESVIOS COMPLEXOS</h1>
+          <p class="subtitle">{{ bloco.nomeDoBloco }}</p>
+        </div>
+      </div>
+
+      <section class="doc-section" *ngFor="let desvio of bloco.desvios; let i = index">
+        <h3 class="section-title">DESVIO {{ i + 1 }} - {{ desvio.tipo | uppercase }}</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Tipo:</span>
+            <span class="value">{{ desvio.tipo || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Linha:</span>
+            <span class="value">{{ desvio.linha || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Data:</span>
+            <span class="value">{{ desvio.data || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Hora:</span>
+            <span class="value">{{ desvio.hora || '-' }}</span>
+          </div>
+          <div class="info-item full" *ngIf="desvio.sentidoHorario">
+            <span class="label">Sentido Horário:</span>
+            <span class="value">{{ desvio.sentidoHorario }}</span>
+          </div>
+          <div class="info-item full" *ngIf="desvio.trajetoSentHorario">
+            <span class="label">Trajeto Sentido Horário:</span>
+            <span class="value">{{ desvio.trajetoSentHorario }}</span>
+          </div>
+          <div class="info-item full" *ngIf="desvio.sentidoAntiHorario">
+            <span class="label">Sentido Anti-Horário:</span>
+            <span class="value">{{ desvio.sentidoAntiHorario }}</span>
+          </div>
+          <div class="info-item full" *ngIf="desvio.trajetoSentAntiHorario">
+            <span class="label">Trajeto Sentido Anti-Horário:</span>
+            <span class="value">{{ desvio.trajetoSentAntiHorario }}</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="doc-footer">
+        <p>Total de desvios: {{ bloco.desvios.length }}</p>
+      </div>
+    </div>
   </div>
 </div>

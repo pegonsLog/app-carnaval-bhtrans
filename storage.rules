@@ -9,6 +9,13 @@ service firebase.storage {
       allow delete: if true;
     }
 
+    // Permite leitura, escrita, exclusão e listagem de arquivos na pasta documentos
+    match /documentos/{allPaths=**} {
+      allow read, list: if true;
+      allow write: if request.resource.size < 10 * 1024 * 1024; // 10MB para documentos
+      allow delete: if true;
+    }
+
     // Bloqueia acesso a outros caminhos
     match /{allPaths=**} {
       allow read, write: if false;

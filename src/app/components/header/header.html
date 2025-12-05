@@ -19,13 +19,17 @@
         <ng-icon name="heroHome" class="nav-icon"></ng-icon>
         <span>Início</span>
       </a>
-      <a routerLink="/importar" routerLinkActive="active" class="nav-link" *ngIf="authService.isAdmin">
-        <ng-icon name="heroArrowUpTray" class="nav-icon"></ng-icon>
-        <span>Importar</span>
-      </a>
+      <button class="nav-link docs-btn" (click)="abrirDocumentos()" *ngIf="authService.isLogado">
+        <ng-icon name="heroFolderOpen" class="nav-icon"></ng-icon>
+        <span>DOTs Antigos</span>
+      </button>
       <a routerLink="/capas" routerLinkActive="active" class="nav-link" *ngIf="authService.podeEditar">
         <ng-icon name="heroDocumentText" class="nav-icon"></ng-icon>
         <span>Capas DOT</span>
+      </a>
+      <a routerLink="/importar" routerLinkActive="active" class="nav-link" *ngIf="authService.isAdmin">
+        <ng-icon name="heroArrowUpTray" class="nav-icon"></ng-icon>
+        <span>Importar Planilha</span>
       </a>
       <a routerLink="/usuarios" routerLinkActive="active" class="nav-link" *ngIf="authService.isAdmin">
         <ng-icon name="heroUsers" class="nav-icon"></ng-icon>
@@ -46,3 +50,6 @@
     </button>
   </div>
 </header>
+
+<!-- Modal de Documentos -->
+<app-documentos-list *ngIf="mostrarDocumentos" (fechar)="fecharDocumentos()"></app-documentos-list>

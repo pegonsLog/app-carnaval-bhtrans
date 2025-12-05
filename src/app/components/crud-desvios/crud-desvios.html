@@ -43,14 +43,18 @@
 
     <div class="form-container" *ngIf="mostrarForm">
       <h4>{{ indiceEditando >= 0 ? 'Editar' : 'Novo' }} Desvio</h4>
-      
+
       <div class="form-row">
         <div class="form-group">
           <label>Tipo *</label>
-          <input type="text" [(ngModel)]="formItem.tipo" placeholder="Tipo do desvio">
+          <select [(ngModel)]="formItem.tipo">
+            <option value="">Selecione o tipo</option>
+            <option value="Trânsito">Trânsito</option>
+            <option value="Transporte coletivo">Transporte coletivo</option>
+          </select>
         </div>
         <div class="form-group">
-          <label>Linha *</label>
+          <label>Linha</label>
           <input type="text" [(ngModel)]="formItem.linha" placeholder="Número da linha">
         </div>
       </div>
@@ -58,7 +62,8 @@
       <div class="form-row">
         <div class="form-group">
           <label>Data</label>
-          <input type="date" [(ngModel)]="formItem.data">
+          <input type="text" [(ngModel)]="formItem.data" (input)="aplicarMascaraData($event)" placeholder="dd/mm/yyyy"
+            maxlength="10">
         </div>
         <div class="form-group">
           <label>Hora</label>
@@ -67,8 +72,8 @@
       </div>
 
       <div class="form-group">
-        <label>Sentido Horário</label>
-        <input type="text" [(ngModel)]="formItem.sentidoHorario" placeholder="Sentido horário">
+        <label>Nome do desvio-Sentido Horário</label>
+        <input type="text" [(ngModel)]="formItem.sentidoHorario" placeholder="Nome do desvio">
       </div>
 
       <div class="form-group">
@@ -77,8 +82,8 @@
       </div>
 
       <div class="form-group">
-        <label>Sentido Anti-Horário</label>
-        <input type="text" [(ngModel)]="formItem.sentidoAntiHorario" placeholder="Sentido anti-horário">
+        <label>Nome do desvio-Sentido Anti-Horário</label>
+        <input type="text" [(ngModel)]="formItem.sentidoAntiHorario" placeholder="Nome do desvio">
       </div>
 
       <div class="form-group">
@@ -88,7 +93,7 @@
 
       <div class="form-footer">
         <button class="btn-cancelar" (click)="cancelarForm()">Cancelar</button>
-        <button class="btn-salvar" (click)="salvarItem()" [disabled]="!formItem.tipo || !formItem.linha">
+        <button class="btn-salvar" (click)="salvarItem()" [disabled]="!formItem.tipo">
           {{ indiceEditando >= 0 ? 'Atualizar' : 'Adicionar' }}
         </button>
       </div>

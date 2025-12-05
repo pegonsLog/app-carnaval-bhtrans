@@ -183,6 +183,10 @@
   &.sinalizacao {
     background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
   }
+
+  &.documentos {
+    background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+  }
 }
 
 @keyframes fadeIn {

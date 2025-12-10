@@ -146,6 +146,19 @@ export class BlocosService {
     }));
   }
 
+  // Busca blocos com limite (para carregamento inicial rápido)
+  async getBlocosLimitados(limite: number): Promise<any[]> {
+    const { limit: limitFn, orderBy } = await import('@angular/fire/firestore');
+    const blocosCollection = collection(this.firestore, this.collectionName);
+    const q = query(blocosCollection, orderBy('nomeDoBloco'), limitFn(limite));
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  }
+
   // Exclui todos os blocos
   async excluirTodosBlocos(onProgress?: (atual: number, total: number) => void): Promise<number> {
     const blocosCollection = collection(this.firestore, this.collectionName);

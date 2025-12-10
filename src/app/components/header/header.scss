@@ -156,18 +156,21 @@
 
       &.logout-btn,
       &.docs-btn {
-        background: rgba(255, 255, 255, 0.1);
+        background: transparent;
         color: rgba(255, 255, 255, 0.7);
         border: none;
         cursor: pointer;
 
-        &::before {
-          display: none;
-        }
-
         &:hover {
-          background: rgba(255, 255, 255, 0.15);
           color: white;
+
+          &::before {
+            opacity: 1;
+          }
+
+          .nav-icon {
+            transform: scale(1.1);
+          }
         }
       }
     }

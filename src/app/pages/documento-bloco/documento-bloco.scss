@@ -132,13 +132,28 @@
 // Página A4
 .a4-page {
   width: 210mm;
-  min-height: 297mm;
   background: white;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   font-family: 'Times New Roman', Times, serif;
   font-size: 11pt;
   line-height: 1.4;
   color: #333;
+  position: relative;
+}
+
+// Capa tem altura fixa de A4
+.capa-page {
+  min-height: 297mm;
+  height: 297mm;
+}
+
+// Páginas de conteúdo se ajustam automaticamente
+.dados-page,
+.mapa-page,
+.dados-operacionais-page,
+.desvios-page {
+  min-height: auto;
+  padding: 15mm;
 }
 
 // CAPA
@@ -209,15 +224,6 @@
     margin: 2mm 0 0 0;
     font-size: 11pt;
   }
-}
-
-// PÁGINAS DE DADOS
-.dados-page,
-.mymaps-page,
-.mapa-page,
-.dados-operacionais-page,
-.desvios-page {
-  padding: 15mm;
 }
 
 // SEÇÕES OPERACIONAIS
@@ -552,33 +558,50 @@
 
   .a4-page {
     box-shadow: none;
-    page-break-after: always;
     margin: 0;
     width: 100%;
     min-height: auto;
+    page-break-after: auto;
+    page-break-inside: auto;
   }
 
-  .a4-page:last-child {
-    page-break-after: auto;
+  // Apenas a capa tem quebra de página após
+  .capa-page {
+    page-break-after: always;
+    min-height: 297mm;
   }
 
-  // Página de dados operacionais permite quebra interna
-  .dados-operacionais-page {
+  // Páginas de dados permitem quebra interna
+  .dados-page,
+  .dados-operacionais-page,
+  .desvios-page {
     page-break-after: auto;
+    page-break-inside: auto;
     min-height: auto;
+  }
 
-    .secao-operacional {
+  // Seções evitam quebra no meio
+  .doc-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .secao-operacional {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .placemark-item {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .tabela-operacional {
+    page-break-inside: auto;
+
+    tr {
       page-break-inside: avoid;
       break-inside: avoid;
-    }
-
-    .tabela-operacional {
-      page-break-inside: auto;
-
-      tr {
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
     }
   }
 

@@ -50,7 +50,15 @@
   </div>
 
   <div class="table-section" *ngIf="!isLoading && blocos.length > 0">
-    <p class="count-info">{{ blocosFiltrados.length }} de {{ blocos.length }} bloco(s)</p>
+    <div class="count-info-container">
+      <p class="count-info">
+        Exibindo {{ blocosExibidos.length }} de {{ blocosFiltrados.length }} bloco(s)
+        <span *ngIf="!todosCarregados" class="loading-hint">(carregando todos...)</span>
+      </p>
+      <span *ngIf="isLoadingTodos" class="loading-badge">
+        <span class="mini-spinner"></span> Carregando filtros...
+      </span>
+    </div>
 
     <div class="table-container">
       <table>
@@ -62,11 +70,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let bloco of blocosFiltrados; let i = index">
+          <tr *ngFor="let bloco of blocosExibidos; let i = index">
             <td class="action-col">
               <div class="action-buttons">
                 <button class="view-btn" (click)="abrirDocumentoCompleto(bloco)" title="Ver DOT">
                   <ng-icon name="heroEye"></ng-icon>
+                </button>
+                <button class="pdf-btn" (click)="exportarPdf(bloco, $event)" title="Exportar PDF"
+                  [disabled]="exportandoPdf[bloco.id]">
+                  <ng-icon name="heroDocumentArrowDown" *ngIf="!exportandoPdf[bloco.id]"></ng-icon>
+                  <span class="mini-spinner" *ngIf="exportandoPdf[bloco.id]"></span>
                 </button>
                 <button class="map-btn" (click)="abrirMapaExterno(bloco)" title="Ver mapa" *ngIf="bloco.myMapsEmbedUrl">
                   <ng-icon name="heroMapPin"></ng-icon>
@@ -101,6 +114,12 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="load-more-container" *ngIf="blocosExibidos.length < blocosFiltrados.length">
+      <button class="load-more-btn" (click)="carregarMais()">
+        Carregar todos ({{ blocosFiltrados.length - blocosExibidos.length }} restantes)
+      </button>
     </div>
   </div>
 

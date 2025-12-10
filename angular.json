@@ -64,7 +64,12 @@
             ],
             "allowedCommonJsDependencies": [
               "file-saver",
-              "buffer"
+              "buffer",
+              "html2canvas",
+              "canvg",
+              "core-js",
+              "raf",
+              "rgbcolor"
             ]
           },
           "configurations": {

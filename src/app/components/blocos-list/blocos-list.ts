@@ -6,8 +6,9 @@ import { Storage, ref, deleteObject } from '@angular/fire/storage';
 import { Firestore, collection, query, where, getDocs, updateDoc, doc, deleteField } from '@angular/fire/firestore';
 import { BlocosService } from '../../services/blocos';
 import { AuthService } from '../../services/auth.service';
+import { PdfExportService } from '../../services/pdf-export.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth } from '@ng-icons/heroicons/outline';
+import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth, heroDocumentArrowDown } from '@ng-icons/heroicons/outline';
 import { BlocoDetalheComponent } from '../bloco-detalhe/bloco-detalhe';
 import { KmlUploadComponent } from '../kml-upload/kml-upload';
 import { PercursoViewerComponent } from '../percurso-viewer/percurso-viewer';
@@ -33,15 +34,19 @@ import { Sinalizacao } from '../../interfaces/sinalizacao.interface';
 @Component({
   selector: 'app-blocos-list',
   imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent, BlocoAcoesModalComponent, CrudAgentesComponent, CrudDesviosComponent, CrudFaixaTecidoComponent, CrudFechamentosComponent, CrudReservaAreaComponent, CrudSinalizacaoComponent, MapaModalComponent],
-  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth })],
+  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth, heroDocumentArrowDown })],
   templateUrl: './blocos-list.html',
   styleUrl: './blocos-list.scss'
 })
 export class BlocosListComponent implements OnInit {
   blocos: any[] = [];
   blocosFiltrados: any[] = [];
+  blocosExibidos: any[] = [];
   isLoading = true;
+  isLoadingTodos = false;
   errorMessage = '';
+  limitePaginacao = 10;
+  todosCarregados = false;
 
   // Filtros
   filtroNome = '';
@@ -93,6 +98,9 @@ export class BlocosListComponent implements OnInit {
   // Controle do modal de mapa
   mapaUrl: string = '';
   mapaTitulo: string = '';
+
+  // Controle de exportação PDF
+  exportandoPdf: { [key: string]: boolean } = {};
 
 
 
@@ -165,7 +173,8 @@ export class BlocosListComponent implements OnInit {
     private firestore: Firestore,
     private router: Router,
     private route: ActivatedRoute,
-    public authService: AuthService
+    public authService: AuthService,
+    private pdfExportService: PdfExportService
   ) { }
 
   ngOnInit() {
@@ -186,41 +195,66 @@ export class BlocosListComponent implements OnInit {
   async carregarBlocos() {
     this.isLoading = true;
     this.errorMessage = '';
+    this.todosCarregados = false;
 
     try {
-      console.log('Iniciando carregamento dos blocos...');
+      console.log('Carregando primeiros blocos...');
 
-      // Adiciona timeout de 15 segundos
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Timeout: A conexão com o Firestore demorou muito.')), 15000);
+      // Carrega apenas os primeiros 10 blocos rapidamente
+      const blocosIniciais = await this.blocosService.getBlocosLimitados(this.limitePaginacao);
+
+      this.ngZone.run(() => {
+        let blocosFiltradosPorPerfil = this.filtrarPorPerfil(blocosIniciais);
+        this.blocos = this.ordenarBlocos(blocosFiltradosPorPerfil);
+        this.blocosFiltrados = this.blocos;
+        this.blocosExibidos = this.blocos;
+        this.isLoading = false;
+        console.log('Primeiros blocos carregados:', this.blocos.length);
       });
 
-      const blocos = await Promise.race([
+      // Carrega todos os blocos em background para filtros
+      this.carregarTodosBlocosBackground();
+
+    } catch (error: any) {
+      console.error('Erro ao carregar blocos:', error);
+      this.ngZone.run(() => {
+        this.errorMessage = error?.message || 'Erro ao carregar os blocos. Verifique sua conexão e tente novamente.';
+        this.isLoading = false;
+      });
+    }
+  }
+
+  private async carregarTodosBlocosBackground() {
+    this.isLoadingTodos = true;
+
+    try {
+      console.log('Carregando todos os blocos em background...');
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Timeout: A conexão com o Firestore demorou muito.')), 30000);
+      });
+
+      const todosBlocos = await Promise.race([
         this.blocosService.getBlocos(),
         timeoutPromise
       ]);
 
-      // Garante que o Angular detecte a mudança
       this.ngZone.run(() => {
-        // Filtra por área se for operador
-        let blocosFiltradosPorPerfil = blocos;
-        if (this.authService.isOperador && this.authService.filtraPorArea) {
-          const regionaisPermitidas = this.authService.regionaisDaArea;
-          blocosFiltradosPorPerfil = blocos.filter((b: any) =>
-            regionaisPermitidas.some(r => r.toLowerCase() === (b.regional || '').toLowerCase())
-          );
+        let blocosFiltradosPorPerfil = this.filtrarPorPerfil(todosBlocos);
+        this.blocos = this.ordenarBlocos(blocosFiltradosPorPerfil);
+        this.extrairRegionais();
+        this.todosCarregados = true;
+        this.isLoadingTodos = false;
+
+        // Aplica filtros se houver algum ativo
+        if (this.filtroNome || this.filtroRegional || this.filtroDataDesfile || this.filtroLivre) {
+          this.aplicarFiltros();
+        } else {
+          this.blocosFiltrados = this.blocos;
+          this.blocosExibidos = this.blocos.slice(0, this.limitePaginacao);
         }
 
-        // Ordena por nome do bloco
-        this.blocos = blocosFiltradosPorPerfil.sort((a: any, b: any) => {
-          const nomeA = (a.nomeDoBloco || '').toLowerCase();
-          const nomeB = (b.nomeDoBloco || '').toLowerCase();
-          return nomeA.localeCompare(nomeB, 'pt-BR');
-        });
-        this.blocosFiltrados = this.blocos;
-        this.extrairRegionais();
-        this.isLoading = false;
-        console.log('Blocos carregados:', this.blocos.length);
+        console.log('Todos os blocos carregados:', this.blocos.length);
 
         // Abre modal de ações se veio de navegação com parâmetro
         if (this.blocoIdParaAbrirAcoes) {
@@ -232,12 +266,33 @@ export class BlocosListComponent implements OnInit {
         }
       });
     } catch (error: any) {
-      console.error('Erro ao carregar blocos:', error);
+      console.error('Erro ao carregar todos os blocos:', error);
       this.ngZone.run(() => {
-        this.errorMessage = error?.message || 'Erro ao carregar os blocos. Verifique sua conexão e tente novamente.';
-        this.isLoading = false;
+        this.isLoadingTodos = false;
       });
     }
+  }
+
+  private filtrarPorPerfil(blocos: any[]): any[] {
+    if (this.authService.isOperador && this.authService.filtraPorArea) {
+      const regionaisPermitidas = this.authService.regionaisDaArea;
+      return blocos.filter((b: any) =>
+        regionaisPermitidas.some(r => r.toLowerCase() === (b.regional || '').toLowerCase())
+      );
+    }
+    return blocos;
+  }
+
+  private ordenarBlocos(blocos: any[]): any[] {
+    return blocos.sort((a: any, b: any) => {
+      const nomeA = (a.nomeDoBloco || '').toLowerCase();
+      const nomeB = (b.nomeDoBloco || '').toLowerCase();
+      return nomeA.localeCompare(nomeB, 'pt-BR');
+    });
+  }
+
+  carregarMais() {
+    this.blocosExibidos = [...this.blocosFiltrados];
   }
 
 
@@ -722,6 +777,9 @@ export class BlocosListComponent implements OnInit {
 
       return nomeMatch && regionalMatch && dataMatch && livreMatch;
     });
+
+    // Reseta a paginação ao filtrar
+    this.blocosExibidos = this.blocosFiltrados.slice(0, this.limitePaginacao);
   }
 
   limparFiltros() {
@@ -730,6 +788,7 @@ export class BlocosListComponent implements OnInit {
     this.filtroDataDesfile = '';
     this.filtroLivre = '';
     this.blocosFiltrados = this.blocos;
+    this.blocosExibidos = this.blocos.slice(0, this.limitePaginacao);
   }
 
   getDiaSemana(dataStr: string): string {
@@ -738,5 +797,22 @@ export class BlocosListComponent implements OnInit {
     const data = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
     const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
     return diasSemana[data.getDay()];
+  }
+
+  async exportarPdf(bloco: any, event: Event) {
+    event.stopPropagation();
+    if (this.exportandoPdf[bloco.id]) return;
+
+    this.exportandoPdf[bloco.id] = true;
+    try {
+      await this.pdfExportService.exportarPdf(bloco);
+    } catch (error: any) {
+      console.error('Erro ao exportar PDF:', error);
+      alert(`Erro ao exportar PDF: ${error.message}`);
+    } finally {
+      this.ngZone.run(() => {
+        this.exportandoPdf[bloco.id] = false;
+      });
+    }
   }
 }

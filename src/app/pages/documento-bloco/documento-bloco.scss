@@ -649,11 +649,16 @@
 // Responsividade Mobile adicional
 @media (max-width: 768px) {
   .header-actions {
-    padding: 0.875rem 1rem;
+    padding: 0.75rem 1rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
 
     h1 {
-      font-size: 1rem;
+      font-size: 0.95rem;
       text-align: center;
+      flex: 1;
+      order: 2;
     }
   }
 
@@ -661,149 +666,84 @@
     display: none;
   }
 
-  .btn-voltar {
-    padding: 0.625rem 1rem;
-    font-size: 0.85rem;
+  .btn-exportar {
+    display: none;
+  }
 
-    span {
-      display: none;
-    }
+  .btn-voltar {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    order: 1;
+  }
+
+  .header-buttons {
+    order: 3;
   }
 
   .documento-wrapper {
-    padding: 0.75rem;
+    padding: 0.5rem;
     gap: 1rem;
   }
 
+  // Mantém formato de página no mobile com scroll horizontal
   .a4-page {
-    padding: 8mm;
+    width: 210mm;
+    min-width: 210mm;
+    transform-origin: top left;
+    transform: scale(0.45);
+    margin-bottom: -55%;
   }
 
   .capa-page {
-    padding: 15mm 10mm;
+    min-height: 297mm;
+    height: 297mm;
+    padding: 20mm 25mm;
   }
 
-  .capa-logo {
-    img {
-      max-width: 90%;
-      max-height: 30mm;
-    }
-  }
-
-  .capa-titulo {
-    h1 {
-      font-size: 18pt;
-    }
-
-    h2 {
-      font-size: 12pt;
-    }
-
-    h3 {
-      font-size: 11pt;
-    }
-  }
-
-  .capa-header .linha {
-    font-size: 9pt;
-  }
-
-  .capa-footer p {
-    font-size: 10pt;
-  }
-
-  .header-text {
-    h1 {
-      font-size: 9pt;
-    }
-
-    h2 {
-      font-size: 11pt;
-    }
-
-    .subtitle {
-      font-size: 9pt;
-    }
-  }
-
-  .section-title {
-    font-size: 9pt;
-    padding: 1.5mm 2mm;
-  }
-
-  .info-item {
-    .label {
-      font-size: 7pt;
-    }
-
-    .value {
-      font-size: 9pt;
-    }
-  }
-
-  .tabela-operacional table {
-    font-size: 8pt;
-
-    thead th {
-      font-size: 7pt;
-      padding: 1.5mm;
-    }
-
-    tbody td {
-      padding: 1mm 1.5mm;
-    }
+  .dados-page,
+  .mapa-page,
+  .dados-operacionais-page,
+  .desvios-page {
+    padding: 15mm;
   }
 
   .mapa-container {
-    height: 150mm;
+    height: 220mm;
   }
 
   .aviso-sem-capa {
     font-size: 0.85rem;
     padding: 0.75rem 1rem;
+    width: 210mm;
+    transform: scale(0.45);
+    transform-origin: top left;
   }
 }
 
 @media (max-width: 480px) {
   .header-actions {
     gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
 
     h1 {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
   }
 
-  .btn-voltar,
-  .btn-imprimir {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
+  .btn-voltar {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
   }
 
   .documento-wrapper {
-    padding: 0.5rem;
+    padding: 0.25rem;
+    overflow-x: auto;
   }
 
+  // Escala menor para telas muito pequenas
   .a4-page {
-    padding: 6mm;
-  }
-
-  .capa-page {
-    padding: 10mm 8mm;
-  }
-
-  .capa-logo {
-    img {
-      max-width: 85%;
-      max-height: 25mm;
-    }
-  }
-
-  .capa-titulo h1 {
-    font-size: 14pt;
-  }
-
-  .mapa-container {
-    height: 120mm;
+    transform: scale(0.38);
+    margin-bottom: -62%;
   }
 }
 

@@ -14,10 +14,14 @@
     </div>
 
     <nav class="nav" [class.active]="isMenuOpen">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link"
+      <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link"
         *ngIf="authService.podeEditar">
         <ng-icon name="heroHome" class="nav-icon"></ng-icon>
         <span>Início</span>
+      </a>
+      <a routerLink="/menu" routerLinkActive="active" class="nav-link" *ngIf="authService.isLogado">
+        <ng-icon name="heroMagnifyingGlass" class="nav-icon"></ng-icon>
+        <span>Buscar Blocos</span>
       </a>
       <button class="nav-link docs-btn" (click)="abrirDocumentos()" *ngIf="authService.isLogado">
         <ng-icon name="heroFolderOpen" class="nav-icon"></ng-icon>

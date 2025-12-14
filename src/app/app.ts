@@ -18,7 +18,9 @@ export class App {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        this.mostrarHeader = !event.urlAfterRedirects.includes('/login');
+        const url = event.urlAfterRedirects;
+        // Esconde header no login e na página pública (acesso público)
+        this.mostrarHeader = !url.includes('/login') && url !== '/';
       });
   }
 }

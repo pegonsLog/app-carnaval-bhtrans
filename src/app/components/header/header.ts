@@ -2,14 +2,14 @@ import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroTicket, heroHome, heroArrowUpTray, heroXMark, heroBars3, heroListBullet, heroDocumentText, heroArrowRightOnRectangle, heroUsers, heroFolderOpen } from '@ng-icons/heroicons/outline';
+import { heroTicket, heroHome, heroArrowUpTray, heroXMark, heroBars3, heroListBullet, heroDocumentText, heroArrowRightOnRectangle, heroUsers, heroFolderOpen, heroMagnifyingGlass } from '@ng-icons/heroicons/outline';
 import { AuthService } from '../../services/auth.service';
 import { DocumentosListComponent } from '../documentos-list/documentos-list';
 
 @Component({
   selector: 'app-header',
   imports: [CommonModule, RouterLink, RouterLinkActive, NgIcon, DocumentosListComponent],
-  viewProviders: [provideIcons({ heroTicket, heroHome, heroArrowUpTray, heroXMark, heroBars3, heroListBullet, heroDocumentText, heroArrowRightOnRectangle, heroUsers, heroFolderOpen })],
+  viewProviders: [provideIcons({ heroTicket, heroHome, heroArrowUpTray, heroXMark, heroBars3, heroListBullet, heroDocumentText, heroArrowRightOnRectangle, heroUsers, heroFolderOpen, heroMagnifyingGlass })],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })

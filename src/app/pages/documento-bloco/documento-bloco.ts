@@ -8,6 +8,7 @@ import { heroArrowLeft, heroPrinter, heroDocumentArrowDown } from '@ng-icons/her
 import { BlocosService } from '../../services/blocos';
 import { CapasService } from '../../services/capas';
 import { DocxExportService } from '../../services/docx-export.service';
+import { AuthService } from '../../services/auth.service';
 import { Capa } from '../../interfaces/capa.interface';
 
 @Component({
@@ -34,6 +35,7 @@ export class DocumentoBlocoComponent implements OnInit {
     private blocosService: BlocosService,
     private capasService: CapasService,
     private docxExportService: DocxExportService,
+    private authService: AuthService,
     private storage: Storage,
     private ngZone: NgZone,
     private sanitizer: DomSanitizer
@@ -325,8 +327,13 @@ export class DocumentoBlocoComponent implements OnInit {
   }
 
   voltar() {
-    // Volta para a lista de blocos
-    this.router.navigate(['/']);
+    // Se usuário está logado, volta para a lista de blocos (admin)
+    // Se não está logado, volta para a busca pública
+    if (this.authService.isLogado) {
+      this.router.navigate(['/admin']);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   imprimir() {

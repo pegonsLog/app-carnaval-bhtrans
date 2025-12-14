@@ -1,16 +1,16 @@
 import { Component, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroUser, heroLockClosed, heroEye, heroEyeSlash } from '@ng-icons/heroicons/outline';
+import { heroUser, heroLockClosed, heroEye, heroEyeSlash, heroArrowLeft } from '@ng-icons/heroicons/outline';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, FormsModule, NgIcon],
-    viewProviders: [provideIcons({ heroUser, heroLockClosed, heroEye, heroEyeSlash })],
+    imports: [CommonModule, FormsModule, NgIcon, RouterLink],
+    viewProviders: [provideIcons({ heroUser, heroLockClosed, heroEye, heroEyeSlash, heroArrowLeft })],
     templateUrl: './login.html',
     styleUrl: './login.scss'
 })
@@ -28,7 +28,7 @@ export class LoginComponent {
     ) {
         // Se já está logado, redireciona
         if (this.authService.isLogado) {
-            this.router.navigate(['/']);
+            this.router.navigate(['/admin']);
         }
     }
 
@@ -47,7 +47,7 @@ export class LoginComponent {
             this.isLoading = false;
 
             if (resultado.sucesso) {
-                this.router.navigate(['/']);
+                this.router.navigate(['/admin']);
             } else {
                 this.mensagemErro = resultado.mensagem;
             }

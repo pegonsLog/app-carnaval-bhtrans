@@ -1,6 +1,6 @@
 <div class="menu-container">
   <h2 class="menu-titulo">Buscar Blocos</h2>
-  
+
   <div class="cards-container">
     <!-- Card Por Bloco -->
     <div class="menu-card" (click)="abrirModalPorBloco()">
@@ -43,8 +43,8 @@
     <div class="modal-body">
       <div class="filtro-grupo">
         <label>Nome do Bloco</label>
-        <input type="text" [(ngModel)]="filtroBlocoNome" (input)="filtrarPorBloco()" 
-               placeholder="Digite o nome do bloco..." class="input-filtro">
+        <input type="text" [(ngModel)]="filtroBlocoNome" (input)="filtrarPorBloco()"
+          placeholder="Digite o nome do bloco..." class="input-filtro">
       </div>
       <div class="lista-blocos" *ngIf="blocosFiltrados.length > 0">
         <div class="bloco-card" *ngFor="let bloco of blocosFiltrados">
@@ -88,8 +88,8 @@
       </div>
       <div class="filtro-grupo">
         <label>Nome do Bloco (opcional)</label>
-        <input type="text" [(ngModel)]="filtroRegionalNome" (input)="filtrarPorRegional()" 
-               placeholder="Filtrar por nome..." class="input-filtro">
+        <input type="text" [(ngModel)]="filtroRegionalNome" (input)="filtrarPorRegional()"
+          placeholder="Filtrar por nome..." class="input-filtro">
       </div>
       <div class="lista-blocos" *ngIf="blocosFiltrados.length > 0">
         <div class="bloco-card" *ngFor="let bloco of blocosFiltrados">
@@ -133,8 +133,8 @@
       </div>
       <div class="filtro-grupo">
         <label>Nome do Bloco (opcional)</label>
-        <input type="text" [(ngModel)]="filtroDataNome" (input)="filtrarPorData()" 
-               placeholder="Filtrar por nome..." class="input-filtro">
+        <input type="text" [(ngModel)]="filtroDataNome" (input)="filtrarPorData()" placeholder="Filtrar por nome..."
+          class="input-filtro">
       </div>
       <div class="lista-blocos" *ngIf="blocosFiltrados.length > 0">
         <div class="bloco-card" *ngFor="let bloco of blocosFiltrados">

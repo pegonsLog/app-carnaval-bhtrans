@@ -1,0 +1,45 @@
+<div class="page-container">
+    <div class="page-header">
+        <button class="btn-voltar" (click)="voltar()">
+            <ng-icon name="heroArrowLeft"></ng-icon>
+        </button>
+        <h2>Buscar Por Data</h2>
+    </div>
+
+    <div class="page-content">
+        <div class="filtro-grupo">
+            <label>Data do Desfile</label>
+            <select [(ngModel)]="filtroData" (change)="filtrarPorData()" class="select-filtro">
+                <option value="">Selecione uma data</option>
+                <option *ngFor="let data of datas" [value]="data">{{ data }}</option>
+            </select>
+        </div>
+
+        <div class="filtro-grupo">
+            <label>Nome do Bloco (opcional)</label>
+            <input type="text" [(ngModel)]="filtroDataNome" (input)="filtrarPorData()" placeholder="Filtrar por nome..."
+                class="input-filtro">
+        </div>
+
+        <div class="lista-blocos" *ngIf="blocosFiltrados.length > 0">
+            <div class="bloco-card" *ngFor="let bloco of blocosFiltrados">
+                <div class="bloco-info">
+                    <span class="bloco-nome">{{ bloco.nomeDoBloco }}</span>
+                    <span class="bloco-data">{{ formatarData(bloco.dataDoDesfile) }}</span>
+                </div>
+                <div class="bloco-acoes">
+                    <button class="btn-acao" (click)="abrirMapa(bloco)" [disabled]="!temMapa(bloco)" title="Ver Mapa">
+                        <ng-icon name="heroMap"></ng-icon>
+                    </button>
+                    <button class="btn-acao" (click)="abrirDocumentoCompleto(bloco)" title="Documento Completo">
+                        <ng-icon name="heroDocumentText"></ng-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sem-resultados" *ngIf="(filtroData || filtroDataNome) && blocosFiltrados.length === 0">
+            Nenhum bloco encontrado
+        </div>
+    </div>
+</div>

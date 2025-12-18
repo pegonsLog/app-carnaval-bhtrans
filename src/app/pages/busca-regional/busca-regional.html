@@ -1,0 +1,45 @@
+<div class="page-container">
+    <div class="page-header">
+        <button class="btn-voltar" (click)="voltar()">
+            <ng-icon name="heroArrowLeft"></ng-icon>
+        </button>
+        <h2>Buscar Por Regional</h2>
+    </div>
+
+    <div class="page-content">
+        <div class="filtro-grupo">
+            <label>Regional</label>
+            <select [(ngModel)]="filtroRegional" (change)="filtrarPorRegional()" class="select-filtro">
+                <option value="">Selecione uma regional</option>
+                <option *ngFor="let regional of regionais" [value]="regional">{{ regional }}</option>
+            </select>
+        </div>
+
+        <div class="filtro-grupo">
+            <label>Nome do Bloco (opcional)</label>
+            <input type="text" [(ngModel)]="filtroRegionalNome" (input)="filtrarPorRegional()"
+                placeholder="Filtrar por nome..." class="input-filtro">
+        </div>
+
+        <div class="lista-blocos" *ngIf="blocosFiltrados.length > 0">
+            <div class="bloco-card" *ngFor="let bloco of blocosFiltrados">
+                <div class="bloco-info">
+                    <span class="bloco-nome">{{ bloco.nomeDoBloco }}</span>
+                    <span class="bloco-data">{{ formatarData(bloco.dataDoDesfile) }}</span>
+                </div>
+                <div class="bloco-acoes">
+                    <button class="btn-acao" (click)="abrirMapa(bloco)" [disabled]="!temMapa(bloco)" title="Ver Mapa">
+                        <ng-icon name="heroMap"></ng-icon>
+                    </button>
+                    <button class="btn-acao" (click)="abrirDocumentoCompleto(bloco)" title="Documento Completo">
+                        <ng-icon name="heroDocumentText"></ng-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sem-resultados" *ngIf="(filtroRegional || filtroRegionalNome) && blocosFiltrados.length === 0">
+            Nenhum bloco encontrado
+        </div>
+    </div>
+</div>

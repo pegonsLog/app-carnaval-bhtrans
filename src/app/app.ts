@@ -19,8 +19,9 @@ export class App {
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         const url = event.urlAfterRedirects;
-        // Esconde header no login e na página pública (acesso público)
-        this.mostrarHeader = !url.includes('/login') && url !== '/';
+        // Esconde header no login, página pública e páginas de busca/mapa (que têm header próprio)
+        const paginasSemHeader = ['/login', '/busca-bloco', '/busca-regional', '/busca-data', '/mapa'];
+        this.mostrarHeader = url !== '/' && !paginasSemHeader.some(p => url.startsWith(p));
       });
   }
 }

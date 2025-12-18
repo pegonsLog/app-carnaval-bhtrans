@@ -653,6 +653,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
+    gap: 0.5rem;
 
     h1 {
       font-size: 0.95rem;
@@ -681,42 +682,121 @@
   }
 
   .documento-wrapper {
-    padding: 0.5rem;
+    padding: 0.75rem;
     gap: 1rem;
   }
 
-  // Mantém formato de página no mobile com scroll horizontal
+  // Adapta páginas ao tamanho da tela
   .a4-page {
-    width: 210mm;
-    min-width: 210mm;
-    transform-origin: top left;
-    transform: scale(0.45);
-    margin-bottom: -55%;
+    width: 100%;
+    min-width: auto;
+    padding: 1rem;
   }
 
   .capa-page {
-    min-height: 297mm;
-    height: 297mm;
-    padding: 20mm 25mm;
+    min-height: auto;
+    height: auto;
+    padding: 1.5rem;
   }
 
   .dados-page,
   .mapa-page,
   .dados-operacionais-page,
   .desvios-page {
-    padding: 15mm;
+    padding: 1rem;
   }
 
   .mapa-container {
-    height: 220mm;
+    height: 60vh;
+    min-height: 300px;
   }
 
   .aviso-sem-capa {
     font-size: 0.85rem;
     padding: 0.75rem 1rem;
-    width: 210mm;
-    transform: scale(0.45);
-    transform-origin: top left;
+    width: 100%;
+  }
+
+  // Ajustes de tipografia para mobile
+  .doc-header {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+
+    .header-text h1 {
+      font-size: 1rem;
+    }
+
+    .header-text .subtitle {
+      font-size: 0.9rem;
+    }
+  }
+
+  .section-title {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .info-item {
+    .label {
+      font-size: 0.75rem;
+    }
+
+    .value {
+      font-size: 0.9rem;
+    }
+
+    &.full {
+      grid-column: 1;
+    }
+  }
+
+  // Capa mobile
+  .capa-header .linha {
+    font-size: 0.85rem;
+  }
+
+  .nome-bloco {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .capa-logo img {
+    max-width: 80%;
+    max-height: 80px;
+  }
+
+  .capa-elaboracao .linha {
+    font-size: 0.85rem;
+  }
+
+  .capa-footer {
+    .cidade, .data {
+      font-size: 0.85rem;
+    }
+  }
+
+  // Placemarks mobile
+  .placemark-header {
+    flex-wrap: wrap;
+  }
+
+  .placemark-name {
+    font-size: 0.9rem;
+  }
+
+  .placemark-descriptions p {
+    font-size: 0.8rem;
+  }
+
+  .doc-footer {
+    font-size: 0.8rem;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
   }
 }
 
@@ -733,17 +813,46 @@
   .btn-voltar {
     padding: 0.4rem 0.6rem;
     font-size: 0.75rem;
+
+    .btn-text {
+      display: none;
+    }
   }
 
   .documento-wrapper {
-    padding: 0.25rem;
-    overflow-x: auto;
+    padding: 0.5rem;
   }
 
-  // Escala menor para telas muito pequenas
   .a4-page {
-    transform: scale(0.38);
-    margin-bottom: -62%;
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .capa-page {
+    padding: 1rem;
+  }
+
+  .nome-bloco {
+    font-size: 1rem;
+  }
+
+  .section-title {
+    font-size: 0.8rem;
+  }
+
+  .info-item {
+    .label {
+      font-size: 0.7rem;
+    }
+
+    .value {
+      font-size: 0.85rem;
+    }
+  }
+
+  .mapa-container {
+    height: 50vh;
+    min-height: 250px;
   }
 }
 

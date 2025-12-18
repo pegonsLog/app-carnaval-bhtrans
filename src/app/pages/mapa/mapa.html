@@ -1,0 +1,19 @@
+<div class="mapa-container">
+    <div class="mapa-header">
+        <button class="btn-voltar" (click)="voltar()">
+            <ng-icon name="heroArrowLeft"></ng-icon>
+        </button>
+        <h2>{{ titulo }}</h2>
+        <button class="btn-nova-aba" (click)="abrirNovaAba()">
+            <ng-icon name="heroArrowTopRightOnSquare"></ng-icon>
+            <span>Abrir</span>
+        </button>
+    </div>
+
+    <div class="mapa-content">
+        <iframe *ngIf="url" [src]="url | safe" frameborder="0" allowfullscreen></iframe>
+        <div class="sem-mapa" *ngIf="!url">
+            <p>Nenhum mapa disponível</p>
+        </div>
+    </div>
+</div>

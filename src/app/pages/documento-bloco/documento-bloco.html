@@ -3,17 +3,17 @@
   <div class="header-actions no-print">
     <button class="btn-voltar" (click)="voltar()">
       <ng-icon name="heroArrowLeft"></ng-icon>
-      Voltar
+      <span class="btn-text">Voltar</span>
     </button>
     <h1>Documento do Bloco</h1>
     <div class="header-buttons">
       <button class="btn-exportar" (click)="exportarDocx()" [disabled]="isLoading">
         <ng-icon name="heroDocumentArrowDown"></ng-icon>
-        Exportar DOCX
+        <span class="btn-text">Exportar DOCX</span>
       </button>
       <button class="btn-imprimir" (click)="imprimir()" [disabled]="isLoading">
         <ng-icon name="heroPrinter"></ng-icon>
-        Imprimir
+        <span class="btn-text">Imprimir</span>
       </button>
     </div>
   </div>

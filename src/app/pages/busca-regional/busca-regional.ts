@@ -84,12 +84,14 @@ export class BuscaRegionalComponent implements OnInit {
     }
 
     filtrarPorRegional() {
-        this.blocosFiltrados = this.blocos.filter(b => {
-            const matchRegional = !this.filtroRegional || b.regional === this.filtroRegional;
-            const matchNome = !this.filtroRegionalNome.trim() ||
-                b.nomeDoBloco?.toLowerCase().includes(this.filtroRegionalNome.toLowerCase());
-            return matchRegional && matchNome;
-        });
+        this.blocosFiltrados = this.blocos
+            .filter(b => {
+                const matchRegional = !this.filtroRegional || b.regional === this.filtroRegional;
+                const matchNome = !this.filtroRegionalNome.trim() ||
+                    b.nomeDoBloco?.toLowerCase().includes(this.filtroRegionalNome.toLowerCase());
+                return matchRegional && matchNome;
+            })
+            .sort((a, b) => (a.nomeDoBloco || '').localeCompare(b.nomeDoBloco || '', 'pt-BR'));
     }
 
     formatarData(data: any): string {
@@ -114,6 +116,18 @@ export class BuscaRegionalComponent implements OnInit {
 
     temMapa(bloco: BlocoItem): boolean {
         return !!(bloco.myMapsEmbedUrl || bloco.percursoUrl);
+    }
+
+    getDiaSemana(data: string): string {
+        if (!data) return '';
+        try {
+            const partes = data.split('/');
+            const dataObj = new Date(parseInt(partes[2]), parseInt(partes[1]) - 1, parseInt(partes[0]));
+            const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            return diasSemana[dataObj.getDay()];
+        } catch {
+            return '';
+        }
     }
 
     voltar() {

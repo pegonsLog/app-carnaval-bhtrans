@@ -80,7 +80,11 @@ export class BuscaLivreComponent implements OnInit {
     });
 
     this.regionaisDisponiveis = Array.from(regionaisSet).sort();
-    this.datasDesfileDisponiveis = Array.from(datasSet).sort();
+    this.datasDesfileDisponiveis = Array.from(datasSet).sort((a, b) => {
+      const [diaA, mesA, anoA] = a.split('/').map(Number);
+      const [diaB, mesB, anoB] = b.split('/').map(Number);
+      return new Date(anoA, mesA - 1, diaA).getTime() - new Date(anoB, mesB - 1, diaB).getTime();
+    });
   }
 
   formatarDataParaFiltro(data: any): string {
@@ -112,21 +116,23 @@ export class BuscaLivreComponent implements OnInit {
       return;
     }
 
-    this.blocosEncontrados = this.blocos.filter(bloco => {
-      // Filtro de busca livre
-      const buscaMatch = !this.termoBusca.trim() || 
-        this.buscaEmTodosCampos(bloco, this.termoBusca);
+    this.blocosEncontrados = this.blocos
+      .filter(bloco => {
+        // Filtro de busca livre
+        const buscaMatch = !this.termoBusca.trim() || 
+          this.buscaEmTodosCampos(bloco, this.termoBusca);
 
-      // Filtro de regional
-      const regionalMatch = !this.filtroRegional || 
-        bloco.regional === this.filtroRegional;
+        // Filtro de regional
+        const regionalMatch = !this.filtroRegional || 
+          bloco.regional === this.filtroRegional;
 
-      // Filtro de data
-      const dataMatch = !this.filtroDataDesfile || 
-        this.formatarDataParaFiltro(bloco.dataDoDesfile) === this.filtroDataDesfile;
+        // Filtro de data
+        const dataMatch = !this.filtroDataDesfile || 
+          this.formatarDataParaFiltro(bloco.dataDoDesfile) === this.filtroDataDesfile;
 
-      return buscaMatch && regionalMatch && dataMatch;
-    });
+        return buscaMatch && regionalMatch && dataMatch;
+      })
+      .sort((a, b) => (a.nomeDoBloco || '').localeCompare(b.nomeDoBloco || '', 'pt-BR'));
   }
 
   private buscaEmTodosCampos(bloco: any, termo: string): boolean {

@@ -17,7 +17,7 @@
             <div class="bloco-card" *ngFor="let bloco of blocosFiltrados">
                 <div class="bloco-info">
                     <span class="bloco-nome">{{ bloco.nomeDoBloco }}</span>
-                    <span class="bloco-data">{{ formatarData(bloco.dataDoDesfile) }}</span>
+                    <span class="bloco-data">{{ formatarData(bloco.dataDoDesfile) }} - {{ getDiaSemana(formatarData(bloco.dataDoDesfile)) }}</span>
                 </div>
                 <div class="bloco-acoes">
                     <button class="btn-acao" (click)="abrirMapa(bloco)" [disabled]="!temMapa(bloco)" title="Ver Mapa">

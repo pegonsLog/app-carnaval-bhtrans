@@ -54,7 +54,7 @@
                 <div class="bloco-info">
                     <span class="bloco-nome">{{ bloco.nomeDoBloco }}</span>
                     <span class="bloco-regional">{{ bloco.regional }}</span>
-                    <span class="bloco-data">{{ formatarDataParaFiltro(bloco.dataDoDesfile) }}</span>
+                    <span class="bloco-data">{{ formatarDataParaFiltro(bloco.dataDoDesfile) }} - {{ getDiaSemana(formatarDataParaFiltro(bloco.dataDoDesfile)) }}</span>
                 </div>
                 <div class="bloco-acoes">
                     <button class="btn-acao" (click)="verNoMapa(bloco)" [disabled]="!temMapa(bloco)" title="Ver Mapa">
@@ -72,8 +72,8 @@
         </div>
 
         <div class="mensagem-inicial" *ngIf="!termoBusca && !filtroRegional && !filtroDataDesfile && !isLoading">
-            <ng-icon name="heroMagnifyingGlass"></ng-icon>
-            <p>Digite algo ou selecione um filtro para começar a busca</p>
+            <!-- <ng-icon name="heroMagnifyingGlass"></ng-icon> -->
+            <!-- <p>Digite algo ou selecione um filtro para começar a busca</p> -->
         </div>
     </div>
 </div>

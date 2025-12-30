@@ -70,17 +70,23 @@ export class BuscaDataComponent implements OnInit {
                 if (dataFormatada) datasSet.add(dataFormatada);
             }
         });
-        this.datas = Array.from(datasSet).sort();
+        this.datas = Array.from(datasSet).sort((a, b) => {
+            const [diaA, mesA, anoA] = a.split('/').map(Number);
+            const [diaB, mesB, anoB] = b.split('/').map(Number);
+            return new Date(anoA, mesA - 1, diaA).getTime() - new Date(anoB, mesB - 1, diaB).getTime();
+        });
     }
 
     filtrarPorData() {
-        this.blocosFiltrados = this.blocos.filter(b => {
-            const dataFormatada = this.formatarData(b.dataDoDesfile);
-            const matchData = !this.filtroData || dataFormatada === this.filtroData;
-            const matchNome = !this.filtroDataNome.trim() ||
-                b.nomeDoBloco?.toLowerCase().includes(this.filtroDataNome.toLowerCase());
-            return matchData && matchNome;
-        });
+        this.blocosFiltrados = this.blocos
+            .filter(b => {
+                const dataFormatada = this.formatarData(b.dataDoDesfile);
+                const matchData = !this.filtroData || dataFormatada === this.filtroData;
+                const matchNome = !this.filtroDataNome.trim() ||
+                    b.nomeDoBloco?.toLowerCase().includes(this.filtroDataNome.toLowerCase());
+                return matchData && matchNome;
+            })
+            .sort((a, b) => (a.nomeDoBloco || '').localeCompare(b.nomeDoBloco || '', 'pt-BR'));
     }
 
     formatarData(data: any): string {

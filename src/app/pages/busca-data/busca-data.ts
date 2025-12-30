@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -31,7 +31,11 @@ export class BuscaDataComponent implements OnInit {
     filtroDataNome = '';
     carregando = false;
 
-    constructor(private blocosService: BlocosService, private router: Router) { }
+    constructor(
+        private blocosService: BlocosService, 
+        private router: Router,
+        private cdr: ChangeDetectorRef
+    ) { }
 
     ngOnInit() {
         this.carregarBlocos();
@@ -50,10 +54,12 @@ export class BuscaDataComponent implements OnInit {
                 percursoUrl: b.percursoUrl
             }));
             this.extrairDatas();
+            this.cdr.detectChanges();
         } catch (error) {
             console.error('Erro ao carregar blocos:', error);
         }
         this.carregando = false;
+        this.cdr.detectChanges();
     }
 
     extrairDatas() {
@@ -99,6 +105,17 @@ export class BuscaDataComponent implements OnInit {
 
     temMapa(bloco: BlocoItem): boolean {
         return !!(bloco.myMapsEmbedUrl || bloco.percursoUrl);
+    }
+
+    getDiaSemana(data: string): string {
+        try {
+            const partes = data.split('/');
+            const dataObj = new Date(parseInt(partes[2]), parseInt(partes[1]) - 1, parseInt(partes[0]));
+            const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            return diasSemana[dataObj.getDay()];
+        } catch {
+            return '';
+        }
     }
 
     voltar() {

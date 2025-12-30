@@ -19,10 +19,10 @@
         <ng-icon name="heroHome" class="nav-icon"></ng-icon>
         <span>Início</span>
       </a>
-      <a routerLink="/menu" routerLinkActive="active" class="nav-link" *ngIf="authService.isLogado">
+      <!-- <a routerLink="/menu" routerLinkActive="active" class="nav-link" *ngIf="authService.isLogado">
         <ng-icon name="heroMagnifyingGlass" class="nav-icon"></ng-icon>
         <span>Buscar Blocos</span>
-      </a>
+      </a> -->
       <button class="nav-link docs-btn" (click)="abrirDocumentos()" *ngIf="authService.isLogado">
         <ng-icon name="heroFolderOpen" class="nav-icon"></ng-icon>
         <span>DOTs Antigos</span>

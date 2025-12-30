@@ -5,14 +5,14 @@
     </button>
 
     <div class="modal-header">
-      <h3>DOTs antigos (.docx)</h3>
+      <h3>DOTs Antigos (PDF)</h3>
     </div>
 
     <div class="upload-section" *ngIf="authService.podeEditar">
       <label class="upload-btn" [class.disabled]="enviando">
         <ng-icon name="heroDocumentArrowUp"></ng-icon>
-        <span>{{ enviando ? 'Enviando...' : 'Importar Documento' }}</span>
-        <input type="file" accept=".docx" (change)="onFileSelected($event)" [disabled]="enviando" hidden />
+        <span>{{ enviando ? 'Enviando...' : 'Importar PDF' }}</span>
+        <input type="file" accept=".pdf" (change)="onFileSelected($event)" [disabled]="enviando" hidden />
       </label>
     </div>
 
@@ -55,7 +55,10 @@
               {{ formatarData(doc.dataUpload) }}</span>
           </div>
           <div class="doc-actions">
-            <button class="action-btn download" (click)="visualizarDocumento(doc)" title="Baixar">
+            <button class="action-btn view" (click)="visualizarDocumento(doc)" title="Visualizar">
+              <ng-icon name="heroEye"></ng-icon>
+            </button>
+            <button class="action-btn download" (click)="baixarDocumento(doc)" title="Baixar">
               <ng-icon name="heroArrowDownTray"></ng-icon>
             </button>
             <button class="action-btn delete" (click)="removerDocumento(doc)" title="Remover"

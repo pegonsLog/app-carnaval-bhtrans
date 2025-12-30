@@ -75,7 +75,6 @@ export class DocumentoBlocoComponent implements OnInit {
       if (this.bloco.myMapsEmbedUrl) {
         this.mapEmbedUrl = this.bloco.myMapsEmbedUrl;
         this.safeMapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.bloco.myMapsEmbedUrl);
-        console.log('Usando myMapsEmbedUrl do bloco:', this.bloco.myMapsEmbedUrl);
       }
 
       this.ngZone.run(() => {
@@ -237,7 +236,6 @@ export class DocumentoBlocoComponent implements OnInit {
       data.secoes.push(currentSection);
     }
 
-    console.log('Markdown parseado:', data);
     return data;
   }
 
@@ -317,9 +315,6 @@ export class DocumentoBlocoComponent implements OnInit {
       // Se é um link do My Maps mas não tem viewer nem edit, adiciona embed
       embedUrl = url.replace(/\/maps\/d\/([^/]+)\//, '/maps/d/$1/embed?');
     }
-
-    console.log('URL original:', url);
-    console.log('URL embed:', embedUrl);
 
     this.mapEmbedUrl = embedUrl;
     // Cria URL segura para o iframe

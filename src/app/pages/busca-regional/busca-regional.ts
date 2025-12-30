@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -30,8 +30,13 @@ export class BuscaRegionalComponent implements OnInit {
     filtroRegional = '';
     filtroRegionalNome = '';
     carregando = false;
+    erro = '';
 
-    constructor(private blocosService: BlocosService, private router: Router) { }
+    constructor(
+        private blocosService: BlocosService, 
+        private router: Router,
+        private cdr: ChangeDetectorRef
+    ) { }
 
     ngOnInit() {
         this.carregarBlocos();
@@ -39,8 +44,16 @@ export class BuscaRegionalComponent implements OnInit {
 
     async carregarBlocos() {
         this.carregando = true;
+        this.erro = '';
         try {
             const dados = await this.blocosService.getBlocos();
+            
+            if (!dados || dados.length === 0) {
+                this.erro = 'Nenhum bloco encontrado';
+                this.carregando = false;
+                return;
+            }
+            
             this.blocos = dados.map(b => ({
                 id: b.id,
                 nomeDoBloco: b.nomeDoBloco,
@@ -49,17 +62,23 @@ export class BuscaRegionalComponent implements OnInit {
                 myMapsEmbedUrl: b.myMapsEmbedUrl,
                 percursoUrl: b.percursoUrl
             }));
+            
             this.extrairRegionais();
-        } catch (error) {
+            this.cdr.detectChanges();
+        } catch (error: any) {
             console.error('Erro ao carregar blocos:', error);
+            this.erro = 'Erro ao carregar dados: ' + (error?.message || 'Erro desconhecido');
         }
         this.carregando = false;
+        this.cdr.detectChanges();
     }
 
     extrairRegionais() {
         const regionaisSet = new Set<string>();
         this.blocos.forEach(b => {
-            if (b.regional) regionaisSet.add(b.regional);
+            if (b.regional) {
+                regionaisSet.add(b.regional);
+            }
         });
         this.regionais = Array.from(regionaisSet).sort();
     }

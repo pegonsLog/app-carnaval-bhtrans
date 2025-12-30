@@ -1,17 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroMagnifyingGlass, heroXMark, heroEye, heroMapPin } from '@ng-icons/heroicons/outline';
+import { heroMagnifyingGlass, heroXMark, heroEye, heroMapPin, heroArrowLeft } from '@ng-icons/heroicons/outline';
 import { BlocosService } from '../../services/blocos';
-import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-busca-livre',
   standalone: true,
   imports: [CommonModule, FormsModule, NgIcon],
-  viewProviders: [provideIcons({ heroMagnifyingGlass, heroXMark, heroEye, heroMapPin })],
+  viewProviders: [provideIcons({ heroMagnifyingGlass, heroXMark, heroEye, heroMapPin, heroArrowLeft })],
   templateUrl: './busca-livre.html',
   styleUrl: './busca-livre.scss'
 })
@@ -31,7 +30,7 @@ export class BuscaLivreComponent implements OnInit {
   constructor(
     private blocosService: BlocosService,
     private router: Router,
-    public authService: AuthService
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
@@ -43,36 +42,24 @@ export class BuscaLivreComponent implements OnInit {
     this.errorMessage = '';
 
     try {
-      console.log('Carregando dados para busca livre...');
-      
       // Carrega todos os blocos
       const todosBlocos = await this.blocosService.getBlocos();
       
-      // Filtra por perfil do usuário
-      this.blocos = this.filtrarPorPerfil(todosBlocos);
+      // Usa todos os blocos (acesso público)
+      this.blocos = todosBlocos;
       
       // Extrai regionais e datas disponíveis
       this.extrairFiltrosDisponiveis();
       
-      console.log('Dados carregados:', this.blocos.length, 'blocos');
+      this.cdr.detectChanges();
       
     } catch (error: any) {
       console.error('Erro ao carregar dados:', error);
       this.errorMessage = 'Erro ao carregar dados. Tente novamente.';
     } finally {
       this.isLoading = false;
+      this.cdr.detectChanges();
     }
-  }
-
-  private filtrarPorPerfil(blocos: any[]): any[] {
-    if (!this.authService.filtraPorArea) {
-      return blocos;
-    }
-
-    const regionaisPermitidas = this.authService.regionaisDaArea;
-    return blocos.filter(bloco => 
-      regionaisPermitidas.includes(bloco.regional)
-    );
   }
 
   private extrairFiltrosDisponiveis() {
@@ -192,5 +179,13 @@ export class BuscaLivreComponent implements OnInit {
     } catch {
       return '';
     }
+  }
+
+  temMapa(bloco: any): boolean {
+    return !!(bloco.myMapsEmbedUrl || bloco.percursoUrl || (bloco.coordenadas && bloco.coordenadas.length > 0));
+  }
+
+  voltar() {
+    this.router.navigate(['/']);
   }
 }

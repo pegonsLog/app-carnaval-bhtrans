@@ -11,7 +11,7 @@
             <label>Data do Desfile</label>
             <select [(ngModel)]="filtroData" (change)="filtrarPorData()" class="select-filtro">
                 <option value="">Selecione uma data</option>
-                <option *ngFor="let data of datas" [value]="data">{{ data }}</option>
+                <option *ngFor="let data of datas" [value]="data">{{ data }} - {{ getDiaSemana(data) }}</option>
             </select>
         </div>
 

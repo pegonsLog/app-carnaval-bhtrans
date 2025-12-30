@@ -3,7 +3,6 @@ import { Firestore, collection, query, where, getDocs } from '@angular/fire/fire
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { Usuario } from '../interfaces/usuario.interface';
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -35,34 +34,23 @@ export class AuthService {
 
   async login(matricula: string, senha: string): Promise<{ sucesso: boolean; mensagem: string }> {
     try {
-      console.log('Iniciando login para matrícula:', matricula);
-      console.log('Configuração do Firebase:', environment.firebase);
-      
       const usuariosCollection = collection(this.firestore, 'usuarios');
-      console.log('Coleção de usuários criada');
       
       const q = query(
         usuariosCollection,
         where('matricula', '==', matricula)
       );
-      console.log('Query criada');
 
-      console.log('Executando query...');
       const querySnapshot = await getDocs(q);
-      console.log('Query executada. Documentos encontrados:', querySnapshot.size);
 
       if (querySnapshot.empty) {
-        console.log('Nenhum usuário encontrado com a matrícula:', matricula);
         return { sucesso: false, mensagem: 'Matrícula ou senha inválidos' };
       }
 
       const doc = querySnapshot.docs[0];
       const dadosUsuario = doc.data() as Omit<Usuario, 'id'>;
-      console.log('Dados do usuário do Firestore:', dadosUsuario);
-      console.log('Perfil:', dadosUsuario.perfil);
 
       if (dadosUsuario.senha !== senha) {
-        console.log('Senha incorreta');
         return { sucesso: false, mensagem: 'Matrícula ou senha inválidos' };
       }
 
@@ -75,7 +63,6 @@ export class AuthService {
       localStorage.setItem(this.storageKey, JSON.stringify(usuarioParaSalvar));
       this.usuarioLogadoSubject.next(usuario);
 
-      console.log('Login realizado com sucesso');
       return { sucesso: true, mensagem: 'Login realizado com sucesso' };
     } catch (error: any) {
       console.error('Erro no login:', error);

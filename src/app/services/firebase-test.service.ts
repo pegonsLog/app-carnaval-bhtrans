@@ -10,13 +10,8 @@ export class FirebaseTestService {
 
   async testarConexao(): Promise<{ sucesso: boolean; mensagem: string }> {
     try {
-      console.log('Testando conexão com Firebase...');
-      
-      // Tenta listar a coleção de usuários
       const usuariosCollection = collection(this.firestore, 'usuarios');
       const snapshot = await getDocs(usuariosCollection);
-      
-      console.log('Conexão bem-sucedida! Documentos encontrados:', snapshot.size);
       
       return {
         sucesso: true,

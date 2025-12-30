@@ -10,6 +10,7 @@ import {
   heroArrowDownTray,
   heroExclamationCircle,
   heroMagnifyingGlass,
+  heroEye,
 } from '@ng-icons/heroicons/outline';
 import {
   DocumentosService,
@@ -29,6 +30,7 @@ import { AuthService } from '../../services/auth.service';
       heroArrowDownTray,
       heroExclamationCircle,
       heroMagnifyingGlass,
+      heroEye,
     }),
   ],
   templateUrl: './documentos-list.html',
@@ -91,8 +93,8 @@ export class DocumentosListComponent implements OnInit {
 
     const arquivo = input.files[0];
 
-    if (!arquivo.name.toLowerCase().endsWith('.docx')) {
-      this.erro = 'Apenas arquivos .docx são permitidos';
+    if (!arquivo.name.toLowerCase().endsWith('.pdf')) {
+      this.erro = 'Apenas arquivos .pdf são permitidos';
       return;
     }
 
@@ -131,6 +133,25 @@ export class DocumentosListComponent implements OnInit {
 
   visualizarDocumento(doc: DocumentoInfo) {
     window.open(doc.url, '_blank');
+  }
+
+  async baixarDocumento(doc: DocumentoInfo) {
+    try {
+      const response = await fetch(doc.url);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = doc.nome;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Erro ao baixar documento:', error);
+      // Fallback: abre em nova aba se o download falhar
+      window.open(doc.url, '_blank');
+    }
   }
 
   formatarTamanho(bytes: number): string {

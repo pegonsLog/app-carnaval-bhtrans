@@ -88,8 +88,7 @@ export const routes: Routes = [
     },
     {
         path: 'busca-livre',
-        component: BuscaLivreComponent,
-        canActivate: [authGuard]
+        component: BuscaLivreComponent
     },
     {
         path: 'mapa',

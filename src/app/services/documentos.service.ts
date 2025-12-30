@@ -25,10 +25,10 @@ export class DocumentosService {
 
   constructor(private storage: Storage) { }
 
-  // Upload de documento .docx
+  // Upload de documento PDF
   async uploadDocumento(arquivo: File): Promise<DocumentoInfo> {
-    if (!arquivo.name.toLowerCase().endsWith('.docx')) {
-      throw new Error('Apenas arquivos .docx são permitidos');
+    if (!arquivo.name.toLowerCase().endsWith('.pdf')) {
+      throw new Error('Apenas arquivos .pdf são permitidos');
     }
 
     const timestamp = Date.now();
@@ -57,7 +57,7 @@ export class DocumentosService {
       const documentos: DocumentoInfo[] = [];
 
       for (const itemRef of result.items) {
-        if (itemRef.name.toLowerCase().endsWith('.docx')) {
+        if (itemRef.name.toLowerCase().endsWith('.pdf')) {
           const url = await getDownloadURL(itemRef);
           const metadata = await getMetadata(itemRef);
 

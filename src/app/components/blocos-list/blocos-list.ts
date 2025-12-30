@@ -198,8 +198,6 @@ export class BlocosListComponent implements OnInit {
     this.todosCarregados = false;
 
     try {
-      console.log('Carregando primeiros blocos...');
-
       // Carrega apenas os primeiros 10 blocos rapidamente
       const blocosIniciais = await this.blocosService.getBlocosLimitados(this.limitePaginacao);
 
@@ -209,7 +207,6 @@ export class BlocosListComponent implements OnInit {
         this.blocosFiltrados = this.blocos;
         this.blocosExibidos = this.blocos;
         this.isLoading = false;
-        console.log('Primeiros blocos carregados:', this.blocos.length);
       });
 
       // Carrega todos os blocos em background para filtros
@@ -228,8 +225,6 @@ export class BlocosListComponent implements OnInit {
     this.isLoadingTodos = true;
 
     try {
-      console.log('Carregando todos os blocos em background...');
-
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => reject(new Error('Timeout: A conexão com o Firestore demorou muito.')), 30000);
       });
@@ -253,8 +248,6 @@ export class BlocosListComponent implements OnInit {
           this.blocosFiltrados = this.blocos;
           this.blocosExibidos = this.blocos.slice(0, this.limitePaginacao);
         }
-
-        console.log('Todos os blocos carregados:', this.blocos.length);
 
         // Abre modal de ações se veio de navegação com parâmetro
         if (this.blocoIdParaAbrirAcoes) {

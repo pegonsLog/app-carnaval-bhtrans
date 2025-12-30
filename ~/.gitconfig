@@ -1,0 +1,11 @@
+[user]
+    name = Desenvolvedor
+    email = dev@exemplo.com
+[init]
+    defaultBranch = main
+[core]
+    pager = cat
+[pager]
+    status = false
+    diff = false
+    log = false

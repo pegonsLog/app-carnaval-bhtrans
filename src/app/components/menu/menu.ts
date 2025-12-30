@@ -26,4 +26,8 @@ export class MenuComponent {
   navegarPorData() {
     this.router.navigate(['/busca-data']);
   }
+
+  navegarBuscaLivre() {
+    this.router.navigate(['/busca-livre']);
+  }
 }

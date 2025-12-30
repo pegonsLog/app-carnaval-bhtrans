@@ -12,6 +12,7 @@ import { MenuComponent } from './components/menu/menu';
 import { BuscaBlocoComponent } from './pages/busca-bloco/busca-bloco';
 import { BuscaRegionalComponent } from './pages/busca-regional/busca-regional';
 import { BuscaDataComponent } from './pages/busca-data/busca-data';
+import { BuscaLivreComponent } from './pages/busca-livre/busca-livre';
 import { MapaComponent } from './pages/mapa/mapa';
 import { authGuard } from './guards/auth.guard';
 
@@ -84,6 +85,11 @@ export const routes: Routes = [
     {
         path: 'busca-data',
         component: BuscaDataComponent
+    },
+    {
+        path: 'busca-livre',
+        component: BuscaLivreComponent,
+        canActivate: [authGuard]
     },
     {
         path: 'mapa',

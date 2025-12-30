@@ -1,22 +1,23 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, query, where, getDocs } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { Usuario } from '../interfaces/usuario.interface';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private firestore = inject(Firestore);
+  private router = inject(Router);
+  
   private usuarioLogadoSubject = new BehaviorSubject<Usuario | null>(null);
   public usuarioLogado$ = this.usuarioLogadoSubject.asObservable();
 
   private storageKey = 'usuario_logado';
 
-  constructor(
-    private firestore: Firestore,
-    private router: Router
-  ) {
+  constructor() {
     this.carregarUsuarioDoStorage();
   }
 
@@ -34,15 +35,24 @@ export class AuthService {
 
   async login(matricula: string, senha: string): Promise<{ sucesso: boolean; mensagem: string }> {
     try {
+      console.log('Iniciando login para matrícula:', matricula);
+      console.log('Configuração do Firebase:', environment.firebase);
+      
       const usuariosCollection = collection(this.firestore, 'usuarios');
+      console.log('Coleção de usuários criada');
+      
       const q = query(
         usuariosCollection,
         where('matricula', '==', matricula)
       );
+      console.log('Query criada');
 
+      console.log('Executando query...');
       const querySnapshot = await getDocs(q);
+      console.log('Query executada. Documentos encontrados:', querySnapshot.size);
 
       if (querySnapshot.empty) {
+        console.log('Nenhum usuário encontrado com a matrícula:', matricula);
         return { sucesso: false, mensagem: 'Matrícula ou senha inválidos' };
       }
 
@@ -52,6 +62,7 @@ export class AuthService {
       console.log('Perfil:', dadosUsuario.perfil);
 
       if (dadosUsuario.senha !== senha) {
+        console.log('Senha incorreta');
         return { sucesso: false, mensagem: 'Matrícula ou senha inválidos' };
       }
 
@@ -64,10 +75,25 @@ export class AuthService {
       localStorage.setItem(this.storageKey, JSON.stringify(usuarioParaSalvar));
       this.usuarioLogadoSubject.next(usuario);
 
+      console.log('Login realizado com sucesso');
       return { sucesso: true, mensagem: 'Login realizado com sucesso' };
     } catch (error: any) {
       console.error('Erro no login:', error);
-      return { sucesso: false, mensagem: 'Erro ao conectar. Tente novamente.' };
+      console.error('Código do erro:', error.code);
+      console.error('Mensagem do erro:', error.message);
+      console.error('Stack trace:', error.stack);
+      
+      let mensagem = 'Erro ao conectar. Tente novamente.';
+      
+      if (error.code === 'permission-denied') {
+        mensagem = 'Permissões insuficientes. Verifique as configurações do Firebase.';
+      } else if (error.code === 'unavailable') {
+        mensagem = 'Serviço Firebase indisponível. Verifique sua conexão.';
+      } else if (error.code === 'unauthenticated') {
+        mensagem = 'Erro de autenticação. Verifique as credenciais do Firebase.';
+      }
+      
+      return { sucesso: false, mensagem };
     }
   }
 

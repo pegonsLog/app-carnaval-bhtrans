@@ -15,7 +15,7 @@
 
     <nav class="nav" [class.active]="isMenuOpen">
       <a routerLink="/admin" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link"
-        *ngIf="authService.podeEditar">
+        *ngIf="authService.podeEditar || authService.isVisualizador">
         <ng-icon name="heroHome" class="nav-icon"></ng-icon>
         <span>Início</span>
       </a>

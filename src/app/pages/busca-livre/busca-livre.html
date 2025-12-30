@@ -1,0 +1,128 @@
+<div class="busca-livre-container">
+  <div class="header-section">
+    <h2>Busca Livre</h2>
+    <p class="subtitle">Busque em todos os campos dos blocos</p>
+  </div>
+
+  <!-- Formulário de Busca -->
+  <div class="search-form">
+    <div class="search-input-group">
+      <div class="input-wrapper">
+        <ng-icon name="heroMagnifyingGlass" class="input-icon"></ng-icon>
+        <input 
+          type="text" 
+          [(ngModel)]="termoBusca" 
+          (ngModelChange)="buscar()"
+          placeholder="Digite qualquer termo para buscar..."
+          class="search-input"
+          autofocus>
+      </div>
+    </div>
+
+    <!-- Filtros Opcionais -->
+    <div class="optional-filters">
+      <h3>Filtros Opcionais</h3>
+      
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label>Regional</label>
+          <select [(ngModel)]="filtroRegional" (ngModelChange)="buscar()">
+            <option value="">Todas as regionais</option>
+            <option *ngFor="let regional of regionaisDisponiveis" [value]="regional">
+              {{ regional }}
+            </option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Data do Desfile</label>
+          <select [(ngModel)]="filtroDataDesfile" (ngModelChange)="buscar()">
+            <option value="">Todas as datas</option>
+            <option *ngFor="let data of datasDesfileDisponiveis" [value]="data">
+              {{ data }} - {{ getDiaSemana(data) }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <button 
+        class="clear-filters-btn" 
+        (click)="limparFiltros()"
+        *ngIf="termoBusca || filtroRegional || filtroDataDesfile">
+        <ng-icon name="heroXMark"></ng-icon>
+        Limpar Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
+
+  <!-- Erro -->
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Resultados -->
+  <div class="results-section" *ngIf="!isLoading && !errorMessage">
+    <!-- Contador de Resultados -->
+    <div class="results-header" *ngIf="termoBusca || filtroRegional || filtroDataDesfile">
+      <p class="results-count">
+        <strong>{{ blocosEncontrados.length }}</strong> 
+        {{ blocosEncontrados.length === 1 ? 'bloco encontrado' : 'blocos encontrados' }}
+      </p>
+    </div>
+
+    <!-- Lista de Resultados -->
+    <div class="blocos-grid" *ngIf="blocosEncontrados.length > 0">
+      <div class="bloco-card" *ngFor="let bloco of blocosEncontrados">
+        <div class="bloco-header">
+          <h3 class="bloco-nome">{{ bloco.nomeDoBloco }}</h3>
+          <span class="bloco-regional">{{ bloco.regional }}</span>
+        </div>
+        
+        <div class="bloco-info">
+          <p><strong>Data:</strong> {{ formatarDataParaFiltro(bloco.dataDoDesfile) }}</p>
+          <p *ngIf="bloco.responsavel"><strong>Responsável:</strong> {{ bloco.responsavel }}</p>
+          <p *ngIf="bloco.telefone"><strong>Telefone:</strong> {{ bloco.telefone }}</p>
+          <p *ngIf="bloco.concentracao"><strong>Concentração:</strong> {{ bloco.concentracao }}</p>
+        </div>
+
+        <div class="bloco-actions">
+          <button class="action-btn primary" (click)="verDetalhes(bloco)">
+            <ng-icon name="heroEye"></ng-icon>
+            Ver Detalhes
+          </button>
+          <button 
+            class="action-btn secondary" 
+            (click)="verNoMapa(bloco)"
+            *ngIf="bloco.coordenadas && bloco.coordenadas.length > 0">
+            <ng-icon name="heroMapPin"></ng-icon>
+            Ver no Mapa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensagem quando não há resultados -->
+    <div class="no-results" *ngIf="(termoBusca || filtroRegional || filtroDataDesfile) && blocosEncontrados.length === 0">
+      <div class="no-results-icon">
+        <ng-icon name="heroMagnifyingGlass"></ng-icon>
+      </div>
+      <h3>Nenhum bloco encontrado</h3>
+      <p>Tente ajustar os termos de busca ou filtros.</p>
+    </div>
+
+    <!-- Mensagem inicial -->
+    <div class="initial-message" *ngIf="!termoBusca && !filtroRegional && !filtroDataDesfile">
+      <div class="initial-icon">
+        <ng-icon name="heroMagnifyingGlass"></ng-icon>
+      </div>
+      <h3>Digite algo para começar a busca</h3>
+      <p>Use o campo acima para buscar em todos os campos dos blocos ou aplique filtros opcionais.</p>
+    </div>
+  </div>
+</div>

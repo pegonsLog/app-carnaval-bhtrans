@@ -42,5 +42,6 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-# Firebase
+# Firebase - Environment files with sensitive data
 /src/environments/environment.ts
+/src/environments/environment.prod.ts

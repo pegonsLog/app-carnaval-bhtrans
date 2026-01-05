@@ -26,15 +26,43 @@ export class BuscaLivreComponent implements OnInit {
   
   regionaisDisponiveis: string[] = [];
   datasDesfileDisponiveis: string[] = [];
+  
+  blocoDestacadoId: string | null = null;
 
   constructor(
     private blocosService: BlocosService,
     private router: Router,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    // Restaura o estado ao voltar da navegação
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras?.state || history.state;
+    
+    if (state && (state['fromMapa'] || state['fromDocumento'])) {
+      this.termoBusca = state['termoBusca'] || '';
+      this.filtroRegional = state['filtroRegional'] || '';
+      this.filtroDataDesfile = state['filtroDataDesfile'] || '';
+      this.blocoDestacadoId = state['blocoId'] || null;
+    }
+  }
 
   async ngOnInit() {
     await this.carregarDados();
+    
+    // Se voltou do mapa, executa a busca para restaurar os resultados
+    if (this.termoBusca || this.filtroRegional || this.filtroDataDesfile) {
+      this.buscar();
+      
+      // Scroll para o bloco destacado após um pequeno delay
+      if (this.blocoDestacadoId) {
+        setTimeout(() => {
+          const elemento = document.getElementById(`bloco-${this.blocoDestacadoId}`);
+          if (elemento) {
+            elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
+      }
+    }
   }
 
   async carregarDados() {
@@ -139,15 +167,66 @@ export class BuscaLivreComponent implements OnInit {
     const termoLower = termo.toLowerCase();
     
     const campos = [
+      // Informações Básicas
+      bloco.periodo,
+      bloco.statusDoDesfile,
+      bloco.justificativaStatus,
+      bloco.numeroInscricao,
       bloco.nomeDoBloco,
+      bloco.categoriaDoBloco,
+      
+      // Informações de Público
+      bloco.publicoAnterior?.toString(),
+      bloco.publicoDeclarado?.toString(),
+      bloco.observacoesAnoAnterior,
+      
+      // Características do Bloco
+      bloco.perfil,
+      bloco.estiloDeMusica,
+      bloco.descricaoDoBloco,
+      
+      // Informações de Data e Horário
+      this.formatarDataParaFiltro(bloco.dataDoDesfile),
+      bloco.horarioDeconcentracao,
+      bloco.inicioDoDesfile,
+      bloco.horarioEncerramento,
+      bloco.duracaoDoDesfile,
+      bloco.horarioDispersao,
+      
+      // Equipamentos e Dimensões
+      bloco.equipamentosUtilizados?.join(' '),
+      bloco.larguraMetros?.toString(),
+      bloco.comprimentoMetros?.toString(),
+      bloco.alturaMetros?.toString(),
+      bloco.potenciaWatts?.toString(),
+      bloco.dimensaoDeVeiculos,
+      
+      // Localização e Percurso
+      bloco.percurso,
       bloco.regional,
-      bloco.responsavel,
-      bloco.telefone,
+      bloco.enderecoDeConcentracao,
+      bloco.bairroDeConcentracao,
+      bloco.enderecoDeDispersao,
+      bloco.bairroDeDispersao,
+      bloco.extensaoDoDesfileMetros?.toString(),
+      bloco.numeroDeQuadras?.toString(),
+      bloco.areaDoTrajetoM2?.toString(),
+      bloco.capacidadePublicoDoTrajeto?.toString(),
+      
+      // Informações Adicionais
+      bloco.informacoesAdicionais,
+      
+      // Responsável Legal
+      bloco.responsavelLegal,
+      bloco.cnpj,
+      bloco.cpf,
       bloco.email,
-      bloco.concentracao,
-      bloco.dispersao,
-      bloco.observacoes,
-      this.formatarDataParaFiltro(bloco.dataDoDesfile)
+      bloco.telefone,
+      bloco.celular,
+      
+      // Responsável Secundário
+      bloco.nomeResponsavelSecundario,
+      bloco.celularContato2
     ];
 
     return campos.some(campo => 
@@ -163,16 +242,32 @@ export class BuscaLivreComponent implements OnInit {
   }
 
   verDetalhes(bloco: any) {
-    this.router.navigate(['/documento', bloco.id]);
+    this.router.navigate(['/documento', bloco.id], {
+      state: {
+        returnUrl: '/busca-livre',
+        termoBusca: this.termoBusca,
+        filtroRegional: this.filtroRegional,
+        filtroDataDesfile: this.filtroDataDesfile,
+        blocoId: bloco.id
+      }
+    });
   }
 
   verNoMapa(bloco: any) {
-    if (bloco.coordenadas && bloco.coordenadas.length > 0) {
-      this.router.navigate(['/mapa'], { 
+    const url = bloco.myMapsEmbedUrl || bloco.percursoUrl;
+    if (url) {
+      this.router.navigate(['/mapa'], {
         queryParams: { 
-          bloco: bloco.id,
-          nome: bloco.nomeDoBloco 
-        } 
+          url, 
+          titulo: bloco.nomeDoBloco,
+          returnUrl: '/busca-livre'
+        },
+        state: {
+          termoBusca: this.termoBusca,
+          filtroRegional: this.filtroRegional,
+          filtroDataDesfile: this.filtroDataDesfile,
+          blocoId: bloco.id
+        }
       });
     }
   }
@@ -188,7 +283,7 @@ export class BuscaLivreComponent implements OnInit {
   }
 
   temMapa(bloco: any): boolean {
-    return !!(bloco.myMapsEmbedUrl || bloco.percursoUrl || (bloco.coordenadas && bloco.coordenadas.length > 0));
+    return !!(bloco.myMapsEmbedUrl || bloco.percursoUrl);
   }
 
   voltar() {

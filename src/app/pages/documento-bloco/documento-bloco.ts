@@ -28,6 +28,9 @@ export class DocumentoBlocoComponent implements OnInit {
 
   isLoading = true;
   errorMessage = '';
+  
+  returnUrl: string | null = null;
+  navigationState: any = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -39,7 +42,16 @@ export class DocumentoBlocoComponent implements OnInit {
     private storage: Storage,
     private ngZone: NgZone,
     private sanitizer: DomSanitizer
-  ) { }
+  ) {
+    // Captura o estado da navegação
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras?.state || history.state;
+    
+    if (state && state['returnUrl']) {
+      this.returnUrl = state['returnUrl'];
+      this.navigationState = state;
+    }
+  }
 
   ngOnInit() {
     const blocoId = this.route.snapshot.paramMap.get('id');
@@ -322,11 +334,19 @@ export class DocumentoBlocoComponent implements OnInit {
   }
 
   voltar() {
-    // Se usuário está logado, volta para a lista de blocos (admin)
-    // Se não está logado, volta para a busca pública
-    if (this.authService.isLogado) {
+    // Se tem URL de retorno e estado, volta para a página de origem com estado preservado
+    if (this.returnUrl && this.navigationState) {
+      this.router.navigate([this.returnUrl], {
+        state: {
+          ...this.navigationState,
+          fromDocumento: true
+        }
+      });
+    } else if (this.authService.isLogado) {
+      // Se usuário está logado, volta para a lista de blocos (admin)
       this.router.navigate(['/admin']);
     } else {
+      // Se não está logado, volta para a busca pública
       this.router.navigate(['/']);
     }
   }

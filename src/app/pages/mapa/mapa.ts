@@ -16,6 +16,8 @@ import { SafePipe } from '../../pipes/safe.pipe';
 export class MapaComponent implements OnInit {
     url = '';
     titulo = 'Mapa do Percurso';
+    returnUrl = '';
+    navigationState: any = null;
 
     constructor(private router: Router, private route: ActivatedRoute) { }
 
@@ -23,7 +25,12 @@ export class MapaComponent implements OnInit {
         this.route.queryParams.subscribe(params => {
             this.url = params['url'] || '';
             this.titulo = params['titulo'] ? `Mapa - ${params['titulo']}` : 'Mapa do Percurso';
+            this.returnUrl = params['returnUrl'] || '';
         });
+        
+        // Captura o estado da navegação
+        const navigation = this.router.getCurrentNavigation();
+        this.navigationState = navigation?.extras?.state || history.state;
     }
 
     abrirNovaAba() {
@@ -31,6 +38,16 @@ export class MapaComponent implements OnInit {
     }
 
     voltar() {
-        window.history.back();
+        if (this.returnUrl && this.navigationState) {
+            // Volta para a página de origem com o estado preservado
+            this.router.navigate([this.returnUrl], {
+                state: {
+                    ...this.navigationState,
+                    fromMapa: true
+                }
+            });
+        } else {
+            window.history.back();
+        }
     }
 }

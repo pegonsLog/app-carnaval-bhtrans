@@ -31,15 +31,41 @@ export class BuscaRegionalComponent implements OnInit {
     filtroRegionalNome = '';
     carregando = false;
     erro = '';
+    blocoDestacadoId: string | null = null;
 
     constructor(
         private blocosService: BlocosService, 
         private router: Router,
         private cdr: ChangeDetectorRef
-    ) { }
+    ) {
+        // Restaura o estado ao voltar da navegação
+        const navigation = this.router.getCurrentNavigation();
+        const state = navigation?.extras?.state || history.state;
+        
+        if (state && (state['fromMapa'] || state['fromDocumento'])) {
+            this.filtroRegional = state['filtroRegional'] || '';
+            this.filtroRegionalNome = state['filtroRegionalNome'] || '';
+            this.blocoDestacadoId = state['blocoId'] || null;
+        }
+    }
 
-    ngOnInit() {
-        this.carregarBlocos();
+    async ngOnInit() {
+        await this.carregarBlocos();
+        
+        // Se voltou do mapa, executa a busca para restaurar os resultados
+        if (this.filtroRegional || this.filtroRegionalNome) {
+            this.filtrarPorRegional();
+            
+            // Scroll para o bloco destacado após um pequeno delay
+            if (this.blocoDestacadoId) {
+                setTimeout(() => {
+                    const elemento = document.getElementById(`bloco-${this.blocoDestacadoId}`);
+                    if (elemento) {
+                        elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 300);
+            }
+        }
     }
 
     async carregarBlocos() {
@@ -105,13 +131,29 @@ export class BuscaRegionalComponent implements OnInit {
         const url = bloco.myMapsEmbedUrl || bloco.percursoUrl;
         if (url) {
             this.router.navigate(['/mapa'], {
-                queryParams: { url, titulo: bloco.nomeDoBloco }
+                queryParams: { 
+                    url, 
+                    titulo: bloco.nomeDoBloco,
+                    returnUrl: '/busca-regional'
+                },
+                state: {
+                    filtroRegional: this.filtroRegional,
+                    filtroRegionalNome: this.filtroRegionalNome,
+                    blocoId: bloco.id
+                }
             });
         }
     }
 
     abrirDocumentoCompleto(bloco: BlocoItem) {
-        this.router.navigate(['/documento', bloco.id]);
+        this.router.navigate(['/documento', bloco.id], {
+            state: {
+                returnUrl: '/busca-regional',
+                filtroRegional: this.filtroRegional,
+                filtroRegionalNome: this.filtroRegionalNome,
+                blocoId: bloco.id
+            }
+        });
     }
 
     temMapa(bloco: BlocoItem): boolean {

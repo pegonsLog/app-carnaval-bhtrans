@@ -28,11 +28,39 @@ export class BuscaBlocoComponent implements OnInit {
     blocosFiltrados: BlocoItem[] = [];
     filtroBlocoNome = '';
     carregando = false;
+    blocoDestacadoId: string | null = null;
 
-    constructor(private blocosService: BlocosService, private router: Router) { }
+    constructor(
+        private blocosService: BlocosService, 
+        private router: Router
+    ) {
+        // Restaura o estado ao voltar da navegação
+        const navigation = this.router.getCurrentNavigation();
+        const state = navigation?.extras?.state || history.state;
+        
+        if (state && (state['fromMapa'] || state['fromDocumento'])) {
+            this.filtroBlocoNome = state['filtroBlocoNome'] || '';
+            this.blocoDestacadoId = state['blocoId'] || null;
+        }
+    }
 
-    ngOnInit() {
-        this.carregarBlocos();
+    async ngOnInit() {
+        await this.carregarBlocos();
+        
+        // Se voltou do mapa, executa a busca para restaurar os resultados
+        if (this.filtroBlocoNome) {
+            this.filtrarPorBloco();
+            
+            // Scroll para o bloco destacado após um pequeno delay
+            if (this.blocoDestacadoId) {
+                setTimeout(() => {
+                    const elemento = document.getElementById(`bloco-${this.blocoDestacadoId}`);
+                    if (elemento) {
+                        elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 300);
+            }
+        }
     }
 
     async carregarBlocos() {
@@ -75,13 +103,27 @@ export class BuscaBlocoComponent implements OnInit {
         const url = bloco.myMapsEmbedUrl || bloco.percursoUrl;
         if (url) {
             this.router.navigate(['/mapa'], {
-                queryParams: { url, titulo: bloco.nomeDoBloco }
+                queryParams: { 
+                    url, 
+                    titulo: bloco.nomeDoBloco,
+                    returnUrl: '/busca-bloco'
+                },
+                state: {
+                    filtroBlocoNome: this.filtroBlocoNome,
+                    blocoId: bloco.id
+                }
             });
         }
     }
 
     abrirDocumentoCompleto(bloco: BlocoItem) {
-        this.router.navigate(['/documento', bloco.id]);
+        this.router.navigate(['/documento', bloco.id], {
+            state: {
+                returnUrl: '/busca-bloco',
+                filtroBlocoNome: this.filtroBlocoNome,
+                blocoId: bloco.id
+            }
+        });
     }
 
     temMapa(bloco: BlocoItem): boolean {

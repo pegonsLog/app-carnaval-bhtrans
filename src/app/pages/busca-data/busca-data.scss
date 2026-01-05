@@ -117,6 +117,13 @@
     border-color: #667eea;
   }
 
+  &.destacado {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    animation: pulseDestaque 1s ease-in-out;
+  }
+
   .bloco-info {
     display: flex;
     flex-direction: column;
@@ -143,6 +150,15 @@
     display: flex;
     gap: 0.5rem;
     flex-shrink: 0;
+  }
+}
+
+@keyframes pulseDestaque {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
   }
 }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -32,7 +32,8 @@ export class BuscaBlocoComponent implements OnInit {
 
     constructor(
         private blocosService: BlocosService, 
-        private router: Router
+        private router: Router,
+        private cdr: ChangeDetectorRef
     ) {
         // Restaura o estado ao voltar da navegação
         const navigation = this.router.getCurrentNavigation();
@@ -47,9 +48,10 @@ export class BuscaBlocoComponent implements OnInit {
     async ngOnInit() {
         await this.carregarBlocos();
         
-        // Se voltou do mapa, executa a busca para restaurar os resultados
+        // Se voltou do mapa ou documento, executa a busca para restaurar os resultados
         if (this.filtroBlocoNome) {
             this.filtrarPorBloco();
+            this.cdr.detectChanges();
             
             // Scroll para o bloco destacado após um pequeno delay
             if (this.blocoDestacadoId) {
@@ -75,10 +77,12 @@ export class BuscaBlocoComponent implements OnInit {
                 myMapsEmbedUrl: b.myMapsEmbedUrl,
                 percursoUrl: b.percursoUrl
             }));
+            this.cdr.detectChanges();
         } catch (error) {
             console.error('Erro ao carregar blocos:', error);
         }
         this.carregando = false;
+        this.cdr.detectChanges();
     }
 
     filtrarPorBloco() {

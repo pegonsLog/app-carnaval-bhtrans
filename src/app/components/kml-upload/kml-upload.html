@@ -16,6 +16,10 @@
         <span class="label">Nº Inscrição:</span>
         <span class="value">{{ bloco?.numeroInscricao }}</span>
       </div>
+      <div class="bloco-info">
+        <span class="label">Data do Desfile:</span>
+        <span class="value">{{ formatarDataExibicao(bloco?.dataDoDesfile) || 'Não informada' }}</span>
+      </div>
 
       <div class="url-input-group">
         <label for="myMapsUrl">URL do Google My Maps</label>
@@ -35,10 +39,10 @@
 
       <div class="validation-info" *ngIf="!kmlValidado">
         <p class="validation-hint">
-          📋 O mapa deve conter as seguintes pastas obrigatórias:
+          📋 O mapa pode conter as seguintes pastas (opcionais):
         </p>
         <ul class="folders-list">
-          <li *ngFor="let folder of foldersObrigatorias">{{ folder }}</li>
+          <li *ngFor="let folder of foldersOpcionais">{{ folder }}</li>
         </ul>
       </div>
 
@@ -62,8 +66,17 @@
       <div class="folders-found" *ngIf="foldersEncontradas.length > 0">
         <p class="folders-title">Pastas encontradas no mapa:</p>
         <div class="folders-tags">
-          <span *ngFor="let folder of foldersEncontradas" class="folder-tag" [class.found]="isFolderObrigatoria(folder)"
-            [class.extra]="!isFolderObrigatoria(folder)">
+          <span *ngFor="let folder of foldersEncontradas" class="folder-tag" [class.found]="isFolderOpcional(folder)"
+            [class.extra]="!isFolderOpcional(folder)">
+            {{ folder }}
+          </span>
+        </div>
+      </div>
+
+      <div class="folders-missing" *ngIf="avisoFoldersFaltando.length > 0 && kmlValidado">
+        <p class="folders-title warning">⚠️ Pastas não encontradas (opcionais):</p>
+        <div class="folders-tags">
+          <span *ngFor="let folder of avisoFoldersFaltando" class="folder-tag missing">
             {{ folder }}
           </span>
         </div>

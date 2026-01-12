@@ -10,11 +10,44 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 
   h2 {
     margin: 0;
     color: #333;
     font-size: 1.5rem;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+    justify-content: center;
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+
+      .stat-icon {
+        font-size: 0.9rem;
+      }
+
+      &.com-mapa {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      &.sem-mapa {
+        background: #fff3cd;
+        color: #856404;
+      }
+    }
   }
 }
 

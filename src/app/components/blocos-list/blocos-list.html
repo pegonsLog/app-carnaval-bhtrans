@@ -1,6 +1,16 @@
 <div class="blocos-list-container">
   <div class="header-section">
     <h2>Blocos Cadastrados</h2>
+    <div class="header-stats" *ngIf="todosCarregados">
+      <span class="stat-item com-mapa">
+        <span class="stat-icon">✓</span>
+        {{ blocosComMapa }} com mapa
+      </span>
+      <span class="stat-item sem-mapa">
+        <span class="stat-icon">✗</span>
+        {{ blocosSemMapa }} sem mapa
+      </span>
+    </div>
     <button class="refresh-btn" (click)="carregarBlocos()" [disabled]="isLoading" *ngIf="authService.podeEditar">
       <ng-icon name="heroMagnifyingGlass"></ng-icon>
       {{ isLoading ? 'Carregando...' : 'Atualizar' }}

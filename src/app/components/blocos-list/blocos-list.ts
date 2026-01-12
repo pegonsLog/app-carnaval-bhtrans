@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -47,6 +47,10 @@ export class BlocosListComponent implements OnInit {
   errorMessage = '';
   limitePaginacao = 10;
   todosCarregados = false;
+
+  // Contadores de mapas
+  blocosComMapa = 0;
+  blocosSemMapa = 0;
 
   // Filtros
   filtroNome = '';
@@ -174,7 +178,8 @@ export class BlocosListComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     public authService: AuthService,
-    private pdfExportService: PdfExportService
+    private pdfExportService: PdfExportService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
@@ -238,6 +243,7 @@ export class BlocosListComponent implements OnInit {
         let blocosFiltradosPorPerfil = this.filtrarPorPerfil(todosBlocos);
         this.blocos = this.ordenarBlocos(blocosFiltradosPorPerfil);
         this.extrairRegionais();
+        this.atualizarContadoresMapas();
         this.todosCarregados = true;
         this.isLoadingTodos = false;
 
@@ -362,13 +368,20 @@ export class BlocosListComponent implements OnInit {
   }
 
   onKmlUploadConcluido(dados: any) {
-    // Atualiza o bloco na lista local
-    const index = this.blocos.findIndex(b => b.numeroInscricao === this.blocoParaUploadKml?.numeroInscricao);
-    if (index !== -1) {
-      this.blocos[index].percursoUrl = dados.percursoUrl;
-      this.blocos[index].percursoDataUpload = new Date();
-      if (dados.myMapsEmbedUrl) {
-        this.blocos[index].myMapsEmbedUrl = dados.myMapsEmbedUrl;
+    // Atualiza o bloco na lista local usando o ID do bloco (mais preciso)
+    if (this.blocoParaUploadKml?.id) {
+      const index = this.blocos.findIndex(b => b.id === this.blocoParaUploadKml?.id);
+      if (index !== -1) {
+        this.blocos[index].percursoUrl = dados.percursoUrl;
+        this.blocos[index].percursoDataUpload = new Date();
+        if (dados.myMapsEmbedUrl) {
+          this.blocos[index].myMapsEmbedUrl = dados.myMapsEmbedUrl;
+        }
+        // Força atualização da view
+        this.blocos = [...this.blocos];
+        this.aplicarFiltros();
+        this.atualizarContadoresMapas();
+        this.cdr.detectChanges();
       }
     }
   }
@@ -727,6 +740,11 @@ export class BlocosListComponent implements OnInit {
       const [diaB, mesB, anoB] = b.split('/');
       return new Date(`${anoA}-${mesA}-${diaA}`).getTime() - new Date(`${anoB}-${mesB}-${diaB}`).getTime();
     });
+  }
+
+  atualizarContadoresMapas() {
+    this.blocosComMapa = this.blocos.filter(b => b.myMapsEmbedUrl || b.percursoUrl).length;
+    this.blocosSemMapa = this.blocos.length - this.blocosComMapa;
   }
 
   private formatarDataParaFiltro(value: any): string | null {

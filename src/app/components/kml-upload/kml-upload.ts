@@ -53,7 +53,8 @@ export class KmlUploadComponent implements OnInit {
   kmlValidado = false;
   isValidando = false;
   foldersEncontradas: string[] = [];
-  foldersObrigatorias = ['RESERVA DE ÁREA', 'DESVIOS', 'SINALIZAÇÃO', 'AGENTES', 'FAIXA DE TECIDO'];
+  foldersOpcionais = ['RESERVA DE ÁREA', 'DESVIOS', 'SINALIZAÇÃO', 'AGENTES', 'FAIXA DE TECIDO'];
+  avisoFoldersFaltando: string[] = [];
 
   constructor(
     private storage: Storage,
@@ -68,9 +69,65 @@ export class KmlUploadComponent implements OnInit {
     }
   }
 
+  // Gera uma chave única baseada em inscrição + data do desfile
+  private gerarChaveMapa(): string {
+    const numeroInscricao = this.bloco?.numeroInscricao || '';
+    const dataDesfile = this.formatarDataParaChave(this.bloco?.dataDoDesfile);
+    return `${numeroInscricao}_${dataDesfile}`;
+  }
+
+  private formatarDataParaChave(data: any): string {
+    if (!data) return 'sem-data';
+    
+    try {
+      let dataObj: Date;
+      
+      if (data.toDate && typeof data.toDate === 'function') {
+        dataObj = data.toDate();
+      } else if (data instanceof Date) {
+        dataObj = data;
+      } else if (typeof data === 'string') {
+        dataObj = new Date(data);
+      } else {
+        return 'sem-data';
+      }
+
+      // Formato: YYYYMMDD
+      const ano = dataObj.getFullYear();
+      const mes = String(dataObj.getMonth() + 1).padStart(2, '0');
+      const dia = String(dataObj.getDate()).padStart(2, '0');
+      return `${ano}${mes}${dia}`;
+    } catch (error) {
+      return 'sem-data';
+    }
+  }
+
+  formatarDataExibicao(data: any): string {
+    if (!data) return '';
+    
+    try {
+      let dataObj: Date;
+      
+      if (data.toDate && typeof data.toDate === 'function') {
+        dataObj = data.toDate();
+      } else if (data instanceof Date) {
+        dataObj = data;
+      } else if (typeof data === 'string') {
+        dataObj = new Date(data);
+      } else {
+        return '';
+      }
+
+      return dataObj.toLocaleDateString('pt-BR');
+    } catch (error) {
+      return '';
+    }
+  }
+
   private async carregarDadosMapaSalvos() {
     try {
-      const mapaDocRef = doc(this.firestore, 'blocos-mapas', this.bloco.numeroInscricao);
+      const chaveMapa = this.gerarChaveMapa();
+      const mapaDocRef = doc(this.firestore, 'blocos-mapas', chaveMapa);
       const mapaDoc = await getDoc(mapaDocRef);
 
       if (mapaDoc.exists()) {
@@ -195,24 +252,26 @@ export class KmlUploadComponent implements OnInit {
         }
       });
 
-      const foldersFaltando = this.foldersObrigatorias.filter(
-        (obrigatoria) => !foldersTemp.some(
-          (encontrada) => encontrada === obrigatoria.toUpperCase()
+      // Verifica quais pastas opcionais estão faltando (apenas para aviso)
+      const foldersFaltando = this.foldersOpcionais.filter(
+        (opcional) => !foldersTemp.some(
+          (encontrada) => encontrada === opcional.toUpperCase()
         )
       );
 
       this.ngZone.run(() => {
         this.foldersEncontradas = foldersTemp;
+        this.avisoFoldersFaltando = foldersFaltando;
 
+        // KML é válido se conseguiu ser parseado (pastas são opcionais)
+        this.kmlValidado = true;
+        
         if (foldersFaltando.length === 0) {
-          this.kmlValidado = true;
-          this.mostrarMensagem('✅ KML validado com sucesso! Todas as pastas obrigatórias foram encontradas.', 'sucesso');
+          this.mostrarMensagem('✅ KML validado com sucesso! Todas as pastas foram encontradas.', 'sucesso');
+        } else if (foldersTemp.length === 0) {
+          this.mostrarMensagem('✅ KML validado. Nenhuma pasta de dados encontrada, apenas o percurso será importado.', 'sucesso');
         } else {
-          this.kmlValidado = false;
-          this.mostrarMensagem(
-            `❌ Pastas obrigatórias não encontradas: ${foldersFaltando.join(', ')}`,
-            'erro'
-          );
+          this.mostrarMensagem(`✅ KML validado. Algumas pastas opcionais não foram encontradas: ${foldersFaltando.join(', ')}`, 'sucesso');
         }
         this.isValidando = false;
       });
@@ -221,6 +280,7 @@ export class KmlUploadComponent implements OnInit {
       this.ngZone.run(() => {
         this.kmlValidado = false;
         this.foldersEncontradas = [];
+        this.avisoFoldersFaltando = [];
         this.mostrarMensagem(`Erro ao validar arquivo: ${error.message}`, 'erro');
         this.isValidando = false;
       });
@@ -242,7 +302,8 @@ export class KmlUploadComponent implements OnInit {
       const numeroInscricao = this.bloco.numeroInscricao;
       const nomeBloco = this.bloco.nomeDoBloco || 'bloco';
       const nomeBlocoSlug = this.slugify(nomeBloco);
-      const nomeArquivo = `blocos/${numeroInscricao}_${nomeBlocoSlug}.md`;
+      const dataChave = this.formatarDataParaChave(this.bloco.dataDoDesfile);
+      const nomeArquivo = `blocos/${numeroInscricao}_${dataChave}_${nomeBlocoSlug}.md`;
 
       const storageRef = ref(this.storage, nomeArquivo);
       await uploadString(storageRef, markdownContent, 'raw', {
@@ -252,11 +313,11 @@ export class KmlUploadComponent implements OnInit {
 
       const downloadURL = await getDownloadURL(storageRef);
 
-      // Salva na coleção separada (blocos-mapas) para persistência
-      await this.salvarDadosMapa(numeroInscricao, downloadURL);
+      // Salva na coleção separada (blocos-mapas) para persistência usando chave composta
+      await this.salvarDadosMapa(downloadURL);
 
-      // Atualiza o bloco atual
-      await this.atualizarBlocoComPercurso(numeroInscricao, downloadURL);
+      // Atualiza o bloco atual usando o ID do documento
+      await this.atualizarBlocoComPercurso(downloadURL);
 
       this.ngZone.run(() => {
         this.uploadProgress = 100;
@@ -281,12 +342,15 @@ export class KmlUploadComponent implements OnInit {
   }
 
   // Salva os dados do mapa em coleção separada para não perder ao deletar blocos
-  private async salvarDadosMapa(numeroInscricao: string, percursoUrl: string) {
-    const mapaDocRef = doc(this.firestore, 'blocos-mapas', numeroInscricao);
+  private async salvarDadosMapa(percursoUrl: string) {
+    const chaveMapa = this.gerarChaveMapa();
+    const mapaDocRef = doc(this.firestore, 'blocos-mapas', chaveMapa);
 
     const dadosMapa = {
-      numeroInscricao: numeroInscricao,
+      numeroInscricao: this.bloco.numeroInscricao,
       nomeDoBloco: this.bloco.nomeDoBloco || '',
+      dataDoDesfile: this.bloco.dataDoDesfile || null,
+      dataDoDesfileFormatada: this.formatarDataExibicao(this.bloco.dataDoDesfile),
       myMapsUrl: this.myMapsUrl.trim(),
       myMapsEmbedUrl: this.converterParaEmbedUrl(this.myMapsUrl),
       percursoUrl: percursoUrl,
@@ -437,14 +501,10 @@ export class KmlUploadComponent implements OnInit {
     return resultado ? resultado + '\n' : '';
   }
 
-  private async atualizarBlocoComPercurso(numeroInscricao: string, percursoUrl: string) {
-    const blocosCollection = collection(this.firestore, 'blocos');
-    const q = query(blocosCollection, where('numeroInscricao', '==', numeroInscricao));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-      const docId = querySnapshot.docs[0].id;
-      const docRef = doc(this.firestore, 'blocos', docId);
+  private async atualizarBlocoComPercurso(percursoUrl: string) {
+    // Usa o ID do documento do bloco diretamente (se disponível)
+    if (this.bloco?.id) {
+      const docRef = doc(this.firestore, 'blocos', this.bloco.id);
       const updateData: any = {
         percursoUrl: percursoUrl,
         percursoDataUpload: new Date(),
@@ -455,6 +515,37 @@ export class KmlUploadComponent implements OnInit {
       }
 
       await updateDoc(docRef, updateData);
+    } else {
+      // Fallback: busca pelo número de inscrição e data
+      const blocosCollection = collection(this.firestore, 'blocos');
+      const q = query(
+        blocosCollection, 
+        where('numeroInscricao', '==', this.bloco.numeroInscricao)
+      );
+      const querySnapshot = await getDocs(q);
+
+      // Filtra pelo bloco com a mesma data
+      const dataDesfileBloco = this.formatarDataParaChave(this.bloco.dataDoDesfile);
+      
+      for (const docSnap of querySnapshot.docs) {
+        const blocoData = docSnap.data();
+        const dataDesfileDoc = this.formatarDataParaChave(blocoData['dataDoDesfile']);
+        
+        if (dataDesfileDoc === dataDesfileBloco) {
+          const docRef = doc(this.firestore, 'blocos', docSnap.id);
+          const updateData: any = {
+            percursoUrl: percursoUrl,
+            percursoDataUpload: new Date(),
+          };
+
+          if (this.myMapsUrl.trim()) {
+            updateData.myMapsEmbedUrl = this.converterParaEmbedUrl(this.myMapsUrl);
+          }
+
+          await updateDoc(docRef, updateData);
+          break;
+        }
+      }
     }
   }
 
@@ -484,8 +575,8 @@ export class KmlUploadComponent implements OnInit {
     this.foldersEncontradas = [];
   }
 
-  isFolderObrigatoria(folder: string): boolean {
-    return this.foldersObrigatorias.some(f => f.toUpperCase() === folder.toUpperCase());
+  isFolderOpcional(folder: string): boolean {
+    return this.foldersOpcionais.some(f => f.toUpperCase() === folder.toUpperCase());
   }
 
   private slugify(text: string): string {

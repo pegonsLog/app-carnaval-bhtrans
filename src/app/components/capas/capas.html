@@ -94,11 +94,17 @@
       <div class="form-group">
         <label>Regionais</label>
         <div class="regionais-input">
-          <input type="text" [(ngModel)]="novaRegional" placeholder="Ex: Regional Norte"
-            (keyup.enter)="adicionarRegional()" />
-          <button type="button" class="btn-add-regional" (click)="adicionarRegional()">
+          <select [(ngModel)]="regionalSelecionada" class="regional-select">
+            <option value="">Selecione uma regional...</option>
+            <option *ngFor="let regional of regionaisDisponiveis" [value]="regional">{{ regional }}</option>
+          </select>
+          <button type="button" class="btn-add-regional" (click)="adicionarRegional()" [disabled]="!regionalSelecionada && !novaRegional.trim()">
             <ng-icon name="heroPlus"></ng-icon>
           </button>
+        </div>
+        <div class="regionais-input" style="margin-top: 0.5rem;">
+          <input type="text" [(ngModel)]="novaRegional" placeholder="Ou digite uma nova regional..."
+            (keyup.enter)="adicionarRegional()" />
         </div>
         <div class="regionais-list" *ngIf="capaAtual.regionais.length > 0">
           <span class="regional-tag" *ngFor="let regional of capaAtual.regionais; let i = index">

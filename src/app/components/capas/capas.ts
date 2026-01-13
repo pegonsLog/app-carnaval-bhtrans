@@ -10,6 +10,7 @@ import {
   heroEye,
 } from '@ng-icons/heroicons/outline';
 import { CapasService } from '../../services/capas';
+import { BlocosService } from '../../services/blocos';
 import { Capa } from '../../interfaces/capa.interface';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal';
 
@@ -46,13 +47,36 @@ export class CapasComponent implements OnInit {
   // Modal de visualização
   capaParaVisualizar: Capa | null = null;
 
+  // Regionais disponíveis (extraídas dos blocos)
+  regionaisDisponiveis: string[] = [];
+  regionalSelecionada = '';
+
   constructor(
     private capasService: CapasService,
+    private blocosService: BlocosService,
     private ngZone: NgZone
   ) { }
 
   ngOnInit() {
     this.carregarCapas();
+    this.carregarRegionaisDisponiveis();
+  }
+
+  async carregarRegionaisDisponiveis() {
+    try {
+      const blocos = await this.blocosService.getBlocos();
+      const regionaisSet = new Set<string>();
+      blocos.forEach(bloco => {
+        if (bloco.regional) {
+          regionaisSet.add(bloco.regional);
+        }
+      });
+      this.ngZone.run(() => {
+        this.regionaisDisponiveis = Array.from(regionaisSet).sort();
+      });
+    } catch (error) {
+      console.error('Erro ao carregar regionais:', error);
+    }
   }
 
   async carregarCapas() {
@@ -76,6 +100,7 @@ export class CapasComponent implements OnInit {
   abrirFormNovo() {
     this.capaAtual = { gerencia: '', elaboradoPor: '', dataElaboracao: '', responsavel: '', regionais: [] };
     this.novaRegional = '';
+    this.regionalSelecionada = '';
     this.isEditing = false;
     this.showFormModal = true;
   }
@@ -83,6 +108,7 @@ export class CapasComponent implements OnInit {
   abrirFormEditar(capa: Capa) {
     this.capaAtual = { ...capa, regionais: capa.regionais || [] };
     this.novaRegional = '';
+    this.regionalSelecionada = '';
     this.isEditing = true;
     this.showFormModal = true;
   }
@@ -91,12 +117,15 @@ export class CapasComponent implements OnInit {
     this.showFormModal = false;
     this.capaAtual = { gerencia: '', elaboradoPor: '', dataElaboracao: '', responsavel: '', regionais: [] };
     this.novaRegional = '';
+    this.regionalSelecionada = '';
   }
 
   adicionarRegional() {
-    if (this.novaRegional.trim() && !this.capaAtual.regionais.includes(this.novaRegional.trim())) {
-      this.capaAtual.regionais.push(this.novaRegional.trim());
+    const regional = this.regionalSelecionada || this.novaRegional.trim();
+    if (regional && !this.capaAtual.regionais.includes(regional)) {
+      this.capaAtual.regionais.push(regional);
       this.novaRegional = '';
+      this.regionalSelecionada = '';
     }
   }
 

@@ -30,6 +30,7 @@
     "@angular/forms": "^19.0.0",
     "@angular/platform-browser": "^19.0.0",
     "@angular/router": "^19.0.0",
+    "@angular/service-worker": "^19.2.18",
     "@ng-icons/core": "^29.0.0",
     "@ng-icons/heroicons": "^29.0.0",
     "docx": "^9.5.1",

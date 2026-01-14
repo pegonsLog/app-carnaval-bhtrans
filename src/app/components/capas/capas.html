@@ -149,7 +149,8 @@
         </div>
 
         <div class="capa-elaboracao">
-          <p class="linha" *ngIf="capaParaVisualizar.elaboradoPor">Elaboração: {{ capaParaVisualizar.elaboradoPor }}</p>
+          <p class="linha" *ngIf="capaParaVisualizar.elaboradoPor"><strong>Elaboração:</strong> {{ capaParaVisualizar.elaboradoPor }}</p>
+          <p class="linha" *ngIf="capaParaVisualizar.responsavel"><strong>Aprovação:</strong> {{ capaParaVisualizar.responsavel }}</p>
         </div>
 
         <div class="capa-footer">

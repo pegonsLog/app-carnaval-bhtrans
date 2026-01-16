@@ -118,8 +118,27 @@
             <span class="value">{{ bloco.email || '-' }}</span>
           </div>
           <div class="info-item">
+            <span class="label">Telefone:</span>
+            <span class="value">{{ bloco.telefone || '-' }}</span>
+          </div>
+          <div class="info-item">
             <span class="label">Celular:</span>
             <span class="value">{{ bloco.celular || '-' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Responsável Secundário -->
+      <section class="doc-section" *ngIf="bloco.nomeResponsavelSecundario || bloco.celularContato2">
+        <h3 class="section-title">RESPONSÁVEL SECUNDÁRIO</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Nome:</span>
+            <span class="value">{{ bloco.nomeResponsavelSecundario || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Celular:</span>
+            <span class="value">{{ bloco.celularContato2 || '-' }}</span>
           </div>
         </div>
       </section>
@@ -176,6 +195,10 @@
           <div class="info-item">
             <span class="label">Capacidade:</span>
             <span class="value">{{ formatNumber(bloco.capacidadePublicoDoTrajeto) }} pessoas</span>
+          </div>
+          <div class="info-item full" *ngIf="bloco.observacoesAnoAnterior">
+            <span class="label">Observações Ano Anterior:</span>
+            <span class="value">{{ bloco.observacoesAnoAnterior }}</span>
           </div>
         </div>
       </section>
@@ -247,6 +270,10 @@
             <span class="label">Status do Desfile:</span>
             <span class="value">{{ bloco.statusDoDesfile || '-' }}</span>
           </div>
+          <div class="info-item full" *ngIf="bloco.justificativaStatus">
+            <span class="label">Justificativa:</span>
+            <span class="value">{{ bloco.justificativaStatus }}</span>
+          </div>
           <div class="info-item">
             <span class="label">Autoriza Divulgação:</span>
             <span class="value">{{ formatBoolean(bloco.autorizaDivulgacao) }}</span>
@@ -282,6 +309,20 @@
           <div class="info-item">
             <span class="label">Potência:</span>
             <span class="value">{{ formatNumber(bloco.potenciaWatts) }} W</span>
+          </div>
+          <div class="info-item full" *ngIf="bloco.dimensaoDeVeiculos">
+            <span class="label">Dimensão de Veículos:</span>
+            <span class="value">{{ bloco.dimensaoDeVeiculos }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Informações Adicionais -->
+      <section class="doc-section" *ngIf="bloco.informacoesAdicionais">
+        <h3 class="section-title">INFORMAÇÕES ADICIONAIS</h3>
+        <div class="info-grid">
+          <div class="info-item full">
+            <span class="value">{{ bloco.informacoesAdicionais }}</span>
           </div>
         </div>
       </section>

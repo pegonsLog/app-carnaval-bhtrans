@@ -93,6 +93,7 @@ export class DocxExportService {
       this.campoValor('CPF', bloco.cpf),
       this.campoValor('CNPJ', bloco.cnpj),
       this.campoValor('E-mail', bloco.email),
+      this.campoValor('Telefone', bloco.telefone),
       this.campoValor('Celular', bloco.celular),
       new Paragraph({ spacing: { after: 200 } }),
 
@@ -112,6 +113,7 @@ export class DocxExportService {
       this.campoValor('Público Declarado', this.formatarNumero(bloco.publicoDeclarado)),
       this.campoValor('Área do Trajeto', `${this.formatarNumero(bloco.areaDoTrajetoM2)} m²`),
       this.campoValor('Capacidade', `${this.formatarNumero(bloco.capacidadePublicoDoTrajeto)} pessoas`),
+      ...(bloco.observacoesAnoAnterior ? [this.campoValor('Observações Ano Anterior', bloco.observacoesAnoAnterior)] : []),
       new Paragraph({ spacing: { after: 200 } }),
 
       // Percurso
@@ -136,6 +138,7 @@ export class DocxExportService {
       this.subtituloSecao('STATUS'),
       this.campoValor('Possui Desfiles', this.formatarBoolean(bloco.possuiDesfiles)),
       this.campoValor('Status do Desfile', bloco.statusDoDesfile),
+      ...(bloco.justificativaStatus ? [this.campoValor('Justificativa', bloco.justificativaStatus)] : []),
       this.campoValor('Autoriza Divulgação', this.formatarBoolean(bloco.autorizaDivulgacao)),
       this.campoValor('Primeiro Cadastro', this.formatarBoolean(bloco.primeiroCadastro)),
       new Paragraph({ spacing: { after: 200 } }),
@@ -147,6 +150,23 @@ export class DocxExportService {
       this.campoValor('Comprimento', `${bloco.comprimentoMetros || '-'} m`),
       this.campoValor('Altura', `${bloco.alturaMetros || '-'} m`),
       this.campoValor('Potência', `${this.formatarNumero(bloco.potenciaWatts)} W`),
+      ...(bloco.dimensaoDeVeiculos ? [this.campoValor('Dimensão de Veículos', bloco.dimensaoDeVeiculos)] : []),
+      new Paragraph({ spacing: { after: 200 } }),
+
+      // Informações Adicionais
+      ...(bloco.informacoesAdicionais ? [
+        this.subtituloSecao('INFORMAÇÕES ADICIONAIS'),
+        this.campoValor('', bloco.informacoesAdicionais),
+        new Paragraph({ spacing: { after: 200 } }),
+      ] : []),
+
+      // Responsável Secundário
+      ...(bloco.nomeResponsavelSecundario || bloco.celularContato2 ? [
+        this.subtituloSecao('RESPONSÁVEL SECUNDÁRIO'),
+        this.campoValor('Nome', bloco.nomeResponsavelSecundario),
+        this.campoValor('Celular', bloco.celularContato2),
+        new Paragraph({ spacing: { after: 200 } }),
+      ] : []),
 
       new Paragraph({ children: [new PageBreak()] }),
     ];

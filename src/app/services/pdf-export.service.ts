@@ -206,6 +206,7 @@ export class PdfExportService {
         y = this.campoValor(doc, 'CPF', bloco.cpf, y);
         y = this.campoValor(doc, 'CNPJ', bloco.cnpj, y);
         y = this.campoValor(doc, 'E-mail', bloco.email, y);
+        y = this.campoValor(doc, 'Telefone', bloco.telefone, y);
         y = this.campoValor(doc, 'Celular', bloco.celular, y);
         y += 5;
 
@@ -225,6 +226,9 @@ export class PdfExportService {
         y = this.campoValor(doc, 'Público Declarado', this.formatarNumero(bloco.publicoDeclarado), y);
         y = this.campoValor(doc, 'Área do Trajeto', `${this.formatarNumero(bloco.areaDoTrajetoM2)} m²`, y);
         y = this.campoValor(doc, 'Capacidade', `${this.formatarNumero(bloco.capacidadePublicoDoTrajeto)} pessoas`, y);
+        if (bloco.observacoesAnoAnterior) {
+            y = this.campoValor(doc, 'Obs. Ano Anterior', bloco.observacoesAnoAnterior, y, true);
+        }
         y += 5;
 
         // Percurso
@@ -255,6 +259,9 @@ export class PdfExportService {
         y = this.criarSecao(doc, 'STATUS', y);
         y = this.campoValor(doc, 'Possui Desfiles', this.formatarBoolean(bloco.possuiDesfiles), y);
         y = this.campoValor(doc, 'Status do Desfile', bloco.statusDoDesfile, y);
+        if (bloco.justificativaStatus) {
+            y = this.campoValor(doc, 'Justificativa', bloco.justificativaStatus, y, true);
+        }
         y = this.campoValor(doc, 'Autoriza Divulgação', this.formatarBoolean(bloco.autorizaDivulgacao), y);
         y += 5;
 
@@ -265,6 +272,25 @@ export class PdfExportService {
         y = this.campoValor(doc, 'Comprimento', `${bloco.comprimentoMetros || '-'} m`, y);
         y = this.campoValor(doc, 'Altura', `${bloco.alturaMetros || '-'} m`, y);
         y = this.campoValor(doc, 'Potência', `${this.formatarNumero(bloco.potenciaWatts)} W`, y);
+        if (bloco.dimensaoDeVeiculos) {
+            y = this.campoValor(doc, 'Dimensão Veículos', bloco.dimensaoDeVeiculos, y);
+        }
+        y += 5;
+
+        // Informações Adicionais
+        if (bloco.informacoesAdicionais) {
+            y = this.criarSecao(doc, 'INFORMAÇÕES ADICIONAIS', y);
+            y = this.campoValor(doc, '', bloco.informacoesAdicionais, y, true);
+            y += 5;
+        }
+
+        // Responsável Secundário
+        if (bloco.nomeResponsavelSecundario || bloco.celularContato2) {
+            y = this.criarSecao(doc, 'RESPONSÁVEL SECUNDÁRIO', y);
+            y = this.campoValor(doc, 'Nome', bloco.nomeResponsavelSecundario, y);
+            y = this.campoValor(doc, 'Celular', bloco.celularContato2, y);
+            y += 5;
+        }
 
         return y;
     }

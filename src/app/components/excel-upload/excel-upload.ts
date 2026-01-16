@@ -5,13 +5,12 @@ import { BlocosService } from '../../services/blocos';
 import { AuthService } from '../../services/auth.service';
 import { Blocos } from '../../interfaces/blocos.interface';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar, heroEllipsisHorizontal, heroXMark } from '@ng-icons/heroicons/outline';
-
+import { heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar, heroEllipsisHorizontal, heroXMark, heroExclamationTriangle, heroInformationCircle } from '@ng-icons/heroicons/outline';
 
 @Component({
   selector: 'app-excel-upload',
   imports: [CommonModule, NgIcon],
-  viewProviders: [provideIcons({ heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar, heroEllipsisHorizontal, heroXMark })],
+  viewProviders: [provideIcons({ heroFolder, heroCloudArrowUp, heroClock, heroTrash, heroChartBar, heroEllipsisHorizontal, heroXMark, heroExclamationTriangle, heroInformationCircle })],
   templateUrl: './excel-upload.html',
   styleUrl: './excel-upload.scss'
 })
@@ -23,72 +22,54 @@ export class ExcelUploadComponent {
   saveMessage = '';
   saveMessageType: 'success' | 'error' | '' = '';
 
-  // Colunas ordenadas (mesma sequência da lista de blocos)
-  displayColumns = [
-    { key: 'Nome Do Bloco', label: 'Nome do Bloco' },
-    { key: 'Data Do Desfile', label: 'Data Desfile' },
-    { key: 'Regional', label: 'Regional' },
-    { key: 'Periodo', label: 'Período' },
-    { key: 'Público Anterior', label: 'Público Anterior' },
-    { key: 'Público Declarado', label: 'Público Declarado' },
-    { key: 'Possui Desfiles?', label: 'Possui Desfiles' },
-    { key: 'Status do Desfile', label: 'Status' },
-    { key: 'Justificativa Status', label: 'Justificativa' },
-    { key: 'Nº de Inscrição', label: 'Nº Inscrição' },
-    { key: 'Categoria Do Bloco', label: 'Categoria' },
-    { key: 'Autoriza Divulgação', label: 'Autoriza Divulgação' },
-    { key: 'Data de Cadastro ou Modificação', label: 'Data Cadastro' },
-    { key: 'Primeiro Cadastro?', label: 'Primeiro Cadastro' },
-    { key: 'Observações Ano Anterior', label: 'Obs. Ano Anterior' },
-    { key: 'Perfil', label: 'Perfil' },
-    { key: 'Estilo de Música', label: 'Estilo Musical' },
-    { key: 'Descrição Do Bloco', label: 'Descrição' },
-    { key: 'Horário Deconcentração', label: 'Concentração' },
-    { key: 'Início Do Desfile', label: 'Início' },
-    { key: 'Horário Encerramento', label: 'Encerramento' },
-    { key: 'Duração Do Desfile', label: 'Duração' },
-    { key: 'Horário Dispersão', label: 'Dispersão' },
-    { key: 'Equipamentos Utilizados', label: 'Equipamentos' },
-    { key: 'Largura Metros', label: 'Largura (m)' },
-    { key: 'Comprimento Metros', label: 'Comprimento (m)' },
-    { key: 'Altura Metros', label: 'Altura (m)' },
-    { key: 'Potência Watts', label: 'Potência (W)' },
-    { key: 'Dimensão De Veículos', label: 'Dimensão Veículos' },
-    { key: 'Percurso', label: 'Percurso' },
-    { key: 'Endereço De Concentração', label: 'End. Concentração' },
-    { key: 'Bairro De Concentração', label: 'Bairro Concentração' },
-    { key: 'Endereço De Dispersão', label: 'End. Dispersão' },
-    { key: 'Bairro De Dispersão', label: 'Bairro Dispersão' },
-    { key: 'Extensão Do Desfile Metros', label: 'Extensão (m)' },
-    { key: 'Número De Quadras', label: 'Nº Quadras' },
-    { key: 'Área Do Trajeto M²', label: 'Área (m²)' },
-    { key: 'Capacidade Público Do Trajeto', label: 'Capacidade' },
-    { key: 'Informações Adicionais', label: 'Info. Adicionais' },
-    { key: 'Responsável Legal', label: 'Responsável' },
-    { key: 'CNPJ', label: 'CNPJ' },
-    { key: 'CPF', label: 'CPF' },
-    { key: 'E Mail', label: 'E-mail' },
-    { key: 'Telefone', label: 'Telefone' },
-    { key: 'Celular', label: 'Celular' },
-    { key: 'Nome Responsável Secundário', label: 'Resp. Secundário' },
-    { key: 'Celular Contato 2', label: 'Celular 2' }
+  colunasEsperadas: string[] = [
+    'periodo', 'possuiDesfiles', 'statusDoDesfile', 'justificativaStatus',
+    'numeroInscricao', 'nomeDoBloco', 'categoriaDoBloco', 'autorizaDivulgacao',
+    'dataCadastroModificacao', 'primeiroCadastro', 'publicoAnterior', 'publicoDeclarado',
+    'publicoPlanejado', 'observacoesAnoAnterior', 'perfil', 'estiloDeMusica',
+    'descricaoDoBloco', 'dataDoDesfile', 'horarioDeconcentracao', 'inicioDoDesfile',
+    'horarioEncerramento', 'duracaoDoDesfile', 'horarioDispersao', 'equipamentosUtilizados',
+    'larguraMetros', 'comprimentoMetros', 'alturaMetros', 'potenciaWatts',
+    'dimensaoDeVeiculos', 'percurso', 'regional', 'enderecoDeConcentracao',
+    'bairroDeConcentracao', 'enderecoDeDispersao', 'bairroDeDispersao',
+    'extensaoDoDesfileMetros', 'numeroDeQuadras', 'areaDoTrajetoM2',
+    'capacidadePublicoDoTrajeto', 'informacoesAdicionais', 'responsavelLegal',
+    'cnpj', 'cpf', 'email', 'telefone', 'celular',
+    'nomeResponsavelSecundario', 'emailResponsavelSecundario', 'celularContato2'
   ];
 
-  // Progresso do salvamento
+  displayColumns = [
+    { key: 'nomeDoBloco', label: 'Nome do Bloco' },
+    { key: 'dataDoDesfile', label: 'Data Desfile' },
+    { key: 'regional', label: 'Regional' },
+    { key: 'periodo', label: 'Período' },
+    { key: 'publicoAnterior', label: 'Público Anterior' },
+    { key: 'publicoDeclarado', label: 'Público Declarado' },
+    { key: 'publicoPlanejado', label: 'Público Planejado' },
+    { key: 'statusDoDesfile', label: 'Status' },
+    { key: 'numeroInscricao', label: 'Nº Inscrição' },
+    { key: 'categoriaDoBloco', label: 'Categoria' },
+    { key: 'horarioDeconcentracao', label: 'Concentração' },
+    { key: 'inicioDoDesfile', label: 'Início' },
+    { key: 'horarioEncerramento', label: 'Encerramento' },
+    { key: 'responsavelLegal', label: 'Responsável' },
+    { key: 'celular', label: 'Celular' }
+  ];
+
   progressoAtual = 0;
   progressoTotal = 0;
   progressoNovos = 0;
   progressoAtualizados = 0;
-
-  // Controle do tooltip
   activeTooltip: { rowIndex: number; header: string } | null = null;
   tooltipContent = '';
-
-  // Exclusão em massa
   isDeleting = false;
   deleteProgressoAtual = 0;
   deleteProgressoTotal = 0;
   showDeleteConfirm = false;
+  showValidacaoModal = false;
+  colunasFaltando: string[] = [];
+  colunasExtras: string[] = [];
+  showInfoColunasModal = false;
 
   constructor(
     private blocosService: BlocosService,
@@ -96,52 +77,12 @@ export class ExcelUploadComponent {
     public authService: AuthService
   ) { }
 
-  // Função auxiliar para parsear datas do Excel
-  private parseExcelDate(dateValue: any): Date {
-    if (!dateValue) {
-      return new Date();
-    }
-
-    // Se já for um objeto Date válido
-    if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
-      return dateValue;
-    }
-
-    // Se for um número (serial do Excel)
-    if (typeof dateValue === 'number') {
-      // Excel usa 1/1/1900 como base (com bug do ano bissexto)
-      const excelEpoch = new Date(1899, 11, 30);
-      return new Date(excelEpoch.getTime() + dateValue * 86400000);
-    }
-
-    // Se for string, tenta diferentes formatos
-    if (typeof dateValue === 'string') {
-      const trimmed = dateValue.trim();
-
-      // Formato dd/mm/yyyy ou dd-mm-yyyy
-      const brMatch = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-      if (brMatch) {
-        const [, day, month, year] = brMatch;
-        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      }
-
-      // Formato yyyy-mm-dd ou yyyy/mm/dd
-      const isoMatch = trimmed.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
-      if (isoMatch) {
-        const [, year, month, day] = isoMatch;
-        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      }
-
-      // Tenta o parse padrão do JavaScript
-      const parsed = new Date(trimmed);
-      if (!isNaN(parsed.getTime())) {
-        return parsed;
-      }
-    }
-
-    // Se nada funcionar, retorna a data atual
-    console.warn('Não foi possível parsear a data:', dateValue);
-    return new Date();
+  private validarColunas(colunasExcel: string[]): { valido: boolean; faltando: string[]; extras: string[] } {
+    const colunasExcelSet = new Set(colunasExcel);
+    const colunasEsperadasSet = new Set(this.colunasEsperadas);
+    const faltando = this.colunasEsperadas.filter(col => !colunasExcelSet.has(col));
+    const extras = colunasExcel.filter(col => !colunasEsperadasSet.has(col));
+    return { valido: faltando.length === 0, faltando, extras };
   }
 
   onFileChange(event: any) {
@@ -149,156 +90,184 @@ export class ExcelUploadComponent {
     if (file) {
       this.fileName = file.name;
       this.saveMessage = '';
+      this.excelData = [];
+      this.headers = [];
       const reader = new FileReader();
-
       reader.onload = (e: any) => {
         const data = e.target.result;
         const workbook = XLSX.read(data, { type: 'binary' });
-
-        // Pega a primeira planilha
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-
-        // Converte para JSON
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false });
-
-        // Filtra apenas registros com status "APROVADO"
-        const dadosFiltrados = jsonData.filter((row: any) => {
-          const status = (row['Status do Desfile'] || '').toString().toUpperCase().trim();
-          return status === 'APROVADO';
-        });
-
-        // Ordena por nome do bloco
-        this.excelData = dadosFiltrados.sort((a: any, b: any) => {
-          const nomeA = (a['Nome Do Bloco'] || '').toLowerCase();
-          const nomeB = (b['Nome Do Bloco'] || '').toLowerCase();
-          return nomeA.localeCompare(nomeB, 'pt-BR');
-        });
-
-        // Extrai os headers (nomes das colunas)
-        if (this.excelData.length > 0) {
-          this.headers = Object.keys(this.excelData[0]);
+        
+        // Pega os headers diretamente da primeira linha (inclui colunas vazias)
+        const headersArray = XLSX.utils.sheet_to_json<string[]>(worksheet, { header: 1 })[0] || [];
+        const colunasExcel = headersArray.map((col: any) => String(col || '').trim()).filter(col => col !== '');
+        
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: '' });
+        if (jsonData.length === 0) {
+          this.saveMessage = 'A planilha está vazia.';
+          this.saveMessageType = 'error';
+          return;
         }
+        
+        const validacao = this.validarColunas(colunasExcel);
+        if (!validacao.valido) {
+          this.colunasFaltando = validacao.faltando;
+          this.colunasExtras = validacao.extras;
+          this.showValidacaoModal = true;
+          return;
+        }
+        this.processarDadosExcel(jsonData);
       };
-
       reader.readAsBinaryString(file);
     }
   }
 
-  // Mapeia os dados do Excel para a interface Blocos
+  private processarDadosExcel(jsonData: unknown[]) {
+    // Normaliza as chaves removendo espaços extras
+    const dadosNormalizados = jsonData.map((row: any) => {
+      const novoRow: any = {};
+      Object.keys(row).forEach(key => {
+        novoRow[key.trim()] = row[key];
+      });
+      return novoRow;
+    });
+
+    const dadosFiltrados = dadosNormalizados.filter((row: any) => {
+      const status = (row['statusDoDesfile'] || '').toString().toUpperCase().trim();
+      return status === 'APROVADO';
+    });
+    this.excelData = dadosFiltrados.sort((a: any, b: any) => {
+      const nomeA = (a['nomeDoBloco'] || '').toLowerCase();
+      const nomeB = (b['nomeDoBloco'] || '').toLowerCase();
+      return nomeA.localeCompare(nomeB, 'pt-BR');
+    });
+    if (this.excelData.length > 0) {
+      this.headers = Object.keys(this.excelData[0]);
+    }
+    if (this.excelData.length === 0) {
+      this.saveMessage = 'Nenhum bloco com status "APROVADO" encontrado.';
+      this.saveMessageType = 'error';
+    }
+  }
+
+  fecharValidacaoModal() {
+    this.showValidacaoModal = false;
+    this.colunasFaltando = [];
+    this.colunasExtras = [];
+    this.fileName = '';
+  }
+
+  copiarColunasEsperadas() {
+    const texto = this.colunasEsperadas.join('\n');
+    navigator.clipboard.writeText(texto).then(() => {
+      this.saveMessage = 'Lista de colunas copiada!';
+      this.saveMessageType = 'success';
+      setTimeout(() => { this.saveMessage = ''; this.saveMessageType = ''; }, 2000);
+    });
+  }
+
+  abrirInfoColunas() { this.showInfoColunasModal = true; }
+  fecharInfoColunas() { this.showInfoColunasModal = false; }
+
+  private parseExcelDate(dateValue: any): Date {
+    if (!dateValue) return new Date();
+    if (dateValue instanceof Date && !isNaN(dateValue.getTime())) return dateValue;
+    if (typeof dateValue === 'number') {
+      const excelEpoch = new Date(1899, 11, 30);
+      return new Date(excelEpoch.getTime() + dateValue * 86400000);
+    }
+    if (typeof dateValue === 'string') {
+      const trimmed = dateValue.trim();
+      const brMatch = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      if (brMatch) {
+        return new Date(parseInt(brMatch[3]), parseInt(brMatch[2]) - 1, parseInt(brMatch[1]));
+      }
+      const isoMatch = trimmed.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+      if (isoMatch) {
+        return new Date(parseInt(isoMatch[1]), parseInt(isoMatch[2]) - 1, parseInt(isoMatch[3]));
+      }
+      const parsed = new Date(trimmed);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return new Date();
+  }
+
   mapExcelDataToBlocos(excelRow: any): Blocos {
     const bloco: any = {
-      periodo: excelRow['Periodo'] || '',
-      possuiDesfiles: excelRow['Possui Desfiles?']?.toLowerCase() === 'sim',
-      statusDoDesfile: excelRow['Status do Desfile'] || '',
-      numeroInscricao: excelRow['Nº de Inscrição'] || '',
-      nomeDoBloco: excelRow['Nome Do Bloco'] || '',
-      categoriaDoBloco: excelRow['Categoria Do Bloco'] || '',
-      autorizaDivulgacao: excelRow['Autoriza Divulgação']?.toLowerCase() === 'sim',
-      dataCadastroModificacao: this.parseExcelDate(excelRow['Data de Cadastro ou Modificação']),
-      primeiroCadastro: excelRow['Primeiro Cadastro?']?.toLowerCase() === 'sim',
-
-      publicoDeclarado: parseInt(excelRow['Público Declarado']) || 0,
-
-      perfil: excelRow['Perfil'] || '',
-      estiloDeMusica: excelRow['Estilo de Música'] || '',
-      descricaoDoBloco: excelRow['Descrição Do Bloco'] || '',
-
-      dataDoDesfile: this.parseExcelDate(excelRow['Data Do Desfile']),
-      horarioDeconcentracao: excelRow['Horário Deconcentração'] || '',
-      inicioDoDesfile: excelRow['Início Do Desfile'] || '',
-      horarioEncerramento: excelRow['Horário Encerramento'] || '',
-      duracaoDoDesfile: excelRow['Duração Do Desfile'] || '',
-      horarioDispersao: excelRow['Horário Dispersão'] || '',
-
-      equipamentosUtilizados: excelRow['Equipamentos Utilizados'] ? excelRow['Equipamentos Utilizados'].split(',').map((e: string) => e.trim()) : [],
-      larguraMetros: parseFloat(excelRow['Largura Metros']) || 0,
-      comprimentoMetros: parseFloat(excelRow['Comprimento Metros']) || 0,
-      alturaMetros: parseFloat(excelRow['Altura Metros']) || 0,
-      potenciaWatts: parseFloat(excelRow['Potência Watts']) || 0,
-
-      percurso: excelRow['Percurso'] || '',
-      regional: excelRow['Regional'] || '',
-      enderecoDeConcentracao: excelRow['Endereço De Concentração'] || '',
-      bairroDeConcentracao: excelRow['Bairro De Concentração'] || '',
-      enderecoDeDispersao: excelRow['Endereço De Dispersão'] || '',
-      bairroDeDispersao: excelRow['Bairro De Dispersão'] || '',
-      extensaoDoDesfileMetros: parseFloat(excelRow['Extensão Do Desfile Metros']) || 0,
-      numeroDeQuadras: parseInt(excelRow['Número De Quadras']) || 0,
-      areaDoTrajetoM2: parseFloat(excelRow['Área Do Trajeto M²']) || 0,
-      capacidadePublicoDoTrajeto: parseInt(excelRow['Capacidade Público Do Trajeto']) || 0,
-
-      responsavelLegal: excelRow['Responsável Legal'] || '',
-      email: excelRow['E Mail'] || '',
-      celular: excelRow['Celular'] || ''
+      periodo: excelRow['periodo'] || '',
+      possuiDesfiles: (excelRow['possuiDesfiles'] || '').toString().toLowerCase() === 'sim',
+      statusDoDesfile: excelRow['statusDoDesfile'] || '',
+      numeroInscricao: excelRow['numeroInscricao'] || '',
+      nomeDoBloco: excelRow['nomeDoBloco'] || '',
+      categoriaDoBloco: excelRow['categoriaDoBloco'] || '',
+      autorizaDivulgacao: (excelRow['autorizaDivulgacao'] || '').toString().toLowerCase() === 'sim',
+      dataCadastroModificacao: this.parseExcelDate(excelRow['dataCadastroModificacao']),
+      primeiroCadastro: (excelRow['primeiroCadastro'] || '').toString().toLowerCase() === 'sim',
+      publicoDeclarado: parseInt(excelRow['publicoDeclarado']) || 0,
+      perfil: excelRow['perfil'] || '',
+      estiloDeMusica: excelRow['estiloDeMusica'] || '',
+      descricaoDoBloco: excelRow['descricaoDoBloco'] || '',
+      dataDoDesfile: this.parseExcelDate(excelRow['dataDoDesfile']),
+      horarioDeconcentracao: excelRow['horarioDeconcentracao'] || '',
+      inicioDoDesfile: excelRow['inicioDoDesfile'] || '',
+      horarioEncerramento: excelRow['horarioEncerramento'] || '',
+      duracaoDoDesfile: excelRow['duracaoDoDesfile'] || '',
+      horarioDispersao: excelRow['horarioDispersao'] || '',
+      equipamentosUtilizados: excelRow['equipamentosUtilizados'] ? excelRow['equipamentosUtilizados'].split(',').map((e: string) => e.trim()) : [],
+      larguraMetros: parseFloat(excelRow['larguraMetros']) || 0,
+      comprimentoMetros: parseFloat(excelRow['comprimentoMetros']) || 0,
+      alturaMetros: parseFloat(excelRow['alturaMetros']) || 0,
+      potenciaWatts: parseFloat(excelRow['potenciaWatts']) || 0,
+      percurso: excelRow['percurso'] || '',
+      regional: excelRow['regional'] || '',
+      enderecoDeConcentracao: excelRow['enderecoDeConcentracao'] || '',
+      bairroDeConcentracao: excelRow['bairroDeConcentracao'] || '',
+      enderecoDeDispersao: excelRow['enderecoDeDispersao'] || '',
+      bairroDeDispersao: excelRow['bairroDeDispersao'] || '',
+      extensaoDoDesfileMetros: parseFloat(excelRow['extensaoDoDesfileMetros']) || 0,
+      numeroDeQuadras: parseInt(excelRow['numeroDeQuadras']) || 0,
+      areaDoTrajetoM2: parseFloat(excelRow['areaDoTrajetoM2']) || 0,
+      capacidadePublicoDoTrajeto: parseInt(excelRow['capacidadePublicoDoTrajeto']) || 0,
+      responsavelLegal: excelRow['responsavelLegal'] || '',
+      email: excelRow['email'] || '',
+      celular: excelRow['celular'] || ''
     };
-
-    // Adiciona campos opcionais apenas se tiverem valor
-    if (excelRow['Justificativa Status']) {
-      bloco.justificativaStatus = excelRow['Justificativa Status'];
+    if (excelRow['justificativaStatus']) bloco.justificativaStatus = excelRow['justificativaStatus'];
+    if (excelRow['publicoAnterior']) {
+      const v = parseInt(excelRow['publicoAnterior']);
+      if (!isNaN(v)) bloco.publicoAnterior = v;
     }
-
-    if (excelRow['Público Anterior']) {
-      const publicoAnterior = parseInt(excelRow['Público Anterior']);
-      if (!isNaN(publicoAnterior)) {
-        bloco.publicoAnterior = publicoAnterior;
-      }
+    if (excelRow['publicoPlanejado']) {
+      const v = parseInt(excelRow['publicoPlanejado']);
+      if (!isNaN(v)) bloco.publicoPlanejado = v;
     }
-
-    if (excelRow['Observações Ano Anterior']) {
-      bloco.observacoesAnoAnterior = excelRow['Observações Ano Anterior'];
-    }
-
-    if (excelRow['Dimensão De Veículos']) {
-      bloco.dimensaoDeVeiculos = excelRow['Dimensão De Veículos'];
-    }
-
-    if (excelRow['Informações Adicionais']) {
-      bloco.informacoesAdicionais = excelRow['Informações Adicionais'];
-    }
-
-    if (excelRow['CNPJ']) {
-      bloco.cnpj = excelRow['CNPJ'];
-    }
-
-    if (excelRow['CPF']) {
-      bloco.cpf = excelRow['CPF'];
-    }
-
-    if (excelRow['Telefone']) {
-      bloco.telefone = excelRow['Telefone'];
-    }
-
-    if (excelRow['Nome Responsável Secundário']) {
-      bloco.nomeResponsavelSecundario = excelRow['Nome Responsável Secundário'];
-    }
-
-    if (excelRow['Celular Contato 2']) {
-      bloco.celularContato2 = excelRow['Celular Contato 2'];
-    }
-
+    if (excelRow['observacoesAnoAnterior']) bloco.observacoesAnoAnterior = excelRow['observacoesAnoAnterior'];
+    if (excelRow['dimensaoDeVeiculos']) bloco.dimensaoDeVeiculos = excelRow['dimensaoDeVeiculos'];
+    if (excelRow['informacoesAdicionais']) bloco.informacoesAdicionais = excelRow['informacoesAdicionais'];
+    if (excelRow['cnpj']) bloco.cnpj = excelRow['cnpj'];
+    if (excelRow['cpf']) bloco.cpf = excelRow['cpf'];
+    if (excelRow['telefone']) bloco.telefone = excelRow['telefone'];
+    if (excelRow['nomeResponsavelSecundario']) bloco.nomeResponsavelSecundario = excelRow['nomeResponsavelSecundario'];
+    if (excelRow['emailResponsavelSecundario']) bloco.emailResponsavelSecundario = excelRow['emailResponsavelSecundario'];
+    if (excelRow['celularContato2']) bloco.celularContato2 = excelRow['celularContato2'];
     return bloco as Blocos;
   }
 
   async salvarNoFirestore() {
     if (this.excelData.length === 0) {
-      this.saveMessage = 'Nenhum dado para salvar. Por favor, carregue um arquivo Excel primeiro.';
+      this.saveMessage = 'Nenhum dado para salvar.';
       this.saveMessageType = 'error';
       return;
     }
-
     this.isSaving = true;
     this.saveMessage = '';
     this.progressoAtual = 0;
     this.progressoTotal = this.excelData.length;
     this.progressoNovos = 0;
     this.progressoAtualizados = 0;
-
     try {
-      // Mapear os dados do Excel para a interface Blocos
       const blocos: Blocos[] = this.excelData.map(row => this.mapExcelDataToBlocos(row));
-
-      // Salvar no Firestore com callback de progresso
       const resultado = await this.blocosService.salvarBlocos(blocos, (atual, total, novos, atualizados) => {
         this.ngZone.run(() => {
           this.progressoAtual = atual;
@@ -307,20 +276,17 @@ export class ExcelUploadComponent {
           this.progressoAtualizados = atualizados;
         });
       });
-
       this.ngZone.run(() => {
-        let mensagem = `✓ Sucesso! ${resultado.total} registro(s) processado(s): ${resultado.novos} novo(s), ${resultado.atualizados} atualizado(s).`;
-        if (resultado.mapasVinculados > 0) {
-          mensagem += ` 🗺️ ${resultado.mapasVinculados} mapa(s) vinculado(s) automaticamente.`;
-        }
-        this.saveMessage = mensagem;
+        let msg = `Sucesso! ${resultado.total} processado(s): ${resultado.novos} novo(s), ${resultado.atualizados} atualizado(s).`;
+        if (resultado.mapasVinculados > 0) msg += ` ${resultado.mapasVinculados} mapa(s) vinculado(s).`;
+        this.saveMessage = msg;
         this.saveMessageType = 'success';
         this.isSaving = false;
       });
     } catch (error) {
-      console.error('Erro ao salvar no Firestore:', error);
+      console.error('Erro ao salvar:', error);
       this.ngZone.run(() => {
-        this.saveMessage = `✗ Erro ao salvar no Firestore: ${error}`;
+        this.saveMessage = `Erro ao salvar: ${error}`;
         this.saveMessageType = 'error';
         this.isSaving = false;
       });
@@ -340,66 +306,45 @@ export class ExcelUploadComponent {
     this.saveMessageType = '';
   }
 
-  // Funções de truncamento e tooltip
-  isTextLong(value: any): boolean {
-    const text = String(value || '');
-    return text.length > 30;
-  }
-
+  isTextLong(value: any): boolean { return String(value || '').length > 30; }
   getTruncatedText(value: any): string {
     const text = String(value || '-');
-    if (text.length > 30) {
-      return text.substring(0, 30) + '...';
-    }
-    return text;
+    return text.length > 30 ? text.substring(0, 30) + '...' : text;
   }
 
   showTooltip(rowIndex: number, header: string, value: any) {
     this.activeTooltip = { rowIndex, header };
     this.tooltipContent = String(value || '-');
   }
-
-  hideTooltip() {
-    this.activeTooltip = null;
-    this.tooltipContent = '';
-  }
-
+  hideTooltip() { this.activeTooltip = null; this.tooltipContent = ''; }
   isTooltipActive(rowIndex: number, header: string): boolean {
     return this.activeTooltip?.rowIndex === rowIndex && this.activeTooltip?.header === header;
   }
 
-  // Exclusão em massa - apenas admin
-  abrirConfirmacaoExclusao() {
-    this.showDeleteConfirm = true;
-  }
-
-  fecharConfirmacaoExclusao() {
-    this.showDeleteConfirm = false;
-  }
+  abrirConfirmacaoExclusao() { this.showDeleteConfirm = true; }
+  fecharConfirmacaoExclusao() { this.showDeleteConfirm = false; }
 
   async excluirTodosBlocos() {
     this.showDeleteConfirm = false;
     this.isDeleting = true;
     this.deleteProgressoAtual = 0;
     this.deleteProgressoTotal = 0;
-
     try {
-      const total = await this.blocosService.excluirTodosBlocos((atual, total) => {
+      const total = await this.blocosService.excluirTodosBlocos((atual, tot) => {
         this.ngZone.run(() => {
           this.deleteProgressoAtual = atual;
-          this.deleteProgressoTotal = total;
+          this.deleteProgressoTotal = tot;
         });
       });
-
       this.ngZone.run(() => {
-        this.saveMessage = `✓ ${total} bloco(s) excluído(s) com sucesso!`;
+        this.saveMessage = `${total} bloco(s) excluído(s)!`;
         this.saveMessageType = 'success';
         this.isDeleting = false;
       });
     } catch (error) {
-      console.error('Erro ao excluir blocos:', error);
+      console.error('Erro ao excluir:', error);
       this.ngZone.run(() => {
-        this.saveMessage = `✗ Erro ao excluir blocos: ${error}`;
+        this.saveMessage = `Erro ao excluir: ${error}`;
         this.saveMessageType = 'error';
         this.isDeleting = false;
       });

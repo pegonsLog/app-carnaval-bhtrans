@@ -1,6 +1,11 @@
 <div class="excel-upload-container">
   <div class="upload-section">
-    <h2>Importe a Planilha da Belotur</h2>
+    <div class="header-with-info">
+      <h2>Importe a Planilha da Belotur</h2>
+      <button class="info-btn" (click)="abrirInfoColunas()" title="Ver nomes das colunas esperadas">
+        <ng-icon name="heroInformationCircle"></ng-icon>
+      </button>
+    </div>
 
     <div class="file-input-wrapper">
       <input type="file" id="fileInput" accept=".xlsx, .xls" (change)="onFileChange($event)" #fileInput />
@@ -69,6 +74,78 @@
       <div class="modal-actions">
         <button class="cancel-btn" (click)="fecharConfirmacaoExclusao()">Cancelar</button>
         <button class="confirm-delete-btn" (click)="excluirTodosBlocos()">Sim, Excluir Tudo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de informações das colunas -->
+  <div class="modal-overlay" *ngIf="showInfoColunasModal" (click)="fecharInfoColunas()">
+    <div class="modal-content info-colunas-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <ng-icon name="heroInformationCircle" class="info-icon"></ng-icon>
+        <h3>Nomes das Colunas do Excel</h3>
+        <button class="modal-close-btn" (click)="fecharInfoColunas()">
+          <ng-icon name="heroXMark"></ng-icon>
+        </button>
+      </div>
+      
+      <p class="modal-description">
+        A planilha Excel deve conter as colunas com os nomes exatamente como listados abaixo. 
+        Copie a lista para facilitar a configuração da sua planilha.
+      </p>
+
+      <div class="info-colunas-content">
+        <div class="colunas-grid">
+          <span class="coluna-item" *ngFor="let col of colunasEsperadas; let i = index">
+            <span class="coluna-numero">{{ i + 1 }}</span>
+            <span class="coluna-nome">{{ col }}</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="copy-btn" (click)="copiarColunasEsperadas()">
+          Copiar Lista de Colunas
+        </button>
+        <button class="close-btn" (click)="fecharInfoColunas()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de validação de colunas -->
+  <div class="modal-overlay" *ngIf="showValidacaoModal" (click)="fecharValidacaoModal()">
+    <div class="modal-content validacao-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <ng-icon name="heroExclamationTriangle" class="warning-icon"></ng-icon>
+        <h3>Colunas da Planilha Incompatíveis</h3>
+      </div>
+      
+      <p class="modal-description">
+        A planilha possui colunas com nomes diferentes do esperado. 
+        Os nomes das colunas devem ser exatamente iguais aos nomes dos atributos.
+      </p>
+
+      <div class="validacao-content">
+        <div class="diferencas-section" *ngIf="colunasFaltando.length > 0">
+          <h4>Colunas que faltam na planilha:</h4>
+          <div class="colunas-list">
+            <span class="coluna-tag faltando" *ngFor="let col of colunasFaltando">{{ col }}</span>
+          </div>
+        </div>
+
+        <div class="extras-section" *ngIf="colunasExtras.length > 0">
+          <h4>Colunas extras na planilha (serão ignoradas):</h4>
+          <div class="colunas-list">
+            <span class="coluna-tag extra" *ngFor="let extra of colunasExtras">{{ extra }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="copy-btn" (click)="copiarColunasEsperadas()">
+          Copiar Lista de Colunas Esperadas
+        </button>
+        <button class="close-btn" (click)="fecharValidacaoModal()">Fechar</button>
       </div>
     </div>
   </div>

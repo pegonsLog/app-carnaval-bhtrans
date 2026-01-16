@@ -14,6 +14,7 @@ export interface Blocos {
     // Informações de Público
     publicoAnterior?: number;
     publicoDeclarado: number;
+    publicoPlanejado?: number;
     observacoesAnoAnterior?: string;
 
     // Características do Bloco
@@ -62,5 +63,6 @@ export interface Blocos {
 
     // Responsável Secundário
     nomeResponsavelSecundario?: string;
+    emailResponsavelSecundario?: string;
     celularContato2?: string;
 }

@@ -26,6 +26,7 @@ export class BuscaLinhaComponent implements OnInit {
     linhas: LinhaItem[] = [];
     linhasFiltradas: LinhaItem[] = [];
     filtroLinha = '';
+    filtroItinerario = '';
     carregando = false;
     linhaExpandida: string | null = null;
 
@@ -43,8 +44,8 @@ export class BuscaLinhaComponent implements OnInit {
 
     async ngOnInit() {
         await this.carregarLinhas();
-        if (this.filtroLinha) {
-            this.filtrarPorLinha();
+        if (this.filtroLinha || this.filtroItinerario) {
+            this.aplicarFiltros();
             this.cdr.detectChanges();
         }
     }
@@ -68,17 +69,24 @@ export class BuscaLinhaComponent implements OnInit {
         this.cdr.detectChanges();
     }
 
-    filtrarPorLinha() {
-        if (!this.filtroLinha.trim()) {
+    aplicarFiltros() {
+        const termoLinha = this.filtroLinha.trim().toLowerCase();
+        const termoItinerario = this.filtroItinerario.trim().toLowerCase();
+
+        if (!termoLinha && !termoItinerario) {
             this.linhasFiltradas = [];
             return;
         }
-        const termo = this.filtroLinha.toLowerCase();
+
         this.linhasFiltradas = this.linhas
-            .filter(l => 
-                l.linhaDestino?.toLowerCase().includes(termo) ||
-                l.pc?.toLowerCase().includes(termo)
-            )
+            .filter(l => {
+                const matchLinha = !termoLinha || 
+                    l.linhaDestino?.toLowerCase().includes(termoLinha) ||
+                    l.pc?.toLowerCase().includes(termoLinha);
+                const matchItinerario = !termoItinerario || 
+                    l.itinerario?.toLowerCase().includes(termoItinerario);
+                return matchLinha && matchItinerario;
+            })
             .sort((a, b) => (a.linhaDestino || '').localeCompare(b.linhaDestino || '', 'pt-BR'));
     }
 

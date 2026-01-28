@@ -7,10 +7,22 @@
     </div>
 
     <div class="page-content">
-        <div class="filtro-grupo">
-            <label>Linha ou PC</label>
-            <input type="text" [(ngModel)]="filtroLinha" (input)="filtrarPorLinha()"
-                placeholder="Digite a linha ou PC..." class="input-filtro">
+        <div class="filtros-container">
+            <div class="filtro-grupo">
+                <label>Linha / Destino</label>
+                <input type="text" [(ngModel)]="filtroLinha" (input)="aplicarFiltros()"
+                    placeholder="Digite a linha ou PC..." class="input-filtro">
+            </div>
+
+            <div class="filtro-grupo">
+                <label>Via / Itinerário (Opcional)</label>
+                <input type="text" [(ngModel)]="filtroItinerario" (input)="aplicarFiltros()"
+                    placeholder="Digite o nome da via..." class="input-filtro">
+            </div>
+
+            <div class="resultado-count" *ngIf="linhasFiltradas.length > 0">
+                {{ linhasFiltradas.length }} linha(s) encontrada(s)
+            </div>
         </div>
 
         <div class="loading" *ngIf="carregando">
@@ -42,12 +54,12 @@
             </div>
         </div>
 
-        <div class="sem-resultados" *ngIf="filtroLinha && linhasFiltradas.length === 0 && !carregando">
+        <div class="sem-resultados" *ngIf="(filtroLinha || filtroItinerario) && linhasFiltradas.length === 0 && !carregando">
             Nenhuma linha encontrada
         </div>
 
-        <div class="instrucao" *ngIf="!filtroLinha && !carregando">
-            Digite o nome da linha ou PC para buscar
+        <div class="instrucao" *ngIf="!filtroLinha && !filtroItinerario && !carregando">
+            Digite o nome ou número da linha, para buscar o desvio.
         </div>
     </div>
 </div>

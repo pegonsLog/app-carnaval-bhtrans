@@ -41,8 +41,21 @@
 
 .page-content { padding: 1.25rem; }
 
-.filtro-grupo {
+.filtros-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   margin-bottom: 1rem;
+}
+
+.resultado-count {
+  font-size: 0.875rem;
+  color: #667eea;
+  font-weight: 600;
+  padding: 0.5rem 0;
+}
+
+.filtro-grupo {
   label {
     display: block;
     font-size: 0.875rem;

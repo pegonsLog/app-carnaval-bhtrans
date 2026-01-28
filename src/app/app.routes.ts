@@ -13,7 +13,10 @@ import { BuscaBlocoComponent } from './pages/busca-bloco/busca-bloco';
 import { BuscaRegionalComponent } from './pages/busca-regional/busca-regional';
 import { BuscaDataComponent } from './pages/busca-data/busca-data';
 import { BuscaLivreComponent } from './pages/busca-livre/busca-livre';
+import { BuscaLinhaComponent } from './pages/busca-linha/busca-linha';
 import { MapaComponent } from './pages/mapa/mapa';
+import { LinhaTcUploadComponent } from './components/linha-tc-upload/linha-tc-upload';
+import { LinhaTcListComponent } from './components/linha-tc-list/linha-tc-list';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -91,8 +94,22 @@ export const routes: Routes = [
         component: BuscaLivreComponent
     },
     {
+        path: 'busca-linha',
+        component: BuscaLinhaComponent
+    },
+    {
         path: 'mapa',
         component: MapaComponent
+    },
+    {
+        path: 'linhas-tc',
+        component: LinhaTcListComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'linhas-tc/importar',
+        component: LinhaTcUploadComponent,
+        canActivate: [authGuard]
     },
     {
         path: '**',

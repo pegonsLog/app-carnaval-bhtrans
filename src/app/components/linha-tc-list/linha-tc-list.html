@@ -1,0 +1,96 @@
+<div class="linha-tc-list-container">
+  <div class="header-section">
+    <h2>Linhas TC</h2>
+    <div class="header-actions">
+      <a routerLink="/linhas-tc/importar" class="import-btn" *ngIf="authService.isAdmin">
+        <ng-icon name="heroArrowUpTray"></ng-icon>
+        Importar Planilha
+      </a>
+      <button class="refresh-btn" (click)="carregarLinhas()" [disabled]="isLoading">
+        <ng-icon name="heroMagnifyingGlass"></ng-icon>
+        {{ isLoading ? 'Carregando...' : 'Atualizar' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Carregando linhas...</p>
+  </div>
+
+  <div class="filters-section" *ngIf="!isLoading && linhas.length > 0">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Linha/Destino</label>
+        <input type="text" [(ngModel)]="filtroLinhaDestino" (ngModelChange)="aplicarFiltros()" placeholder="Buscar por linha...">
+      </div>
+      <div class="filter-group">
+        <label>PC</label>
+        <input type="text" [(ngModel)]="filtroPc" (ngModelChange)="aplicarFiltros()" placeholder="Buscar por PC...">
+      </div>
+      <div class="filter-group">
+        <label>Busca Livre</label>
+        <input type="text" [(ngModel)]="filtroLivre" (ngModelChange)="aplicarFiltros()" placeholder="Buscar em todos os campos...">
+      </div>
+    </div>
+    <button class="clear-filters-btn" (click)="limparFiltros()" *ngIf="filtroLinhaDestino || filtroPc || filtroLivre">
+      Limpar Filtros
+    </button>
+  </div>
+
+  <div class="table-section" *ngIf="!isLoading && linhas.length > 0">
+    <div class="count-info-container">
+      <p class="count-info">
+        Exibindo {{ linhasExibidas.length }} de {{ linhasFiltradas.length }} linha(s)
+        <span *ngIf="!todasCarregadas" class="loading-hint">(carregando todas...)</span>
+      </p>
+      <span *ngIf="isLoadingTodas" class="loading-badge">
+        <span class="mini-spinner"></span> Carregando filtros...
+      </span>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th *ngFor="let col of displayColumns">{{ col.label }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let linha of linhasExibidas; let i = index">
+            <td class="row-number">{{ i + 1 }}</td>
+            <td *ngFor="let col of displayColumns" class="cell-content">
+              <div class="cell-wrapper">
+                <span class="text-truncate" [title]="linha[col.key]">{{ getTruncatedText(linha[col.key]) }}</span>
+                <button *ngIf="isTextLong(linha[col.key])" class="tooltip-trigger" (click)="showTooltip(i, col.key, linha[col.key])">
+                  <ng-icon name="heroEllipsisHorizontal"></ng-icon>
+                </button>
+                <div class="tooltip-balloon" *ngIf="isTooltipActive(i, col.key)">
+                  <button class="tooltip-close" (click)="hideTooltip()">
+                    <ng-icon name="heroXMark"></ng-icon>
+                  </button>
+                  <p>{{ tooltipContent }}</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="load-more-container" *ngIf="linhasExibidas.length < linhasFiltradas.length">
+      <button class="load-more-btn" (click)="carregarMais()">
+        Carregar todas ({{ linhasFiltradas.length - linhasExibidas.length }} restantes)
+      </button>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && linhas.length === 0 && !errorMessage">
+    <ng-icon name="heroMagnifyingGlass" class="empty-icon"></ng-icon>
+    <p>Nenhuma linha TC cadastrada</p>
+    <p class="empty-subtitle">Importe um arquivo Excel para adicionar linhas</p>
+  </div>
+</div>

@@ -3,6 +3,15 @@
   <p class="menu-subtitulo">Escolha uma das opções para encontrar os blocos</p> -->
 
   <div class="cards-container">
+    <!-- Card Por Linha TC -->
+    <div class="menu-card" (click)="navegarBuscaLinha()">
+      <div class="card-icon">
+        <ng-icon name="heroArrowPath"></ng-icon>
+      </div>
+      <span class="card-titulo">Por Linha</span>
+      <span class="card-descricao">Busque os desvios e PEDs criados das linhas desviadas</span>
+    </div>
+
     <!-- Card Por Bloco -->
     <div class="menu-card" (click)="navegarPorBloco()">
       <div class="card-icon">
@@ -10,15 +19,6 @@
       </div>
       <span class="card-titulo">Por Bloco</span>
       <span class="card-descricao">Busque pelo nome do bloco</span>
-    </div>
-
-    <!-- Card Por Regional -->
-    <div class="menu-card" (click)="navegarPorRegional()">
-      <div class="card-icon">
-        <ng-icon name="heroBuildingOffice2"></ng-icon>
-      </div>
-      <span class="card-titulo">Por Regional</span>
-      <span class="card-descricao">Filtre por regional</span>
     </div>
 
     <!-- Card Por Data -->

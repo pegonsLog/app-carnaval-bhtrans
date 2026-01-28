@@ -1,0 +1,170 @@
+<div class="linha-tc-upload-container">
+  <div class="upload-section">
+    <div class="header-with-info">
+      <h2>Importar Linhas TC</h2>
+      <button class="info-btn" (click)="abrirInfoColunas()" title="Ver nomes das colunas esperadas">
+        <ng-icon name="heroInformationCircle"></ng-icon>
+      </button>
+    </div>
+
+    <div class="file-input-wrapper">
+      <input type="file" id="fileInput" accept=".xlsx, .xls" (change)="onFileChange($event)" #fileInput />
+      <label for="fileInput" class="file-label">
+        <ng-icon name="heroFolder" class="icon"></ng-icon>
+        <span>{{ fileName || 'Selecione o arquivo' }}</span>
+      </label>
+    </div>
+
+    <div class="action-buttons" *ngIf="excelData.length > 0">
+      <button class="save-btn" (click)="salvarNoFirestore()" [disabled]="isSaving">
+        <span *ngIf="!isSaving"><ng-icon name="heroCloudArrowUp"></ng-icon> Salvar no Firestore</span>
+        <span *ngIf="isSaving"><ng-icon name="heroClock"></ng-icon> Salvando...</span>
+      </button>
+      <button class="clear-btn" (click)="clearData(); fileInput.value = ''" [disabled]="isSaving">
+        <ng-icon name="heroTrash"></ng-icon> Limpar Dados
+      </button>
+    </div>
+
+    <div class="progress-section" *ngIf="isSaving">
+      <div class="progress-info">
+        <span class="progress-text">Salvando registro {{ progressoAtual }} de {{ progressoTotal }}</span>
+        <span class="progress-percent">{{ progressoPorcentagem }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progressoPorcentagem"></div>
+      </div>
+      <div class="progress-stats">
+        <span class="stat novo">{{ progressoNovos }} novo(s)</span>
+        <span class="stat atualizado">{{ progressoAtualizados }} atualizado(s)</span>
+      </div>
+    </div>
+
+    <div class="message-box" *ngIf="saveMessage" [class.success]="saveMessageType === 'success'" [class.error]="saveMessageType === 'error'">
+      {{ saveMessage }}
+    </div>
+
+    <div class="admin-section" *ngIf="authService.isAdmin">
+      <hr class="divider">
+      <h4>Área Administrativa</h4>
+      <button class="delete-all-btn" (click)="abrirConfirmacaoExclusao()" [disabled]="isDeleting">
+        <ng-icon name="heroTrash"></ng-icon> Excluir Todas as Linhas
+      </button>
+      <div class="progress-section" *ngIf="isDeleting">
+        <div class="progress-info">
+          <span class="progress-text">Excluindo registro {{ deleteProgressoAtual }} de {{ deleteProgressoTotal }}</span>
+          <span class="progress-percent">{{ deleteProgressoPorcentagem }}%</span>
+        </div>
+        <div class="progress-bar delete">
+          <div class="progress-fill delete" [style.width.%]="deleteProgressoPorcentagem"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmação de exclusão -->
+  <div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="fecharConfirmacaoExclusao()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>⚠️ Confirmar Exclusão</h3>
+      <p>Tem certeza que deseja excluir <strong>TODAS</strong> as linhas TC do Firestore?</p>
+      <p class="warning-text">Esta ação não pode ser desfeita!</p>
+      <div class="modal-actions">
+        <button class="cancel-btn" (click)="fecharConfirmacaoExclusao()">Cancelar</button>
+        <button class="confirm-delete-btn" (click)="excluirTodasLinhas()">Sim, Excluir Tudo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de informações das colunas -->
+  <div class="modal-overlay" *ngIf="showInfoColunasModal" (click)="fecharInfoColunas()">
+    <div class="modal-content info-colunas-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <ng-icon name="heroInformationCircle" class="info-icon"></ng-icon>
+        <h3>Nomes das Colunas do Excel</h3>
+        <button class="modal-close-btn" (click)="fecharInfoColunas()">
+          <ng-icon name="heroXMark"></ng-icon>
+        </button>
+      </div>
+      <p class="modal-description">A planilha Excel deve conter as colunas com os nomes exatamente como listados abaixo.</p>
+      <div class="info-colunas-content">
+        <div class="colunas-grid">
+          <span class="coluna-item" *ngFor="let col of colunasEsperadas; let i = index">
+            <span class="coluna-numero">{{ i + 1 }}</span>
+            <span class="coluna-nome">{{ col }}</span>
+          </span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="copy-btn" (click)="copiarColunasEsperadas()">Copiar Lista de Colunas</button>
+        <button class="close-btn" (click)="fecharInfoColunas()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de validação de colunas -->
+  <div class="modal-overlay" *ngIf="showValidacaoModal" (click)="fecharValidacaoModal()">
+    <div class="modal-content validacao-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <ng-icon name="heroExclamationTriangle" class="warning-icon"></ng-icon>
+        <h3>Colunas da Planilha Incompatíveis</h3>
+      </div>
+      <p class="modal-description">A planilha possui colunas com nomes diferentes do esperado.</p>
+      <div class="validacao-content">
+        <div class="diferencas-section" *ngIf="colunasFaltando.length > 0">
+          <h4>Colunas que faltam na planilha:</h4>
+          <div class="colunas-list">
+            <span class="coluna-tag faltando" *ngFor="let col of colunasFaltando">{{ col }}</span>
+          </div>
+        </div>
+        <div class="extras-section" *ngIf="colunasExtras.length > 0">
+          <h4>Colunas extras na planilha (serão ignoradas):</h4>
+          <div class="colunas-list">
+            <span class="coluna-tag extra" *ngFor="let extra of colunasExtras">{{ extra }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="copy-btn" (click)="copiarColunasEsperadas()">Copiar Lista de Colunas Esperadas</button>
+        <button class="close-btn" (click)="fecharValidacaoModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-section" *ngIf="excelData.length > 0">
+    <h3>Dados Carregados ({{ excelData.length }} registros)</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th *ngFor="let col of displayColumns">{{ col.label }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of excelData; let i = index">
+            <td class="row-number">{{ i + 1 }}</td>
+            <td *ngFor="let col of displayColumns" class="cell-content">
+              <div class="cell-wrapper">
+                <span class="text-truncate">{{ getTruncatedText(row[col.key]) }}</span>
+                <button *ngIf="isTextLong(row[col.key])" class="tooltip-trigger" (click)="showTooltip(i, col.key, row[col.key])">
+                  <ng-icon name="heroEllipsisHorizontal"></ng-icon>
+                </button>
+                <div class="tooltip-balloon" *ngIf="isTooltipActive(i, col.key)">
+                  <button class="tooltip-close" (click)="hideTooltip()">
+                    <ng-icon name="heroXMark"></ng-icon>
+                  </button>
+                  <p>{{ tooltipContent }}</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="excelData.length === 0">
+    <ng-icon name="heroChartBar" class="empty-icon-svg"></ng-icon>
+    <p>Nenhum arquivo carregado</p>
+    <p class="empty-subtitle">Selecione um arquivo Excel (.xlsx ou .xls) para visualizar os dados</p>
+  </div>
+</div>

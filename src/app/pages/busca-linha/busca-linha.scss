@@ -1,0 +1,203 @@
+.page-container {
+  font-family: 'Montserrat', sans-serif;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    flex: 1;
+  }
+}
+
+.btn-voltar {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  ng-icon { font-size: 1.25rem; color: white; }
+  &:hover { background: rgba(255, 255, 255, 0.2); }
+}
+
+.page-content { padding: 1.25rem; }
+
+.filtro-grupo {
+  margin-bottom: 1rem;
+  label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.input-filtro {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: 'Montserrat', sans-serif;
+  transition: all 0.2s ease;
+  background: #fff;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  }
+  &::placeholder { color: #999; }
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e0e0e0;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.lista-linhas {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.linha-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+
+  &:hover { border-color: #667eea; }
+  &.expandido {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  }
+}
+
+.linha-header {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+
+  .linha-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+
+    .linha-nome {
+      font-weight: 600;
+      color: #1a1a2e;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .linha-pc {
+      font-size: 0.8rem;
+      color: #666;
+    }
+  }
+}
+
+.btn-expandir {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background: #f0f0f0;
+  flex-shrink: 0;
+
+  ng-icon { font-size: 1rem; color: #666; }
+  &:hover { background: #667eea; ng-icon { color: white; } }
+}
+
+.linha-detalhes {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid #e9ecef;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.detalhe-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child { border-bottom: none; }
+
+  .detalhe-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #667eea;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+  }
+
+  .detalhe-valor {
+    display: block;
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+}
+
+.sem-resultados, .instrucao {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.instrucao { color: #999; }

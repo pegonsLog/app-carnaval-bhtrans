@@ -36,7 +36,6 @@
   .cards-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
     gap: 1.5rem;
     width: 100%;
     max-width: 500px;
@@ -117,7 +116,6 @@
 
     .cards-container {
       grid-template-columns: 1fr;
-      grid-template-rows: repeat(4, 1fr);
       gap: 1rem;
       max-width: 350px;
     }
@@ -155,7 +153,6 @@
 
   .menu-container .cards-container {
     grid-template-columns: 1fr;
-    grid-template-rows: repeat(4, 1fr);
     max-width: 320px;
     gap: 0.75rem;
   }

@@ -1,0 +1,53 @@
+<div class="page-container">
+    <div class="page-header">
+        <button class="btn-voltar" (click)="voltar()">
+            <ng-icon name="heroArrowLeft"></ng-icon>
+        </button>
+        <h2>Buscar Por Linha</h2>
+    </div>
+
+    <div class="page-content">
+        <div class="filtro-grupo">
+            <label>Linha ou PC</label>
+            <input type="text" [(ngModel)]="filtroLinha" (input)="filtrarPorLinha()"
+                placeholder="Digite a linha ou PC..." class="input-filtro">
+        </div>
+
+        <div class="loading" *ngIf="carregando">
+            <div class="spinner"></div>
+            <p>Carregando linhas...</p>
+        </div>
+
+        <div class="lista-linhas" *ngIf="linhasFiltradas.length > 0 && !carregando">
+            <div class="linha-card" *ngFor="let linha of linhasFiltradas" [class.expandido]="linhaExpandida === linha.id">
+                <div class="linha-header" (click)="toggleExpansao(linha.id)">
+                    <div class="linha-info">
+                        <span class="linha-nome">{{ linha.linhaDestino }}</span>
+                        <span class="linha-pc">PC: {{ linha.pc || '-' }}</span>
+                    </div>
+                    <button class="btn-expandir">
+                        <ng-icon [name]="linhaExpandida === linha.id ? 'heroXMark' : 'heroEllipsisHorizontal'"></ng-icon>
+                    </button>
+                </div>
+                <div class="linha-detalhes" *ngIf="linhaExpandida === linha.id">
+                    <div class="detalhe-item">
+                        <span class="detalhe-label">Itinerário</span>
+                        <span class="detalhe-valor">{{ linha.itinerario || '-' }}</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <span class="detalhe-label">PEDs Ativados</span>
+                        <span class="detalhe-valor">{{ linha.pedsAtivados || '-' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sem-resultados" *ngIf="filtroLinha && linhasFiltradas.length === 0 && !carregando">
+            Nenhuma linha encontrada
+        </div>
+
+        <div class="instrucao" *ngIf="!filtroLinha && !carregando">
+            Digite o nome da linha ou PC para buscar
+        </div>
+    </div>
+</div>

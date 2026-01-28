@@ -2,13 +2,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroMagnifyingGlass, heroCalendarDays, heroBuildingOffice2 } from '@ng-icons/heroicons/outline';
+import { heroMagnifyingGlass, heroCalendarDays, heroArrowPath } from '@ng-icons/heroicons/outline';
 
 @Component({
   selector: 'app-menu',
   standalone: true,
   imports: [CommonModule, NgIcon],
-  viewProviders: [provideIcons({ heroMagnifyingGlass, heroCalendarDays, heroBuildingOffice2 })],
+  viewProviders: [provideIcons({ heroMagnifyingGlass, heroCalendarDays, heroArrowPath })],
   templateUrl: './menu.html',
   styleUrl: './menu.scss'
 })
@@ -29,5 +29,9 @@ export class MenuComponent {
 
   navegarBuscaLivre() {
     this.router.navigate(['/busca-livre']);
+  }
+
+  navegarBuscaLinha() {
+    this.router.navigate(['/busca-linha']);
   }
 }

@@ -35,6 +35,10 @@
         <ng-icon name="heroArrowUpTray" class="nav-icon"></ng-icon>
         <span>Importar Planilha</span>
       </a>
+      <a routerLink="/linhas-tc" routerLinkActive="active" class="nav-link" *ngIf="authService.isAdmin">
+        <ng-icon name="heroMapPin" class="nav-icon"></ng-icon>
+        <span>Linhas TC</span>
+      </a>
       <a routerLink="/usuarios" routerLinkActive="active" class="nav-link" *ngIf="authService.isAdmin">
         <ng-icon name="heroUsers" class="nav-icon"></ng-icon>
         <span>Usuários</span>

@@ -135,7 +135,7 @@ export class ExcelUploadComponent {
 
     const dadosFiltrados = dadosNormalizados.filter((row: any) => {
       const status = (row['statusDoDesfile'] || '').toString().toUpperCase().trim();
-      return status === 'APROVADO';
+      return status === 'APROVADO' || status === 'ALTERADO';
     });
     this.excelData = dadosFiltrados.sort((a: any, b: any) => {
       const nomeA = (a['nomeDoBloco'] || '').toLowerCase();
@@ -146,7 +146,7 @@ export class ExcelUploadComponent {
       this.headers = Object.keys(this.excelData[0]);
     }
     if (this.excelData.length === 0) {
-      this.saveMessage = 'Nenhum bloco com status "APROVADO" encontrado.';
+      this.saveMessage = 'Nenhum bloco com status "APROVADO" ou "ALTERADO" encontrado.';
       this.saveMessageType = 'error';
     }
   }

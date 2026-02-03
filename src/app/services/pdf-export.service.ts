@@ -441,7 +441,7 @@ export class PdfExportService {
         const labelWidth = doc.getTextWidth(`${label}: `);
         doc.setFont('helvetica', 'normal');
 
-        const valorStr = valor || '-';
+        const valorStr = valor !== null && valor !== undefined ? String(valor) : '-';
 
         if (multiline && valorStr.length > 60) {
             const lines = doc.splitTextToSize(valorStr, this.CONTENT_WIDTH - labelWidth);

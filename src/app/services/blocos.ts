@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, getDocs, query, where, updateDoc, doc, setDoc, deleteDoc, getDoc } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, getDocs, query, where, updateDoc, doc, deleteDoc, getDoc } from '@angular/fire/firestore';
 import { Blocos } from '../interfaces/blocos.interface';
 
 @Injectable({
@@ -10,6 +10,21 @@ export class BlocosService {
   private mapasCollectionName = 'blocos-mapas';
 
   constructor(private firestore: Firestore) { }
+
+  // Converte data para string YYYY-MM-DD para comparação consistente
+  private formatDateForComparison(date: any): string {
+    if (!date) return '';
+    // Se for Timestamp do Firestore
+    if (date?.toDate) {
+      date = date.toDate();
+    }
+    const d = date instanceof Date ? date : new Date(date);
+    if (isNaN(d.getTime())) return '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
 
   // Busca dados do mapa salvos na coleção separada
   async getDadosMapa(numeroInscricao: string): Promise<any | null> {
@@ -56,26 +71,40 @@ export class BlocosService {
     }
   }
 
-  // Salva ou atualiza um bloco baseado no número de inscrição, nome do bloco e data do desfile
+  // Salva ou atualiza um bloco baseado no número de inscrição e data do desfile
   async salvarBloco(bloco: Blocos): Promise<void> {
     const blocosCollection = collection(this.firestore, this.collectionName);
+    const dataDesfileNova = this.formatDateForComparison(bloco.dataDoDesfile);
 
-    // Busca se já existe um bloco com os mesmos campos identificadores
+    // Busca todos os blocos com o mesmo número de inscrição
     const q = query(
       blocosCollection,
-      where('numeroInscricao', '==', bloco.numeroInscricao),
-      where('nomeDoBloco', '==', bloco.nomeDoBloco),
-      where('dataDoDesfile', '==', bloco.dataDoDesfile)
+      where('numeroInscricao', '==', bloco.numeroInscricao)
     );
     const querySnapshot = await getDocs(q);
 
-    if (!querySnapshot.empty) {
-      // Se existe, atualiza o documento existente
-      const docId = querySnapshot.docs[0].id;
-      const docRef = doc(this.firestore, this.collectionName, docId);
+    // Procura documento para atualizar
+    // Se existe apenas 1 registro, atualiza ele (mesmo com data diferente)
+    // Se existem múltiplos, procura pela mesma data de desfile
+    let docExistente: any = null;
+    
+    if (querySnapshot.size === 1) {
+      docExistente = querySnapshot.docs[0];
+    } else if (querySnapshot.size > 1) {
+      for (const docSnapshot of querySnapshot.docs) {
+        const dados = docSnapshot.data();
+        const dataExistente = this.formatDateForComparison(dados['dataDoDesfile']);
+        if (dataExistente === dataDesfileNova) {
+          docExistente = docSnapshot;
+          break;
+        }
+      }
+    }
+
+    if (docExistente) {
+      const docRef = doc(this.firestore, this.collectionName, docExistente.id);
       await updateDoc(docRef, { ...bloco } as any);
     } else {
-      // Se não existe, cria um novo documento
       await addDoc(blocosCollection, { ...bloco } as any);
     }
   }
@@ -93,21 +122,40 @@ export class BlocosService {
     for (let i = 0; i < blocos.length; i++) {
       const bloco = blocos[i];
       const blocosCollection = collection(this.firestore, this.collectionName);
+      const dataDesfileNova = this.formatDateForComparison(bloco.dataDoDesfile);
 
-      // Busca usando os três campos identificadores: número de inscrição, nome do bloco e data do desfile
+      // Busca todos os blocos com o mesmo número de inscrição
       const q = query(
         blocosCollection,
-        where('numeroInscricao', '==', bloco.numeroInscricao),
-        where('nomeDoBloco', '==', bloco.nomeDoBloco),
-        where('dataDoDesfile', '==', bloco.dataDoDesfile)
+        where('numeroInscricao', '==', bloco.numeroInscricao)
       );
       const querySnapshot = await getDocs(q);
 
+      // Procura documento para atualizar
+      // Se existe apenas 1 registro com esse numeroInscricao, atualiza ele (mesmo com data diferente)
+      // Se existem múltiplos, procura pela mesma data de desfile
+      let docExistente: any = null;
+      
+      if (querySnapshot.size === 1) {
+        // Apenas 1 registro: atualiza independente da data (caso a data tenha sido alterada)
+        docExistente = querySnapshot.docs[0];
+      } else if (querySnapshot.size > 1) {
+        // Múltiplos registros: procura pela mesma data de desfile
+        for (const docSnapshot of querySnapshot.docs) {
+          const dados = docSnapshot.data();
+          const dataExistente = this.formatDateForComparison(dados['dataDoDesfile']);
+          if (dataExistente === dataDesfileNova) {
+            docExistente = docSnapshot;
+            break;
+          }
+        }
+      }
+
       let blocoDocId: string;
 
-      if (!querySnapshot.empty) {
+      if (docExistente) {
         // Atualiza documento existente
-        blocoDocId = querySnapshot.docs[0].id;
+        blocoDocId = docExistente.id;
         const docRef = doc(this.firestore, this.collectionName, blocoDocId);
         await updateDoc(docRef, { ...bloco } as any);
         atualizados++;

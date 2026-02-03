@@ -191,107 +191,112 @@ export class PdfExportService {
         doc.line(this.MARGIN, y, this.PAGE_WIDTH - this.MARGIN, y);
         y += 10;
 
-        // Identificação
-        y = this.criarSecao(doc, 'IDENTIFICAÇÃO DO BLOCO', y);
-        y = this.campoValor(doc, 'Nome do Bloco', bloco.nomeDoBloco, y);
-        y = this.campoValor(doc, 'Nº Inscrição', bloco.numeroInscricao, y);
-        y = this.campoValor(doc, 'Categoria', bloco.categoriaDoBloco, y);
+        // 1. Informações Básicas
+        y = this.criarSecao(doc, 'INFORMAÇÕES BÁSICAS', y);
         y = this.campoValor(doc, 'Período', bloco.periodo, y);
-        y = this.campoValor(doc, 'Regional', bloco.regional, y);
-        y += 5;
-
-        // Responsável
-        y = this.criarSecao(doc, 'RESPONSÁVEL LEGAL', y);
-        y = this.campoValor(doc, 'Nome', bloco.responsavelLegal, y);
-        y = this.campoValor(doc, 'CPF', bloco.cpf, y);
-        y = this.campoValor(doc, 'CNPJ', bloco.cnpj, y);
-        y = this.campoValor(doc, 'E-mail', bloco.email, y);
-        y = this.campoValor(doc, 'Telefone', bloco.telefone, y);
-        y = this.campoValor(doc, 'Celular', bloco.celular, y);
-        y += 5;
-
-        // Data e Horários
-        y = this.criarSecao(doc, 'DATA E HORÁRIOS DO DESFILE', y);
-        y = this.campoValor(doc, 'Data do Desfile', this.formatarDataFirestore(bloco.dataDoDesfile), y);
-        y = this.campoValor(doc, 'Concentração', bloco.horarioDeconcentracao, y);
-        y = this.campoValor(doc, 'Início', bloco.inicioDoDesfile, y);
-        y = this.campoValor(doc, 'Encerramento', bloco.horarioEncerramento, y);
-        y = this.campoValor(doc, 'Duração', bloco.duracaoDoDesfile, y);
-        y = this.campoValor(doc, 'Dispersão', bloco.horarioDispersao, y);
-        y += 5;
-
-        // Público
-        y = this.criarSecao(doc, 'PÚBLICO ESTIMADO', y);
-        y = this.campoValor(doc, 'Público Anterior', this.formatarNumero(bloco.publicoAnterior), y);
-        y = this.campoValor(doc, 'Público Declarado', this.formatarNumero(bloco.publicoDeclarado), y);
-        y = this.campoValor(doc, 'Área do Trajeto', `${this.formatarNumero(bloco.areaDoTrajetoM2)} m²`, y);
-        y = this.campoValor(doc, 'Capacidade', `${this.formatarNumero(bloco.capacidadePublicoDoTrajeto)} pessoas`, y);
-        if (bloco.observacoesAnoAnterior) {
-            y = this.campoValor(doc, 'Obs. Ano Anterior', bloco.observacoesAnoAnterior, y, true);
-        }
-        y += 5;
-
-        // Percurso
-        y = this.criarSecao(doc, 'PERCURSO E LOCALIZAÇÃO', y);
-        y = this.campoValor(doc, 'Percurso', bloco.percurso, y, true);
-        y = this.campoValor(doc, 'End. Concentração', bloco.enderecoDeConcentracao, y);
-        y = this.campoValor(doc, 'Bairro Concentração', bloco.bairroDeConcentracao, y);
-        y = this.campoValor(doc, 'End. Dispersão', bloco.enderecoDeDispersao, y);
-        y = this.campoValor(doc, 'Bairro Dispersão', bloco.bairroDeDispersao, y);
-        y = this.campoValor(doc, 'Extensão', `${this.formatarNumero(bloco.extensaoDoDesfileMetros)} m`, y);
-        y = this.campoValor(doc, 'Nº de Quadras', bloco.numeroDeQuadras, y);
-
-        // Verifica se precisa de nova página
-        if (y > 250) {
-            doc.addPage();
-            y = this.MARGIN;
-        }
-        y += 5;
-
-        // Características
-        y = this.criarSecao(doc, 'CARACTERÍSTICAS', y);
-        y = this.campoValor(doc, 'Perfil', bloco.perfil, y);
-        y = this.campoValor(doc, 'Estilo Musical', bloco.estiloDeMusica, y);
-        y = this.campoValor(doc, 'Descrição', bloco.descricaoDoBloco, y, true);
-        y += 5;
-
-        // Status
-        y = this.criarSecao(doc, 'STATUS', y);
         y = this.campoValor(doc, 'Possui Desfiles', this.formatarBoolean(bloco.possuiDesfiles), y);
         y = this.campoValor(doc, 'Status do Desfile', bloco.statusDoDesfile, y);
         if (bloco.justificativaStatus) {
             y = this.campoValor(doc, 'Justificativa', bloco.justificativaStatus, y, true);
         }
+        y = this.campoValor(doc, 'Nº Inscrição', bloco.numeroInscricao, y);
+        y = this.campoValor(doc, 'Nome do Bloco', bloco.nomeDoBloco, y);
+        y = this.campoValor(doc, 'Categoria', bloco.categoriaDoBloco, y);
         y = this.campoValor(doc, 'Autoriza Divulgação', this.formatarBoolean(bloco.autorizaDivulgacao), y);
+        y = this.campoValor(doc, 'Data Cadastro', this.formatarDataFirestore(bloco.dataCadastroModificacao), y);
+        y = this.campoValor(doc, 'Primeiro Cadastro', this.formatarBoolean(bloco.primeiroCadastro), y);
         y += 5;
 
-        // Equipamentos
+        // 2. Público
+        y = this.verificarNovaPagina(doc, y);
+        y = this.criarSecao(doc, 'PÚBLICO', y);
+        y = this.campoValor(doc, 'Público Anterior', this.formatarNumero(bloco.publicoAnterior), y);
+        y = this.campoValor(doc, 'Público Declarado', this.formatarNumero(bloco.publicoDeclarado), y);
+        if (bloco.observacoesAnoAnterior) {
+            y = this.campoValor(doc, 'Observações Ano Anterior', bloco.observacoesAnoAnterior, y, true);
+        }
+        y += 5;
+
+        // 3. Características do Bloco
+        y = this.verificarNovaPagina(doc, y);
+        y = this.criarSecao(doc, 'CARACTERÍSTICAS DO BLOCO', y);
+        y = this.campoValor(doc, 'Perfil', bloco.perfil, y);
+        y = this.campoValor(doc, 'Estilo Musical', bloco.estiloDeMusica, y);
+        y = this.campoValor(doc, 'Descrição', bloco.descricaoDoBloco, y, true);
+        y += 5;
+
+        // 4. Data e Horário
+        y = this.verificarNovaPagina(doc, y);
+        y = this.criarSecao(doc, 'DATA E HORÁRIO', y);
+        y = this.campoValor(doc, 'Data do Desfile', this.formatarDataFirestore(bloco.dataDoDesfile), y);
+        y = this.campoValor(doc, 'Horário Concentração', bloco.horarioDeconcentracao, y);
+        y = this.campoValor(doc, 'Início do Desfile', bloco.inicioDoDesfile, y);
+        y = this.campoValor(doc, 'Horário Encerramento', bloco.horarioEncerramento, y);
+        y = this.campoValor(doc, 'Duração', bloco.duracaoDoDesfile, y);
+        y = this.campoValor(doc, 'Horário Dispersão', bloco.horarioDispersao, y);
+        y += 5;
+
+        // 5. Equipamentos e Dimensões
+        y = this.verificarNovaPagina(doc, y);
         y = this.criarSecao(doc, 'EQUIPAMENTOS E DIMENSÕES', y);
         y = this.campoValor(doc, 'Equipamentos', this.formatarArray(bloco.equipamentosUtilizados), y, true);
-        y = this.campoValor(doc, 'Largura', `${bloco.larguraMetros || '-'} m`, y);
-        y = this.campoValor(doc, 'Comprimento', `${bloco.comprimentoMetros || '-'} m`, y);
-        y = this.campoValor(doc, 'Altura', `${bloco.alturaMetros || '-'} m`, y);
-        y = this.campoValor(doc, 'Potência', `${this.formatarNumero(bloco.potenciaWatts)} W`, y);
+        y = this.campoValor(doc, 'Largura (m)', bloco.larguraMetros || '-', y);
+        y = this.campoValor(doc, 'Comprimento (m)', bloco.comprimentoMetros || '-', y);
+        y = this.campoValor(doc, 'Altura (m)', bloco.alturaMetros || '-', y);
+        y = this.campoValor(doc, 'Potência (W)', this.formatarNumero(bloco.potenciaWatts), y);
         if (bloco.dimensaoDeVeiculos) {
             y = this.campoValor(doc, 'Dimensão Veículos', bloco.dimensaoDeVeiculos, y);
         }
         y += 5;
 
-        // Informações Adicionais
+        // 6. Localização e Percurso
+        y = this.verificarNovaPagina(doc, y);
+        y = this.criarSecao(doc, 'LOCALIZAÇÃO E PERCURSO', y);
+        y = this.campoValor(doc, 'Percurso', bloco.percurso, y, true);
+        y = this.campoValor(doc, 'Regional', bloco.regional, y);
+        y = this.campoValor(doc, 'Endereço Concentração', bloco.enderecoDeConcentracao, y);
+        y = this.campoValor(doc, 'Bairro Concentração', bloco.bairroDeConcentracao, y);
+        y = this.campoValor(doc, 'Endereço Dispersão', bloco.enderecoDeDispersao, y);
+        y = this.campoValor(doc, 'Bairro Dispersão', bloco.bairroDeDispersao, y);
+        y = this.campoValor(doc, 'Extensão (m)', this.formatarNumero(bloco.extensaoDoDesfileMetros), y);
+        y = this.campoValor(doc, 'Nº Quadras', bloco.numeroDeQuadras, y);
+        y = this.campoValor(doc, 'Área (m²)', this.formatarNumero(bloco.areaDoTrajetoM2), y);
+        y = this.campoValor(doc, 'Capacidade Público', this.formatarNumero(bloco.capacidadePublicoDoTrajeto), y);
+        y += 5;
+
+        // 7. Informações Adicionais
         if (bloco.informacoesAdicionais) {
+            y = this.verificarNovaPagina(doc, y);
             y = this.criarSecao(doc, 'INFORMAÇÕES ADICIONAIS', y);
-            y = this.campoValor(doc, '', bloco.informacoesAdicionais, y, true);
+            y = this.campoValor(doc, 'Informações Adicionais', bloco.informacoesAdicionais, y, true);
             y += 5;
         }
 
-        // Responsável Secundário
-        if (bloco.nomeResponsavelSecundario || bloco.celularContato2) {
-            y = this.criarSecao(doc, 'RESPONSÁVEL SECUNDÁRIO', y);
-            y = this.campoValor(doc, 'Nome', bloco.nomeResponsavelSecundario, y);
-            y = this.campoValor(doc, 'Celular', bloco.celularContato2, y);
-            y += 5;
+        // 8. Responsável Legal
+        y = this.verificarNovaPagina(doc, y);
+        y = this.criarSecao(doc, 'RESPONSÁVEL LEGAL', y);
+        y = this.campoValor(doc, 'Nome', bloco.responsavelLegal, y);
+        y = this.campoValor(doc, 'CNPJ', bloco.cnpj, y);
+        y = this.campoValor(doc, 'CPF', bloco.cpf, y);
+        y = this.campoValor(doc, 'E-mail', bloco.email, y);
+        y = this.campoValor(doc, 'Telefone', bloco.telefone, y);
+        y = this.campoValor(doc, 'Celular', bloco.celular, y);
+        if (bloco.nomeResponsavelSecundario) {
+            y = this.campoValor(doc, 'Responsável Secundário', bloco.nomeResponsavelSecundario, y);
         }
+        if (bloco.celularContato2) {
+            y = this.campoValor(doc, 'Celular Contato 2', bloco.celularContato2, y);
+        }
+        y += 5;
 
+        return y;
+    }
+
+    private verificarNovaPagina(doc: jsPDF, y: number): number {
+        if (y > 250) {
+            doc.addPage();
+            return this.MARGIN;
+        }
         return y;
     }
 

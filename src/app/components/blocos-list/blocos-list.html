@@ -11,10 +11,16 @@
         {{ blocosSemMapa }} sem mapa
       </span>
     </div>
-    <button class="refresh-btn" (click)="carregarBlocos()" [disabled]="isLoading" *ngIf="authService.podeEditar">
-      <ng-icon name="heroMagnifyingGlass"></ng-icon>
-      {{ isLoading ? 'Carregando...' : 'Atualizar' }}
-    </button>
+    <div class="header-actions">
+      <a routerLink="/admin/blocos" class="admin-btn" *ngIf="authService.podeEditar">
+        <ng-icon name="heroClipboardDocumentList"></ng-icon>
+        Lista por Status
+      </a>
+      <button class="refresh-btn" (click)="carregarBlocos()" [disabled]="isLoading" *ngIf="authService.podeEditar">
+        <ng-icon name="heroMagnifyingGlass"></ng-icon>
+        {{ isLoading ? 'Carregando...' : 'Atualizar' }}
+      </button>
+    </div>
   </div>
 
   <div class="error-message" *ngIf="errorMessage">

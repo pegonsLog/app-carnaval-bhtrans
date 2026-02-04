@@ -133,11 +133,8 @@ export class ExcelUploadComponent {
       return novoRow;
     });
 
-    const dadosFiltrados = dadosNormalizados.filter((row: any) => {
-      const status = (row['statusDoDesfile'] || '').toString().toUpperCase().trim();
-      return status === 'APROVADO' || status === 'ALTERADO';
-    });
-    this.excelData = dadosFiltrados.sort((a: any, b: any) => {
+    // Importa todos os blocos independente do status
+    this.excelData = dadosNormalizados.sort((a: any, b: any) => {
       const nomeA = (a['nomeDoBloco'] || '').toLowerCase();
       const nomeB = (b['nomeDoBloco'] || '').toLowerCase();
       return nomeA.localeCompare(nomeB, 'pt-BR');
@@ -146,7 +143,7 @@ export class ExcelUploadComponent {
       this.headers = Object.keys(this.excelData[0]);
     }
     if (this.excelData.length === 0) {
-      this.saveMessage = 'Nenhum bloco com status "APROVADO" ou "ALTERADO" encontrado.';
+      this.saveMessage = 'Nenhum bloco encontrado na planilha.';
       this.saveMessageType = 'error';
     }
   }

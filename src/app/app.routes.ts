@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home';
 import { ExcelUploadComponent } from './components/excel-upload/excel-upload';
 import { BlocosListComponent } from './components/blocos-list/blocos-list';
+import { BlocosAdminComponent } from './components/blocos-admin/blocos-admin';
 import { CapasComponent } from './components/capas/capas';
 import { DocumentoBlocoComponent } from './pages/documento-bloco/documento-bloco';
 import { LoginComponent } from './pages/login/login';
@@ -31,6 +32,11 @@ export const routes: Routes = [
     {
         path: 'admin',
         component: BlocosListComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'admin/blocos',
+        component: BlocosAdminComponent,
         canActivate: [authGuard]
     },
     {

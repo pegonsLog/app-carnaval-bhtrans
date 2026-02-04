@@ -1,0 +1,98 @@
+<div class="blocos-admin-container">
+  <div class="header-section">
+    <h2>Administração de Blocos</h2>
+    <button class="btn-voltar" (click)="voltarParaAdmin()">
+      <ng-icon name="heroXMark"></ng-icon>
+      Voltar
+    </button>
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Carregando blocos...</p>
+  </div>
+
+  <div class="filters-section" *ngIf="!isLoading && blocos.length > 0">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Nome do Bloco</label>
+        <input type="text" [(ngModel)]="filtroNome" (ngModelChange)="aplicarFiltros()" placeholder="Buscar por nome...">
+      </div>
+      <div class="filter-group">
+        <label>Status</label>
+        <select [(ngModel)]="filtroStatus" (ngModelChange)="aplicarFiltros()">
+          <option value="">Todos os status</option>
+          <option *ngFor="let status of statusDisponiveis" [value]="status">{{ status }}</option>
+        </select>
+      </div>
+    </div>
+    <button class="clear-filters-btn" (click)="limparFiltros()" *ngIf="filtroNome || filtroStatus">
+      Limpar Filtros
+    </button>
+  </div>
+
+  <div class="table-section" *ngIf="!isLoading && blocos.length > 0">
+    <p class="count-info">
+      Exibindo {{ blocosFiltrados.length }} de {{ blocos.length }} bloco(s)
+    </p>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nome do Bloco</th>
+            <th>Data do Desfile</th>
+            <th>Status</th>
+            <th class="action-col">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bloco of blocosFiltrados; let i = index">
+            <td class="row-number">{{ i + 1 }}</td>
+            <td class="nome-bloco">{{ bloco.nomeDoBloco || '-' }}</td>
+            <td>{{ formatarData(bloco.dataDoDesfile) }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="bloco.statusDoDesfile?.toLowerCase()">
+                {{ bloco.statusDoDesfile || '-' }}
+              </span>
+            </td>
+            <td class="action-col">
+              <div class="action-buttons">
+                <button class="btn-view" (click)="abrirDetalhe(bloco)" title="Ver detalhes">
+                  <ng-icon name="heroEye"></ng-icon>
+                </button>
+                <button class="btn-delete" (click)="abrirModalExcluir(bloco)" title="Excluir">
+                  <ng-icon name="heroTrash"></ng-icon>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && blocos.length === 0 && !errorMessage">
+    <ng-icon name="heroMagnifyingGlass" class="empty-icon"></ng-icon>
+    <p>Nenhum bloco cadastrado</p>
+  </div>
+</div>
+
+<!-- Modal de Detalhe -->
+<app-bloco-detalhe *ngIf="blocoSelecionado" [bloco]="blocoSelecionado" (fechar)="fecharDetalhe()">
+</app-bloco-detalhe>
+
+<!-- Modal de Confirmação de Exclusão -->
+<app-confirm-modal 
+  *ngIf="blocoParaExcluir" 
+  titulo="Excluir Bloco"
+  [mensagem]="'Deseja realmente excluir o bloco ' + blocoParaExcluir.nomeDoBloco + '? Esta ação não pode ser desfeita.'" 
+  tipo="danger"
+  (confirmar)="confirmarExclusao()" 
+  (cancelar)="fecharModalExcluir()">
+</app-confirm-modal>

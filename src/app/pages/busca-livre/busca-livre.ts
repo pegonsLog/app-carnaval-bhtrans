@@ -70,11 +70,8 @@ export class BuscaLivreComponent implements OnInit {
     this.errorMessage = '';
 
     try {
-      // Carrega todos os blocos
-      const todosBlocos = await this.blocosService.getBlocos();
-      
-      // Usa todos os blocos (acesso público)
-      this.blocos = todosBlocos;
+      // Carrega apenas blocos aprovados e alterados (acesso público)
+      this.blocos = await this.blocosService.getBlocosPublicos();
       
       // Extrai regionais e datas disponíveis
       this.extrairFiltrosDisponiveis();

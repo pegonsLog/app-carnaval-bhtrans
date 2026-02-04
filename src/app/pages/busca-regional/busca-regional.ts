@@ -72,7 +72,7 @@ export class BuscaRegionalComponent implements OnInit {
         this.carregando = true;
         this.erro = '';
         try {
-            const dados = await this.blocosService.getBlocos();
+            const dados = await this.blocosService.getBlocosPublicos();
             
             if (!dados || dados.length === 0) {
                 this.erro = 'Nenhum bloco encontrado';

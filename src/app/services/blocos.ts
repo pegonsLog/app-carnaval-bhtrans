@@ -194,6 +194,15 @@ export class BlocosService {
     }));
   }
 
+  // Busca apenas blocos aprovados e alterados (para acesso público)
+  async getBlocosPublicos(): Promise<any[]> {
+    const blocos = await this.getBlocos();
+    return blocos.filter(bloco => {
+      const status = (bloco.statusDoDesfile || '').toString().toUpperCase().trim();
+      return status === 'APROVADO' || status === 'ALTERADO';
+    });
+  }
+
   // Busca blocos com limite (para carregamento inicial rápido)
   async getBlocosLimitados(limite: number): Promise<any[]> {
     const { limit: limitFn, orderBy } = await import('@angular/fire/firestore');
@@ -222,5 +231,11 @@ export class BlocosService {
     }
 
     return total;
+  }
+
+  // Exclui um bloco pelo ID
+  async excluirBloco(id: string): Promise<void> {
+    const docRef = doc(this.firestore, this.collectionName, id);
+    await deleteDoc(docRef);
   }
 }

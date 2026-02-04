@@ -70,7 +70,7 @@ export class BuscaDataComponent implements OnInit {
     async carregarBlocos() {
         this.carregando = true;
         try {
-            const dados = await this.blocosService.getBlocos();
+            const dados = await this.blocosService.getBlocosPublicos();
             this.blocos = dados.map(b => ({
                 id: b.id,
                 nomeDoBloco: b.nomeDoBloco,

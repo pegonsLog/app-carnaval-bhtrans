@@ -1,14 +1,14 @@
 import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { Storage, ref, deleteObject } from '@angular/fire/storage';
 import { Firestore, collection, query, where, getDocs, updateDoc, doc, deleteField } from '@angular/fire/firestore';
 import { BlocosService } from '../../services/blocos';
 import { AuthService } from '../../services/auth.service';
 import { PdfExportService } from '../../services/pdf-export.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth, heroDocumentArrowDown } from '@ng-icons/heroicons/outline';
+import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth, heroDocumentArrowDown, heroClipboardDocumentList } from '@ng-icons/heroicons/outline';
 import { BlocoDetalheComponent } from '../bloco-detalhe/bloco-detalhe';
 import { KmlUploadComponent } from '../kml-upload/kml-upload';
 import { PercursoViewerComponent } from '../percurso-viewer/percurso-viewer';
@@ -33,8 +33,8 @@ import { Sinalizacao } from '../../interfaces/sinalizacao.interface';
 
 @Component({
   selector: 'app-blocos-list',
-  imports: [CommonModule, FormsModule, NgIcon, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent, BlocoAcoesModalComponent, CrudAgentesComponent, CrudDesviosComponent, CrudFaixaTecidoComponent, CrudFechamentosComponent, CrudReservaAreaComponent, CrudSinalizacaoComponent, MapaModalComponent],
-  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth, heroDocumentArrowDown })],
+  imports: [CommonModule, FormsModule, NgIcon, RouterLink, BlocoDetalheComponent, KmlUploadComponent, PercursoViewerComponent, ConfirmModalComponent, DadosBeloturComponent, DadosMymapsComponent, BlocoAcoesModalComponent, CrudAgentesComponent, CrudDesviosComponent, CrudFaixaTecidoComponent, CrudFechamentosComponent, CrudReservaAreaComponent, CrudSinalizacaoComponent, MapaModalComponent],
+  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroEye, heroArrowUpTray, heroMapPin, heroCog6Tooth, heroDocumentArrowDown, heroClipboardDocumentList })],
   templateUrl: './blocos-list.html',
   styleUrl: './blocos-list.scss'
 })
@@ -273,13 +273,19 @@ export class BlocosListComponent implements OnInit {
   }
 
   private filtrarPorPerfil(blocos: any[]): any[] {
+    // Filtra apenas blocos com status APROVADO ou ALTERADO
+    let blocosFiltrados = blocos.filter((b: any) => {
+      const status = (b.statusDoDesfile || '').toString().toUpperCase().trim();
+      return status === 'APROVADO' || status === 'ALTERADO';
+    });
+
     if (this.authService.isOperador && this.authService.filtraPorArea) {
       const regionaisPermitidas = this.authService.regionaisDaArea;
-      return blocos.filter((b: any) =>
+      return blocosFiltrados.filter((b: any) =>
         regionaisPermitidas.some(r => r.toLowerCase() === (b.regional || '').toLowerCase())
       );
     }
-    return blocos;
+    return blocosFiltrados;
   }
 
   private ordenarBlocos(blocos: any[]): any[] {

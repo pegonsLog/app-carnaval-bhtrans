@@ -5,12 +5,13 @@ import { RouterLink } from '@angular/router';
 import { LinhaTcService } from '../../services/linha-tc.service';
 import { AuthService } from '../../services/auth.service';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroArrowUpTray } from '@ng-icons/heroicons/outline';
+import { heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroArrowUpTray, heroPencilSquare } from '@ng-icons/heroicons/outline';
+import { LinhaTc } from '../../interfaces/linha-tc.interface';
 
 @Component({
   selector: 'app-linha-tc-list',
   imports: [CommonModule, FormsModule, NgIcon, RouterLink],
-  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroArrowUpTray })],
+  viewProviders: [provideIcons({ heroEllipsisHorizontal, heroXMark, heroMagnifyingGlass, heroArrowUpTray, heroPencilSquare })],
   templateUrl: './linha-tc-list.html',
   styleUrl: './linha-tc-list.scss'
 })
@@ -30,6 +31,13 @@ export class LinhaTcListComponent implements OnInit {
 
   activeTooltip: { rowIndex: number; field: string } | null = null;
   tooltipContent = '';
+
+  // Edição
+  editModalOpen = false;
+  linhaEmEdicao: any = null;
+  editForm: LinhaTc = { linhaDestino: '', pc: '', itinerario: '', pedsAtivados: '' };
+  isSaving = false;
+  editError = '';
 
   displayColumns = [
     { key: 'linhaDestino', label: 'Linha/Destino' },
@@ -75,7 +83,13 @@ export class LinhaTcListComponent implements OnInit {
     return linhas.sort((a: any, b: any) => {
       const linhaA = (a.linhaDestino || '').toLowerCase();
       const linhaB = (b.linhaDestino || '').toLowerCase();
-      return linhaA.localeCompare(linhaB, 'pt-BR');
+      const compareLinha = linhaA.localeCompare(linhaB, 'pt-BR');
+      
+      if (compareLinha !== 0) return compareLinha;
+      
+      const pcA = (a.pc || '').toLowerCase();
+      const pcB = (b.pc || '').toLowerCase();
+      return pcA.localeCompare(pcB, 'pt-BR');
     });
   }
 
@@ -131,5 +145,52 @@ export class LinhaTcListComponent implements OnInit {
 
   isTooltipActive(rowIndex: number, field: string): boolean {
     return this.activeTooltip?.rowIndex === rowIndex && this.activeTooltip?.field === field;
+  }
+
+  // Métodos de edição
+  abrirEdicao(linha: any) {
+    this.linhaEmEdicao = linha;
+    this.editForm = {
+      linhaDestino: linha.linhaDestino || '',
+      pc: linha.pc || '',
+      itinerario: linha.itinerario || '',
+      pedsAtivados: linha.pedsAtivados || ''
+    };
+    this.editError = '';
+    this.editModalOpen = true;
+  }
+
+  fecharEdicao() {
+    this.editModalOpen = false;
+    this.linhaEmEdicao = null;
+    this.editError = '';
+    this.isSaving = false;
+  }
+
+  async salvarEdicao() {
+    if (!this.linhaEmEdicao?.id) return;
+
+    this.isSaving = true;
+    this.editError = '';
+
+    try {
+      await this.linhaTcService.atualizarLinhaTc(this.linhaEmEdicao.id, this.editForm);
+
+      this.ngZone.run(() => {
+        // Atualiza localmente
+        const index = this.linhas.findIndex(l => l.id === this.linhaEmEdicao.id);
+        if (index !== -1) {
+          this.linhas[index] = { ...this.linhas[index], ...this.editForm };
+          this.aplicarFiltros();
+        }
+        this.fecharEdicao();
+      });
+    } catch (error: any) {
+      console.error('Erro ao salvar:', error);
+      this.ngZone.run(() => {
+        this.editError = error?.message || 'Erro ao salvar alterações.';
+        this.isSaving = false;
+      });
+    }
   }
 }

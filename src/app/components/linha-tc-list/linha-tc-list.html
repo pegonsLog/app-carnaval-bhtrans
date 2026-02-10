@@ -57,6 +57,7 @@
           <tr>
             <th>#</th>
             <th *ngFor="let col of displayColumns">{{ col.label }}</th>
+            <th *ngIf="authService.isAdmin">Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -76,6 +77,11 @@
                 </div>
               </div>
             </td>
+            <td *ngIf="authService.isAdmin" class="actions-cell">
+              <button class="edit-btn" (click)="abrirEdicao(linha)" title="Editar">
+                <ng-icon name="heroPencilSquare"></ng-icon>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -92,5 +98,48 @@
     <ng-icon name="heroMagnifyingGlass" class="empty-icon"></ng-icon>
     <p>Nenhuma linha TC cadastrada</p>
     <p class="empty-subtitle">Importe um arquivo Excel para adicionar linhas</p>
+  </div>
+
+  <!-- Modal de Edição -->
+  <div class="modal-overlay" *ngIf="editModalOpen" (click)="fecharEdicao()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Editar Linha TC</h3>
+        <button class="modal-close" (click)="fecharEdicao()">
+          <ng-icon name="heroXMark"></ng-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="edit-error" *ngIf="editError">{{ editError }}</div>
+
+        <div class="form-group">
+          <label>Linha/Destino</label>
+          <input type="text" [(ngModel)]="editForm.linhaDestino" placeholder="Linha/Destino">
+        </div>
+
+        <div class="form-group">
+          <label>PC</label>
+          <input type="text" [(ngModel)]="editForm.pc" placeholder="PC">
+        </div>
+
+        <div class="form-group">
+          <label>Itinerário</label>
+          <textarea [(ngModel)]="editForm.itinerario" placeholder="Itinerário" rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>PEDs Ativados</label>
+          <textarea [(ngModel)]="editForm.pedsAtivados" placeholder="PEDs Ativados" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="cancel-btn" (click)="fecharEdicao()" [disabled]="isSaving">Cancelar</button>
+        <button class="save-btn" (click)="salvarEdicao()" [disabled]="isSaving">
+          {{ isSaving ? 'Salvando...' : 'Salvar' }}
+        </button>
+      </div>
+    </div>
   </div>
 </div>

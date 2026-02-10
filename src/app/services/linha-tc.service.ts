@@ -83,4 +83,9 @@ export class LinhaTcService {
     }
     return total;
   }
+
+  async atualizarLinhaTc(id: string, dados: Partial<LinhaTc>): Promise<void> {
+    const docRef = doc(this.firestore, this.collectionName, id);
+    await updateDoc(docRef, { ...dados } as any);
+  }
 }

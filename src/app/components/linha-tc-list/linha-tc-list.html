@@ -61,7 +61,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let linha of linhasExibidas; let i = index">
+          <tr *ngFor="let linha of linhasExibidas; let i = index" [class.linha-sem-pc]="linha.pc === '-'">
             <td class="row-number">{{ i + 1 }}</td>
             <td *ngFor="let col of displayColumns" class="cell-content">
               <div class="cell-wrapper">

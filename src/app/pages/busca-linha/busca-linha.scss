@@ -122,6 +122,12 @@
     border-color: #667eea;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
   }
+  &.linha-metropolitana {
+    .linha-info .linha-nome,
+    .linha-info .linha-pc { 
+      color: #dc3545 !important; 
+    }
+  }
 }
 
 .linha-header {
@@ -214,3 +220,20 @@
 }
 
 .instrucao { color: #999; }
+
+.info-metropolitano {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #856404;
+  margin-top: 1.5rem;
+
+  .info-icon {
+    font-size: 1rem;
+  }
+}

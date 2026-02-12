@@ -87,7 +87,16 @@ export class BuscaLinhaComponent implements OnInit {
                     l.itinerario?.toLowerCase().includes(termoItinerario);
                 return matchLinha && matchItinerario;
             })
-            .sort((a, b) => (a.linhaDestino || '').localeCompare(b.linhaDestino || '', 'pt-BR'));
+            .sort((a, b) => {
+                const pcA = (a.pc || '').trim();
+                const pcB = (b.pc || '').trim();
+                
+                // Fonte preta (PC != '-') antes da vermelha (PC == '-')
+                if (pcA === '-' && pcB !== '-') return 1;
+                if (pcA !== '-' && pcB === '-') return -1;
+                
+                return (a.linhaDestino || '').localeCompare(b.linhaDestino || '', 'pt-BR');
+            });
     }
 
     toggleExpansao(linhaId: string) {

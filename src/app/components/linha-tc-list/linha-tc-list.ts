@@ -81,15 +81,16 @@ export class LinhaTcListComponent implements OnInit {
 
   private ordenarLinhas(linhas: any[]): any[] {
     return linhas.sort((a: any, b: any) => {
+      const pcA = (a.pc || '').trim();
+      const pcB = (b.pc || '').trim();
+      
+      // Fonte preta (PC != '-') antes da vermelha (PC == '-')
+      if (pcA === '-' && pcB !== '-') return 1;
+      if (pcA !== '-' && pcB === '-') return -1;
+      
       const linhaA = (a.linhaDestino || '').toLowerCase();
       const linhaB = (b.linhaDestino || '').toLowerCase();
-      const compareLinha = linhaA.localeCompare(linhaB, 'pt-BR');
-      
-      if (compareLinha !== 0) return compareLinha;
-      
-      const pcA = (a.pc || '').toLowerCase();
-      const pcB = (b.pc || '').toLowerCase();
-      return pcA.localeCompare(pcB, 'pt-BR');
+      return linhaA.localeCompare(linhaB, 'pt-BR');
     });
   }
 

@@ -29,6 +29,14 @@ export class BuscaLinhaComponent implements OnInit {
     filtroItinerario = '';
     carregando = false;
     linhaExpandida: string | null = null;
+    
+    get linhasNormais(): number {
+        return this.linhasFiltradas.filter(l => l.pc?.trim() !== '-' && l.pc).length;
+    }
+    
+    get linhasMetropolitanas(): number {
+        return this.linhasFiltradas.filter(l => l.pc?.trim() === '-' || !l.pc).length;
+    }
 
     constructor(
         private linhaTcService: LinhaTcService,

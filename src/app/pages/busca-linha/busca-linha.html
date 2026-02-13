@@ -21,7 +21,7 @@
             </div>
 
             <div class="resultado-count" *ngIf="linhasFiltradas.length > 0">
-                {{ linhasFiltradas.length }} linha(s) encontrada(s)
+                Encontrada(s) <span *ngIf="linhasNormais > 0"><strong class="count-sumob">{{ linhasNormais }}</strong> linha(s) da Sumob</span><span *ngIf="linhasNormais > 0 && linhasMetropolitanas > 0"> e </span><span *ngIf="linhasMetropolitanas > 0"><strong class="count-metropolitana">{{ linhasMetropolitanas }}</strong> linha(s) metropolitana(s)</span>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
         </div>
 
         <div class="lista-linhas" *ngIf="linhasFiltradas.length > 0 && !carregando">
-            <div class="linha-card" *ngFor="let linha of linhasFiltradas" [class.expandido]="linhaExpandida === linha.id" [class.linha-metropolitana]="linha.pc?.trim() === '-' || !linha.pc">
+            <div class="linha-card" *ngFor="let linha of linhasFiltradas" [class.expandido]="linhaExpandida === linha.id" [class.linha-metropolitana]="linha.pc.trim() === '-' || !linha.pc">
                 <div class="linha-header" (click)="toggleExpansao(linha.id)">
                     <div class="linha-info">
                         <span class="linha-nome">{{ linha.linhaDestino }}</span>

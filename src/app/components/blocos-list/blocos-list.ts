@@ -56,9 +56,12 @@ export class BlocosListComponent implements OnInit {
   filtroNome = '';
   filtroRegionais: string[] = [];
   dropdownRegionalAberto = false;
+  filtroStatus: string[] = [];
+  dropdownStatusAberto = false;
   filtroDataDesfile = '';
   filtroLivre = '';
   regionaisDisponiveis: string[] = [];
+  statusDisponiveis: string[] = [];
   datasDesfileDisponiveis: string[] = [];
 
   // Controle do tooltip
@@ -240,7 +243,7 @@ export class BlocosListComponent implements OnInit {
         this.isLoadingTodos = false;
 
         // Aplica filtros se houver algum ativo
-        if (this.filtroNome || this.filtroRegionais.length > 0 || this.filtroDataDesfile || this.filtroLivre) {
+        if (this.filtroNome || this.filtroRegionais.length > 0 || this.filtroStatus.length > 0 || this.filtroDataDesfile || this.filtroLivre) {
           this.aplicarFiltros();
         } else {
           this.blocosFiltrados = this.blocos;
@@ -717,11 +720,15 @@ export class BlocosListComponent implements OnInit {
 
   extrairRegionais() {
     const regionais = new Set<string>();
+    const status = new Set<string>();
     const datas = new Set<string>();
 
     this.blocos.forEach(bloco => {
       if (bloco.regional && bloco.regional.trim()) {
         regionais.add(bloco.regional.trim());
+      }
+      if (bloco.statusDoDesfile && String(bloco.statusDoDesfile).trim()) {
+        status.add(String(bloco.statusDoDesfile).trim());
       }
       if (bloco.dataDoDesfile) {
         const dataFormatada = this.formatarDataParaFiltro(bloco.dataDoDesfile);
@@ -732,6 +739,7 @@ export class BlocosListComponent implements OnInit {
     });
 
     this.regionaisDisponiveis = Array.from(regionais).sort();
+    this.statusDisponiveis = Array.from(status).sort((a, b) => a.localeCompare(b, 'pt-BR'));
     this.datasDesfileDisponiveis = Array.from(datas).sort((a, b) => {
       // Ordena por data (converte dd/mm/yyyy para comparação)
       const [diaA, mesA, anoA] = a.split('/');
@@ -779,12 +787,15 @@ export class BlocosListComponent implements OnInit {
       const regionalMatch = this.filtroRegionais.length === 0 ||
         this.filtroRegionais.includes((bloco.regional || '').trim());
 
+      const statusMatch = this.filtroStatus.length === 0 ||
+        this.filtroStatus.includes(String(bloco.statusDoDesfile || '').trim());
+
       const dataMatch = !this.filtroDataDesfile ||
         this.formatarDataParaFiltro(bloco.dataDoDesfile) === this.filtroDataDesfile;
 
       const livreMatch = this.buscaEmTodosCampos(bloco, this.filtroLivre);
 
-      return nomeMatch && regionalMatch && dataMatch && livreMatch;
+      return nomeMatch && regionalMatch && statusMatch && dataMatch && livreMatch;
     });
 
     // Reseta a paginação ao filtrar
@@ -795,6 +806,8 @@ export class BlocosListComponent implements OnInit {
     this.filtroNome = '';
     this.filtroRegionais = [];
     this.dropdownRegionalAberto = false;
+    this.filtroStatus = [];
+    this.dropdownStatusAberto = false;
     this.filtroDataDesfile = '';
     this.filtroLivre = '';
     this.blocosFiltrados = this.blocos;
@@ -809,6 +822,7 @@ export class BlocosListComponent implements OnInit {
 
   toggleDropdownRegional() {
     this.dropdownRegionalAberto = !this.dropdownRegionalAberto;
+    if (this.dropdownRegionalAberto) this.dropdownStatusAberto = false;
   }
 
   isRegionalSelecionada(regional: string): boolean {
@@ -827,12 +841,41 @@ export class BlocosListComponent implements OnInit {
     this.aplicarFiltros();
   }
 
+  get textoFiltroStatus(): string {
+    if (this.filtroStatus.length === 0) return 'Escolha o status';
+    if (this.filtroStatus.length <= 2) return this.filtroStatus.join(', ');
+    return `${this.filtroStatus.length} status selecionados`;
+  }
+
+  toggleDropdownStatus() {
+    this.dropdownStatusAberto = !this.dropdownStatusAberto;
+    if (this.dropdownStatusAberto) this.dropdownRegionalAberto = false;
+  }
+
+  isStatusSelecionado(status: string): boolean {
+    return this.filtroStatus.includes(status);
+  }
+
+  toggleStatus(status: string) {
+    this.filtroStatus = this.isStatusSelecionado(status)
+      ? this.filtroStatus.filter(s => s !== status)
+      : [...this.filtroStatus, status];
+    this.aplicarFiltros();
+  }
+
+  limparStatus() {
+    this.filtroStatus = [];
+    this.aplicarFiltros();
+  }
+
   @HostListener('document:click', ['$event'])
-  fecharDropdownRegionalAoClicarFora(event: MouseEvent) {
-    if (!this.dropdownRegionalAberto) return;
+  fecharDropdownsAoClicarFora(event: MouseEvent) {
     const alvo = event.target as HTMLElement | null;
-    if (!alvo?.closest('.multi-select')) {
+    if (this.dropdownRegionalAberto && !alvo?.closest('.multi-select-regional')) {
       this.dropdownRegionalAberto = false;
+    }
+    if (this.dropdownStatusAberto && !alvo?.closest('.multi-select-status')) {
+      this.dropdownStatusAberto = false;
     }
   }
 

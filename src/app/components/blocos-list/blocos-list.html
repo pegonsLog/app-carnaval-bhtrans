@@ -40,7 +40,7 @@
       </div>
       <div class="filter-group">
         <label>Regional</label>
-        <div class="multi-select">
+        <div class="multi-select multi-select-regional">
           <button type="button" class="multi-select-toggle" (click)="toggleDropdownRegional()"
             [class.open]="dropdownRegionalAberto">
             <span class="multi-select-text">{{ textoFiltroRegional }}</span>
@@ -59,6 +59,26 @@
         </div>
       </div>
       <div class="filter-group">
+        <label>Status</label>
+        <div class="multi-select multi-select-status">
+          <button type="button" class="multi-select-toggle" (click)="toggleDropdownStatus()"
+            [class.open]="dropdownStatusAberto">
+            <span class="multi-select-text">{{ textoFiltroStatus }}</span>
+            <span class="multi-select-arrow">▾</span>
+          </button>
+          <div class="multi-select-menu" *ngIf="dropdownStatusAberto">
+            <label class="multi-select-option" *ngFor="let status of statusDisponiveis">
+              <input type="checkbox" [checked]="isStatusSelecionado(status)"
+                (change)="toggleStatus(status)">
+              <span>{{ status }}</span>
+            </label>
+            <p class="multi-select-empty" *ngIf="statusDisponiveis.length === 0">Nenhum status disponível</p>
+            <button type="button" class="multi-select-clear" *ngIf="filtroStatus.length > 0"
+              (click)="limparStatus()">Limpar seleção</button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-group">
         <label>Data do Desfile</label>
         <select [(ngModel)]="filtroDataDesfile" (ngModelChange)="aplicarFiltros()">
           <option value="">Escolha a data</option>
@@ -73,7 +93,7 @@
       </div>
     </div>
     <button class="clear-filters-btn" (click)="limparFiltros()"
-      *ngIf="filtroNome || filtroRegionais.length > 0 || filtroDataDesfile || filtroLivre">
+      *ngIf="filtroNome || filtroRegionais.length > 0 || filtroStatus.length > 0 || filtroDataDesfile || filtroLivre">
       Limpar Filtros
     </button>
   </div>

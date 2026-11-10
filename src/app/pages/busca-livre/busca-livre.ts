@@ -211,19 +211,7 @@ export class BuscaLivreComponent implements OnInit {
       bloco.capacidadePublicoDoTrajeto?.toString(),
       
       // Informações Adicionais
-      bloco.informacoesAdicionais,
-      
-      // Responsável Legal
-      bloco.responsavelLegal,
-      bloco.cnpj,
-      bloco.cpf,
-      bloco.email,
-      bloco.telefone,
-      bloco.celular,
-      
-      // Responsável Secundário
-      bloco.nomeResponsavelSecundario,
-      bloco.celularContato2
+      bloco.informacoesAdicionais
     ];
 
     return campos.some(campo => 

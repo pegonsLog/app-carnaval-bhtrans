@@ -155,16 +155,7 @@ export class BlocosListComponent implements OnInit {
     { key: 'areaDoTrajetoM2', label: 'Área (m²)' },
     { key: 'capacidadePublicoDoTrajeto', label: 'Capacidade' },
     // Adicionais
-    { key: 'informacoesAdicionais', label: 'Info. Adicionais' },
-    // Responsável
-    { key: 'responsavelLegal', label: 'Responsável' },
-    { key: 'cnpj', label: 'CNPJ' },
-    { key: 'cpf', label: 'CPF' },
-    { key: 'email', label: 'E-mail' },
-    { key: 'telefone', label: 'Telefone' },
-    { key: 'celular', label: 'Celular' },
-    { key: 'nomeResponsavelSecundario', label: 'Resp. Secundário' },
-    { key: 'celularContato2', label: 'Celular 2' }
+    { key: 'informacoesAdicionais', label: 'Info. Adicionais' }
   ];
 
   // ID do bloco para abrir modal de ações (vindo de query param)

@@ -92,19 +92,6 @@ export class BlocoDetalheComponent {
       campos: [
         { key: 'informacoesAdicionais', label: 'Informações Adicionais' }
       ]
-    },
-    {
-      titulo: 'Responsável Legal',
-      campos: [
-        { key: 'responsavelLegal', label: 'Nome' },
-        { key: 'cnpj', label: 'CNPJ' },
-        { key: 'cpf', label: 'CPF' },
-        { key: 'email', label: 'E-mail' },
-        { key: 'telefone', label: 'Telefone' },
-        { key: 'celular', label: 'Celular' },
-        { key: 'nomeResponsavelSecundario', label: 'Responsável Secundário' },
-        { key: 'celularContato2', label: 'Celular Contato 2' }
-      ]
     }
   ];
 

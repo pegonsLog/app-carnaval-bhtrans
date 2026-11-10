@@ -38,12 +38,3 @@
     areaDoTrajetoM2
     capacidadePublicoDoTrajeto
     informacoesAdicionais
-    responsavelLegal
-    cnpj
-    cpf
-    email
-    telefone
-    celular
-    nomeResponsavelSecundario
-    emailResponsavelSecundario
-    celularContato2

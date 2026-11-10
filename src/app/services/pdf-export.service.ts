@@ -272,23 +272,6 @@ export class PdfExportService {
             y += 5;
         }
 
-        // 8. Responsável Legal
-        y = this.verificarNovaPagina(doc, y);
-        y = this.criarSecao(doc, 'RESPONSÁVEL LEGAL', y);
-        y = this.campoValor(doc, 'Nome', bloco.responsavelLegal, y);
-        y = this.campoValor(doc, 'CNPJ', bloco.cnpj, y);
-        y = this.campoValor(doc, 'CPF', bloco.cpf, y);
-        y = this.campoValor(doc, 'E-mail', bloco.email, y);
-        y = this.campoValor(doc, 'Telefone', bloco.telefone, y);
-        y = this.campoValor(doc, 'Celular', bloco.celular, y);
-        if (bloco.nomeResponsavelSecundario) {
-            y = this.campoValor(doc, 'Responsável Secundário', bloco.nomeResponsavelSecundario, y);
-        }
-        if (bloco.celularContato2) {
-            y = this.campoValor(doc, 'Celular Contato 2', bloco.celularContato2, y);
-        }
-        y += 5;
-
         return y;
     }
 

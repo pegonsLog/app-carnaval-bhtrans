@@ -97,54 +97,6 @@
         </div>
       </section>
 
-      <!-- Responsável -->
-      <section class="doc-section">
-        <h3 class="section-title">RESPONSÁVEL LEGAL</h3>
-        <div class="info-grid">
-          <div class="info-item full">
-            <span class="label">Nome:</span>
-            <span class="value">{{ bloco.responsavelLegal || '-' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="label">CPF:</span>
-            <span class="value">{{ bloco.cpf || '-' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="label">CNPJ:</span>
-            <span class="value">{{ bloco.cnpj || '-' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="label">E-mail:</span>
-            <span class="value">{{ bloco.email || '-' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Telefone:</span>
-            <span class="value">{{ bloco.telefone || '-' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Celular:</span>
-            <span class="value">{{ bloco.celular || '-' }}</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Responsável Secundário -->
-      <section class="doc-section" *ngIf="bloco.nomeResponsavelSecundario || bloco.celularContato2">
-        <h3 class="section-title">RESPONSÁVEL SECUNDÁRIO</h3>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="label">Nome:</span>
-            <span class="value">{{ bloco.nomeResponsavelSecundario || '-' }}</span>
-          </div>
-          <div class="info-item">
-            <span class="label">Celular:</span>
-            <span class="value">{{ bloco.celularContato2 || '-' }}</span>
-          </div>
-        </div>
-      </section>
-
-
-
       <!-- Data e Horários -->
       <section class="doc-section">
         <h3 class="section-title">DATA E HORÁRIOS DO DESFILE</h3>

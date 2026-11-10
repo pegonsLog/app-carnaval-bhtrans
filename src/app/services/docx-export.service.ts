@@ -87,16 +87,6 @@ export class DocxExportService {
       this.campoValor('Regional', bloco.regional),
       new Paragraph({ spacing: { after: 200 } }),
 
-      // Responsável
-      this.subtituloSecao('RESPONSÁVEL LEGAL'),
-      this.campoValor('Nome', bloco.responsavelLegal),
-      this.campoValor('CPF', bloco.cpf),
-      this.campoValor('CNPJ', bloco.cnpj),
-      this.campoValor('E-mail', bloco.email),
-      this.campoValor('Telefone', bloco.telefone),
-      this.campoValor('Celular', bloco.celular),
-      new Paragraph({ spacing: { after: 200 } }),
-
       // Data e Horários
       this.subtituloSecao('DATA E HORÁRIOS DO DESFILE'),
       this.campoValor('Data do Desfile', this.formatarDataFirestore(bloco.dataDoDesfile)),
@@ -157,14 +147,6 @@ export class DocxExportService {
       ...(bloco.informacoesAdicionais ? [
         this.subtituloSecao('INFORMAÇÕES ADICIONAIS'),
         this.campoValor('', bloco.informacoesAdicionais),
-        new Paragraph({ spacing: { after: 200 } }),
-      ] : []),
-
-      // Responsável Secundário
-      ...(bloco.nomeResponsavelSecundario || bloco.celularContato2 ? [
-        this.subtituloSecao('RESPONSÁVEL SECUNDÁRIO'),
-        this.campoValor('Nome', bloco.nomeResponsavelSecundario),
-        this.campoValor('Celular', bloco.celularContato2),
         new Paragraph({ spacing: { after: 200 } }),
       ] : []),
 

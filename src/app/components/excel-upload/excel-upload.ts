@@ -33,9 +33,7 @@ export class ExcelUploadComponent {
     'dimensaoDeVeiculos', 'percurso', 'regional', 'enderecoDeConcentracao',
     'bairroDeConcentracao', 'enderecoDeDispersao', 'bairroDeDispersao',
     'extensaoDoDesfileMetros', 'numeroDeQuadras', 'areaDoTrajetoM2',
-    'capacidadePublicoDoTrajeto', 'informacoesAdicionais', 'responsavelLegal',
-    'cnpj', 'cpf', 'email', 'telefone', 'celular',
-    'nomeResponsavelSecundario', 'emailResponsavelSecundario', 'celularContato2'
+    'capacidadePublicoDoTrajeto', 'informacoesAdicionais'
   ];
 
   displayColumns = [
@@ -51,9 +49,7 @@ export class ExcelUploadComponent {
     { key: 'categoriaDoBloco', label: 'Categoria' },
     { key: 'horarioDeconcentracao', label: 'Concentração' },
     { key: 'inicioDoDesfile', label: 'Início' },
-    { key: 'horarioEncerramento', label: 'Encerramento' },
-    { key: 'responsavelLegal', label: 'Responsável' },
-    { key: 'celular', label: 'Celular' }
+    { key: 'horarioEncerramento', label: 'Encerramento' }
   ];
 
   progressoAtual = 0;
@@ -225,10 +221,7 @@ export class ExcelUploadComponent {
       extensaoDoDesfileMetros: parseFloat(excelRow['extensaoDoDesfileMetros']) || 0,
       numeroDeQuadras: parseInt(excelRow['numeroDeQuadras']) || 0,
       areaDoTrajetoM2: parseFloat(excelRow['areaDoTrajetoM2']) || 0,
-      capacidadePublicoDoTrajeto: parseInt(excelRow['capacidadePublicoDoTrajeto']) || 0,
-      responsavelLegal: excelRow['responsavelLegal'] || '',
-      email: excelRow['email'] || '',
-      celular: excelRow['celular'] || ''
+      capacidadePublicoDoTrajeto: parseInt(excelRow['capacidadePublicoDoTrajeto']) || 0
     };
     if (excelRow['justificativaStatus']) bloco.justificativaStatus = excelRow['justificativaStatus'];
     if (excelRow['publicoAnterior']) {
@@ -242,12 +235,6 @@ export class ExcelUploadComponent {
     if (excelRow['observacoesAnoAnterior']) bloco.observacoesAnoAnterior = excelRow['observacoesAnoAnterior'];
     if (excelRow['dimensaoDeVeiculos']) bloco.dimensaoDeVeiculos = excelRow['dimensaoDeVeiculos'];
     if (excelRow['informacoesAdicionais']) bloco.informacoesAdicionais = excelRow['informacoesAdicionais'];
-    if (excelRow['cnpj']) bloco.cnpj = excelRow['cnpj'];
-    if (excelRow['cpf']) bloco.cpf = excelRow['cpf'];
-    if (excelRow['telefone']) bloco.telefone = excelRow['telefone'];
-    if (excelRow['nomeResponsavelSecundario']) bloco.nomeResponsavelSecundario = excelRow['nomeResponsavelSecundario'];
-    if (excelRow['emailResponsavelSecundario']) bloco.emailResponsavelSecundario = excelRow['emailResponsavelSecundario'];
-    if (excelRow['celularContato2']) bloco.celularContato2 = excelRow['celularContato2'];
     return bloco as Blocos;
   }
 

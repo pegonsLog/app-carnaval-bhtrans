@@ -52,17 +52,4 @@ export interface Blocos {
 
     // Informações Adicionais
     informacoesAdicionais?: string;
-
-    // Responsável Legal
-    responsavelLegal: string;
-    cnpj?: string;
-    cpf?: string;
-    email: string;
-    telefone?: string;
-    celular: string;
-
-    // Responsável Secundário
-    nomeResponsavelSecundario?: string;
-    emailResponsavelSecundario?: string;
-    celularContato2?: string;
 }

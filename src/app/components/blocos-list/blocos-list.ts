@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -54,7 +54,8 @@ export class BlocosListComponent implements OnInit {
 
   // Filtros
   filtroNome = '';
-  filtroRegional = '';
+  filtroRegionais: string[] = [];
+  dropdownRegionalAberto = false;
   filtroDataDesfile = '';
   filtroLivre = '';
   regionaisDisponiveis: string[] = [];
@@ -239,7 +240,7 @@ export class BlocosListComponent implements OnInit {
         this.isLoadingTodos = false;
 
         // Aplica filtros se houver algum ativo
-        if (this.filtroNome || this.filtroRegional || this.filtroDataDesfile || this.filtroLivre) {
+        if (this.filtroNome || this.filtroRegionais.length > 0 || this.filtroDataDesfile || this.filtroLivre) {
           this.aplicarFiltros();
         } else {
           this.blocosFiltrados = this.blocos;
@@ -775,8 +776,8 @@ export class BlocosListComponent implements OnInit {
       const nomeMatch = !this.filtroNome ||
         (bloco.nomeDoBloco || '').toLowerCase().includes(this.filtroNome.toLowerCase());
 
-      const regionalMatch = !this.filtroRegional ||
-        bloco.regional === this.filtroRegional;
+      const regionalMatch = this.filtroRegionais.length === 0 ||
+        this.filtroRegionais.includes((bloco.regional || '').trim());
 
       const dataMatch = !this.filtroDataDesfile ||
         this.formatarDataParaFiltro(bloco.dataDoDesfile) === this.filtroDataDesfile;
@@ -792,11 +793,47 @@ export class BlocosListComponent implements OnInit {
 
   limparFiltros() {
     this.filtroNome = '';
-    this.filtroRegional = '';
+    this.filtroRegionais = [];
+    this.dropdownRegionalAberto = false;
     this.filtroDataDesfile = '';
     this.filtroLivre = '';
     this.blocosFiltrados = this.blocos;
     this.blocosExibidos = this.blocos.slice(0, this.limitePaginacao);
+  }
+
+  get textoFiltroRegional(): string {
+    if (this.filtroRegionais.length === 0) return 'Escolha a regional';
+    if (this.filtroRegionais.length <= 2) return this.filtroRegionais.join(', ');
+    return `${this.filtroRegionais.length} regionais selecionadas`;
+  }
+
+  toggleDropdownRegional() {
+    this.dropdownRegionalAberto = !this.dropdownRegionalAberto;
+  }
+
+  isRegionalSelecionada(regional: string): boolean {
+    return this.filtroRegionais.includes(regional);
+  }
+
+  toggleRegional(regional: string) {
+    this.filtroRegionais = this.isRegionalSelecionada(regional)
+      ? this.filtroRegionais.filter(r => r !== regional)
+      : [...this.filtroRegionais, regional];
+    this.aplicarFiltros();
+  }
+
+  limparRegionais() {
+    this.filtroRegionais = [];
+    this.aplicarFiltros();
+  }
+
+  @HostListener('document:click', ['$event'])
+  fecharDropdownRegionalAoClicarFora(event: MouseEvent) {
+    if (!this.dropdownRegionalAberto) return;
+    const alvo = event.target as HTMLElement | null;
+    if (!alvo?.closest('.multi-select')) {
+      this.dropdownRegionalAberto = false;
+    }
   }
 
   getDiaSemana(dataStr: string): string {

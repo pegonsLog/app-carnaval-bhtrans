@@ -40,10 +40,23 @@
       </div>
       <div class="filter-group">
         <label>Regional</label>
-        <select [(ngModel)]="filtroRegional" (ngModelChange)="aplicarFiltros()">
-          <option value="">Escolha a regional</option>
-          <option *ngFor="let regional of regionaisDisponiveis" [value]="regional">{{ regional }}</option>
-        </select>
+        <div class="multi-select">
+          <button type="button" class="multi-select-toggle" (click)="toggleDropdownRegional()"
+            [class.open]="dropdownRegionalAberto">
+            <span class="multi-select-text">{{ textoFiltroRegional }}</span>
+            <span class="multi-select-arrow">▾</span>
+          </button>
+          <div class="multi-select-menu" *ngIf="dropdownRegionalAberto">
+            <label class="multi-select-option" *ngFor="let regional of regionaisDisponiveis">
+              <input type="checkbox" [checked]="isRegionalSelecionada(regional)"
+                (change)="toggleRegional(regional)">
+              <span>{{ regional }}</span>
+            </label>
+            <p class="multi-select-empty" *ngIf="regionaisDisponiveis.length === 0">Nenhuma regional disponível</p>
+            <button type="button" class="multi-select-clear" *ngIf="filtroRegionais.length > 0"
+              (click)="limparRegionais()">Limpar seleção</button>
+          </div>
+        </div>
       </div>
       <div class="filter-group">
         <label>Data do Desfile</label>
@@ -60,7 +73,7 @@
       </div>
     </div>
     <button class="clear-filters-btn" (click)="limparFiltros()"
-      *ngIf="filtroNome || filtroRegional || filtroDataDesfile || filtroLivre">
+      *ngIf="filtroNome || filtroRegionais.length > 0 || filtroDataDesfile || filtroLivre">
       Limpar Filtros
     </button>
   </div>
